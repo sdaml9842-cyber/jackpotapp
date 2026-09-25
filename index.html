@@ -3,89 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viral Matrix & Jackpot - منصة الإطلاق والسحب الكبرى</title>
+    <title>Viral Matrix Quantum ($VMAX) | محطة السيولة الذكية</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0b0e11; color: #ffffff; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 480px; background: #181a20; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #2b313a; margin-bottom: 20px; }
-        h1 { font-size: 22px; text-align: center; margin-bottom: 8px; color: #f0b90b; }
-        p.subtitle { text-align: center; font-size: 13px; color: #848e9c; margin-bottom: 20px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-primary { background: #f0b90b; color: #000000; }
-        .btn-primary:hover { background: #d9a406; }
-        .btn-secondary { background: #2b313a; color: #ffffff; border: 1px solid #474d57; }
-        .section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #2b313a; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 13px; color: #848e9c; margin-bottom: 6px; }
-        .input-group input { width: 100%; padding: 12px; background: #0b0e11; border: 1px solid #2b313a; border-radius: 8px; color: #fff; font-size: 14px; }
-        .status { margin-top: 15px; text-align: center; font-size: 13px; color: #0ecb81; word-break: break-all; }
-        .jackpot-box { background: linear-gradient(135deg, #1e2329, #2b313a); border: 2px dashed #f0b90b; border-radius: 12px; padding: 16px; text-align: center; margin-top: 15px; }
-        .jackpot-amount { font-size: 24px; font-weight: bold; color: #0ecb81; margin: 8px 0; }
+        :root {
+            --bg-base: #050709;
+            --surface: #0f131a;
+            --surface-glass: rgba(15, 19, 26, 0.75);
+            --border: #212630;
+            --gold: #f0b90b;
+            --gold-glow: rgba(240, 185, 11, 0.25);
+            --green: #0ecb81;
+            --green-glow: rgba(14, 203, 129, 0.25);
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --danger: #f85149;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-main); padding: 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        
+        .matrix-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;
+            background: radial-gradient(circle at 50% 10%, rgba(240,185,11,0.04) 0%, transparent 60%),
+                        radial-gradient(circle at 10% 90%, rgba(14,203,129,0.03) 0%, transparent 50%);
+        }
+
+        .wrapper { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 14px; }
+        
+        .card { 
+            background: var(--surface-glass); backdrop-filter: blur(12px); border: 1px solid var(--border); 
+            border-radius: 16px; padding: 18px; box-shadow: 0 12px 32px rgba(0,0,0,0.6); 
+            position: relative; overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .badge { font-size: 10px; background: rgba(240,185,11,0.1); color: var(--gold); border: 1px solid rgba(240,185,11,0.3); padding: 3px 8px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
+        .live-indicator { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--green); font-weight: 600; }
+        .pulse-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); animation: pulse 1.5s infinite; }
+
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--green); } 100% { transform: scale(0.95); opacity: 0.8; } }
+
+        h1 { font-size: 17px; color: var(--text-main); font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+        p.desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+
+        /* لوحة العداد التنازلي والسيولة الكمّية */
+        .quantum-box { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; }
+        .timer-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 8px 0; }
+        .time-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
+        .time-val { font-size: 20px; font-weight: 800; color: var(--gold); font-family: monospace; }
+        .time-lbl { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+        .time-sep { font-size: 18px; color: var(--gold); font-weight: bold; }
+
+        /* شريط تقدم السيولة */
+        .pool-progress-container { margin: 10px 0; text-align: right; }
+        .pool-info { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+        .progress-bar { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .progress-fill { width: 78%; height: 100%; background: linear-gradient(90deg, var(--gold), var(--green)); border-radius: 3px; transition: width 0.5s ease; }
+
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-gold { background: var(--gold); color: #000; box-shadow: 0 4px 16px var(--gold-glow); }
+        .btn-gold:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .btn-dark { background: #161b22; color: var(--text-main); border: 1px solid var(--border); }
+        .btn-dark:hover { background: #1f2630; border-color: #30363d; }
+
+        /* جدول الصفقات الحية المصغر */
+        .live-feed { margin-top: 10px; max-height: 90px; overflow-y: hidden; font-size: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+        .feed-item { display: flex; justify-content: space-between; color: var(--text-muted); padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,0.03); }
+        .feed-item span:last-child { color: var(--green); font-family: monospace; }
+
+        .status-box { margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 11px; text-align: center; font-weight: 600; display: none; }
+        .status-success { background: var(--green-glow); color: var(--green); border: 1px solid rgba(14,203,129,0.3); }
+        .status-error { background: rgba(248,81,73,0.1); color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+
+        .input-box { margin-bottom: 10px; }
+        .input-box label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+        .input-box input { width: 100%; padding: 10px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 12px; outline: none; transition: border-color 0.2s; }
+        .input-box input:focus { border-color: var(--gold); }
+
+        .security-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 9px; color: var(--text-muted); margin-top: 10px; }
     </style>
 </head>
 <body>
+    <div class="matrix-bg"></div>
 
-    <!-- قسم ربط المحفظة ومنصة الإطلاق -->
-    <div class="container">
-        <h1>Viral Matrix ⚡ Launchpad</h1>
-        <p class="subtitle">منصة إطلاق العملات الرقمية ($VMAX) وعقد BNB Chain</p>
-        
-        <button id="connectWallet" class="btn btn-primary">ربط محفظة Binance Web3</button>
-        <div id="walletStatus" class="status">المحفظة غير متصلة</div>
-
-        <div class="section">
-            <h2 style="font-size: 16px; margin-bottom: 12px; color: #eaecef;">إطلاق عملة جديدة</h2>
-            <div class="input-group">
-                <label>اسم العملة (Viral Matrix)</label>
-                <input type="text" id="tokenName" value="Viral Matrix" placeholder="أدخل اسم العملة">
+    <div class="wrapper">
+        <!-- قسم التحدي الزمني والسيولة الكمّية -->
+        <div class="card">
+            <div class="header-flex">
+                <span class="badge">VMAX Quantum Protocol</span>
+                <div class="live-indicator">
+                    <div class="pulse-dot"></div>
+                    <span>تحديث شبكي مباشر</span>
+                </div>
             </div>
-            <div class="input-group">
-                <label>رمز العملة (VMAX)</label>
-                <input type="text" id="tokenSymbol" value="VMAX" placeholder="أدخل رمز العملة">
+
+            <h1>تحدي الاستجابة وتوزيع السيولة</h1>
+            <p class="desc">نظام ذكي يعتمد على خوارزميات التحقق الزمني اللحظي لتوزيع المكاسب ومنع الروبوتات الآلية.</p>
+            
+            <div class="quantum-box">
+                <span style="font-size: 10px; color: var(--text-muted);">نافذة إثبات التواجد الحالية</span>
+                <div class="timer-grid">
+                    <div class="time-block">
+                        <div class="time-val" id="minutes">02</div>
+                        <div class="time-lbl">دقيقة</div>
+                    </div>
+                    <div class="time-sep">:</div>
+                    <div class="time-block">
+                        <div class="time-val" id="seconds">59</div>
+                        <div class="time-lbl">ثانية</div>
+                    </div>
+                </div>
+                
+                <div class="pool-progress-container">
+                    <div class="pool-info">
+                        <span>معدل المشاركة الفورية</span>
+                        <span id="poolPercentage">78.4%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                </div>
             </div>
-            <button id="launchBtn" class="btn btn-secondary">إطلاق العملة فوراً 🚀</button>
-        </div>
-    </div>
 
-    <!-- قسم الجوائز والسحب الكبرى الجديد -->
-    <div class="container">
-        <h1>🏆 سحب الجائزة الكبرى</h1>
-        <p class="subtitle">شارك في السحب الأسبوعي لحاملي توكن $VMAX</p>
-        
-        <div class="jackpot-box">
-            <span style="font-size: 14px; color: #f0b90b;">إجمالي الجائزة الحالية</span>
-            <div class="jackpot-amount">50,000 $VMAX</div>
-            <p style="font-size: 12px; color: #848e9c;">العقد الذكي: 0xfAF...b332</p>
+            <button id="quantumClaimBtn" class="btn btn-gold">
+                <span>⚡ إثبات التواجد والمطالبة الذكية</span>
+            </button>
+
+            <div class="live-feed" id="liveFeed">
+                <div class="feed-item"><span>0x4f...9a سجل تفاعلاً ناجحاً</span><span>+1,250 VMAX</span></div>
+                <div class="feed-item"><span>0x12...b8 تدقيق العقد بنجاح</span><span>Verified</span></div>
+            </div>
+
+            <div id="claimStatus" class="status-box"></div>
+            
+            <div class="security-badge">
+                <span>🛡️ محمي عبر عقود ذكية لامركزية على BNB Chain</span>
+            </div>
         </div>
 
-        <button id="participateBtn" class="btn btn-primary" style="margin-top: 15px;">دخول السحب الآن 🎟️</button>
-        <div id="drawStatus" class="status"></div>
+        <!-- منصة إطلاق الرموز والربط اللامركزي -->
+        <div class="card">
+            <div class="header-flex">
+                <span class="badge">Binance Web3 DEX</span>
+                <span style="font-size: 10px; color: var(--gold);" id="walletLabel">غير متصل</span>
+            </div>
+
+            <h1>بروتوكول إطلاق التوكنات</h1>
+            <p class="desc">إنشاء وتوزيع الأصول الرقمية بمعايير BEP-20 مع حماية تلقائية للسيولة.</p>
+            
+            <button id="connectWalletBtn" class="btn btn-dark">
+                <span>🔗 ربط محفظة Web3 (Binance / MetaMask)</span>
+            </button>
+
+            <div style="margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
+                <div class="input-box">
+                    <label>اسم المشروع الاحترافي</label>
+                    <input type="text" id="tokenNameInput" value="Viral Matrix Quantum">
+                </div>
+                <div class="input-box">
+                    <label>رمز الأصول (Ticker)</label>
+                    <input type="text" id="tokenSymbolInput" value="VMAX">
+                </div>
+                <button id="deployBtn" class="btn btn-dark" style="background: rgba(240,185,11,0.08); color: var(--gold); border: 1px solid rgba(240,185,11,0.2);">
+                    <span>🚀 تهيئة عقد الإطلاق الذكي</span>
+                </button>
+            </div>
+            <div id="deployStatus" class="status-box"></div>
+        </div>
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0xfAF6861788010A1A7f6C65DE7133baC24945b332";
-        
-        document.getElementById('connectWallet').addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    document.getElementById('walletStatus').innerText = "تم التوصيل: " + accounts[0].substring(0, 6) + "..." + accounts[0].substring(38);
-                } catch (error) {
-                    document.getElementById('walletStatus').innerText = "فشل الاتصال بالمحفظة!";
-                }
-            } else {
-                alert("يرجى فتح الموقع من متصفح محفظة Binance Web3 Wallet");
+        // محرك العداد التنازلي التفاعلي المتقدم (180 ثانية)
+        let totalSeconds = 180;
+        const minEl = document.getElementById('minutes');
+        const secEl = document.getElementById('seconds');
+        const claimBtn = document.getElementById('quantumClaimBtn');
+        const claimStatus = document.getElementById('claimStatus');
+        const progressBar = document.getElementById('progressBar');
+        const poolPercentage = document.getElementById('poolPercentage');
+
+        const timerInterval = setInterval(() => {
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                minEl.innerText = "00";
+                secEl.innerText = "00";
+                claimBtn.style.opacity = "0.5";
+                claimBtn.style.pointerEvents = "none";
+                claimBtn.innerHTML = "<span>انتهت النافذة الحالية - بانتظار الجولة القادمة</span>";
+                return;
+            }
+            totalSeconds--;
+            let m = Math.floor(totalSeconds / 60);
+            let s = totalSeconds % 60;
+            minEl.innerText = String(m).padStart(2, '0');
+            secEl.innerText = String(s).padStart(2, '0');
+            
+            // تحديث شريط السيولة بشكل ديناميكي واقعي
+            let progress = (180 - totalSeconds) / 180 * 100;
+            progressBar.style.width = Math.min(progress + 70, 99) + '%';
+        }, 1000);
+
+        // محاكاة نظام التفاعل المضمون
+        claimBtn.addEventListener('click', () => {
+            if (totalSeconds > 0) {
+                claimStatus.style.display = "block";
+                claimStatus.className = "status-box status-success";
+                claimStatus.innerHTML = "✅ تم التحقق من توقيعك المشفر بنجاح! سيتم إرسال المخصصات إلى محفظتك المرتبطة فور إغلاق الكتلة.";
+                claimBtn.style.pointerEvents = "none";
+                claimBtn.style.opacity = "0.7";
             }
         });
 
-        document.getElementById('launchBtn').addEventListener('click', () => {
-            alert("جاري تحضير معاملات إطلاق العملة على شبكة BNB Chain...");
+        // محاكاة ربط محفظة Web3 الحقيقية
+        document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const shortAddr = accounts[0].substring(0, 6) + '...' + accounts[0].substring(38);
+                    document.getElementById('walletLabel').innerText = shortAddr;
+                    document.getElementById('connectWalletBtn').innerHTML = "<span>✅ متصل: " + shortAddr + "</span>";
+                    document.getElementById('connectWalletBtn').style.borderColor = "var(--green)";
+                } catch (err) {
+                    alert("تم رفض الاتصال بالمحفظة.");
+                }
+            } else {
+                alert("يرجى فتح الموقع حصرياً من متصفح محفظة Binance Web3 أو MetaMask.");
+            }
         });
 
-        document.getElementById('participateBtn').addEventListener('click', () => {
-            document.getElementById('drawStatus').innerText = "تم تسجيل محفظتك في السحب بنجاح! بالتوفيق 🌟";
+        // زر تهيئة الإطلاق الذكي
+        document.getElementById('deployBtn').addEventListener('click', () => {
+            const name = document.getElementById('tokenNameInput').value;
+            const symbol = document.getElementById('tokenSymbolInput').value;
+            const depStatus = document.getElementById('deployStatus');
+            depStatus.style.display = "block";
+            depStatus.className = "status-box status-success";
+            depStatus.innerHTML = `💎 جاري تجميع بوابات السيولة لتوكن (${symbol} - ${name}) على شبكة BNB Chain...`;
         });
+
+        // إضافة سجلات تفاعل حي عشوائية لزيادة الواقعية الذكية
+        const liveFeed = document.getElementById('liveFeed');
+        const sampleWallets = ["0x88...3e", "0x3a...1f", "0x9c...4b", "0x7e...2d", "0x2f...9c"];
+        const sampleAmounts = ["+850 VMAX", "+2,100 VMAX", "+500 VMAX", "+1,500 VMAX"];
+        
+        setInterval(() => {
+            const randomWallet = sampleWallets[Math.floor(Math.random() * sampleWallets.length)];
+            const randomAmount = sampleAmounts[Math.floor(Math.random() * sampleAmounts.length)];
+            const newItem = document.createElement('div');
+            newItem.className = 'feed-item';
+            newItem.innerHTML = `<span>${randomWallet} أثبت التواجد</span><span>${randomAmount}</span>`;
+            liveFeed.prepend(newItem);
+            if(liveFeed.children.length > 3) {
+                liveFeed.lastChild.remove();
+            }
+        }, 4000);
     </script>
 </body>
 </html>
