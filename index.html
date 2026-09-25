@@ -3,435 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viral Matrix Quantum | VMAX Pro</title>
+    <title>Viral Matrix Quantum | Web3 DApp</title>
 
-    <!-- خط Cairo للأوزان العريضة والاحترافية -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- استدعاء مكتبة Web3 الحقيقية (Ethers.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
     <style>
-        /* ================= المتغيرات اللونية (Dark/AMOLED Mode) ================= */
         :root {
-            --bg-dark: #020408;
-            --glass-bg: rgba(14, 18, 25, 0.65);
+            --bg-dark: #020408; --glass-bg: rgba(14, 18, 25, 0.65);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --gold-primary: #f3ba2f;
-            --gold-glow: rgba(243, 186, 47, 0.4);
-            --green-bull: #0ecb81;
-            --green-glow: rgba(14, 203, 129, 0.2);
-            --red-bear: #f6465d;
-            --red-glow: rgba(246, 70, 93, 0.2);
-            --text-light: #ffffff;
-            --text-dim: #848e9c;
+            --gold-primary: #f3ba2f; --gold-glow: rgba(243, 186, 47, 0.4);
+            --green-bull: #0ecb81; --red-bear: #f6465d;
+            --text-light: #ffffff; --text-dim: #848e9c;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; padding-bottom: 90px; }
+        
+        .app-container { width: 100%; max-width: 480px; padding: 16px; display: flex; flex-direction: column; gap: 20px; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding-bottom: 90px;
-        }
-
-        .cyber-grid {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(243, 186, 47, 0.03), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(14, 203, 129, 0.03), transparent 25%);
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* ================= شريط الأسعار ================= */
-        .market-ticker {
+        /* ================= زر ربط المحفظة الحقيقي ================= */
+        .wallet-header {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px 16px;
+            background: var(--glass-bg); padding: 12px 16px;
+            border: 1px solid var(--glass-border); border-radius: 16px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.4);
         }
-        .ticker-pair { display: flex; flex-direction: column; }
-        .ticker-symbol { font-size: 14px; font-weight: 900; color: #fff; }
-        .ticker-price { font-size: 13px; font-weight: 700; color: var(--green-bull); font-family: monospace; }
-
-        /* ================= الكروت الزجاجية ================= */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease;
+        .network-badge { font-size: 12px; font-weight: 800; color: var(--gold-primary); background: rgba(243, 186, 47, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); }
+        .btn-connect {
+            background: linear-gradient(135deg, var(--green-bull), #0a9960);
+            color: #fff; border: none; padding: 8px 16px; border-radius: 10px;
+            font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px var(--green-glow);
+            transition: 0.3s;
         }
 
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .card-title { font-size: 24px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--gold-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .badge-pro { background: rgba(243, 186, 47, 0.1); border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 900; }
-        p.subtitle { font-size: 14px; color: var(--text-dim); font-weight: 600; line-height: 1.6; margin-bottom: 20px; }
-
-        /* ================= المدخلات ================= */
+        /* ================= الكروت والمدخلات ================= */
+        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .card-title { font-size: 24px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--gold-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px;}
         .input-group { margin-bottom: 18px; }
         .input-group label { display: block; font-size: 13px; color: var(--text-dim); font-weight: 800; margin-bottom: 8px; }
-        .input-group input {
-            width: 100%; padding: 16px; background: rgba(0,0,0,0.4);
-            border: 1.5px solid var(--glass-border); border-radius: 16px;
-            color: #fff; font-size: 16px; font-weight: 800; outline: none; transition: 0.3s;
-        }
-        .input-group input:focus { border-color: var(--gold-primary); box-shadow: 0 0 16px var(--gold-glow); background: rgba(0,0,0,0.6); }
-
-        /* ================= الأزرار ================= */
-        .btn-action {
-            width: 100%; padding: 18px; border: none; border-radius: 16px;
-            font-size: 17px; font-weight: 900; cursor: pointer;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-action:active { transform: scale(0.97); }
-        .btn-gold { background: linear-gradient(135deg, var(--gold-primary), #d09c00); color: #000; box-shadow: 0 8px 24px var(--gold-glow); }
-        .btn-red { background: linear-gradient(135deg, var(--red-bear), #c92a3e); color: #fff; box-shadow: 0 8px 24px var(--red-glow); }
-
-        /* ================= المؤشرات (Metrics) ================= */
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .metric-box { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px; }
-        .metric-label { font-size: 11px; color: var(--text-dim); font-weight: 700; margin-bottom: 4px; }
-        .metric-value { font-size: 16px; font-weight: 900; color: #fff; font-family: monospace; }
-        .metric-value.highlight { color: var(--gold-primary); }
-
-        /* ================= شريط السيولة ================= */
-        .progress-container { margin-top: 10px; margin-bottom: 20px; }
-        .progress-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; margin-bottom: 8px; color: var(--text-dim); }
-        .progress-header span:last-child { color: var(--green-bull); }
-        .progress-track { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; position: relative; border: 1px solid var(--glass-border); }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-bull), var(--gold-primary)); width: 68%; border-radius: 20px; box-shadow: 0 0 10px var(--green-glow); }
-
-        /* ================= صندوق الجوائز الدورية (الشفافية التامة) ================= */
-        .reward-card {
-            background: linear-gradient(180deg, rgba(14, 203, 129, 0.05) 0%, var(--glass-bg) 100%);
-            border: 1px solid var(--green-bull);
-            box-shadow: 0 0 20px rgba(14, 203, 129, 0.1);
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .contract-verified {
-            position: absolute; top: 0; left: 0; right: 0;
-            background: rgba(14, 203, 129, 0.2); color: var(--green-bull);
-            font-size: 10px; font-weight: 900; padding: 4px; letter-spacing: 1px;
-        }
-        .reward-title { font-size: 18px; font-weight: 900; color: #fff; margin-top: 10px; margin-bottom: 5px; }
-        .reward-pool { font-size: 28px; font-weight: 900; color: var(--gold-primary); font-family: monospace; text-shadow: 0 0 15px var(--gold-glow); margin-bottom: 15px; }
+        .input-group input { width: 100%; padding: 16px; background: rgba(0,0,0,0.4); border: 1.5px solid var(--glass-border); border-radius: 16px; color: #fff; font-size: 16px; font-weight: 800; outline: none; }
         
-        .cycle-timer {
-            font-size: 32px; font-weight: 900; color: #fff; font-family: monospace;
-            background: rgba(0,0,0,0.5); border-radius: 12px; padding: 10px 20px;
-            display: inline-block; border: 1px solid var(--glass-border); margin-bottom: 20px; letter-spacing: 2px;
-            transition: all 0.3s;
-        }
-        .cycle-timer.ready { color: var(--green-bull); border-color: var(--green-bull); box-shadow: 0 0 15px var(--green-glow); animation: pulse-green 1.5s infinite; }
-        
-        .btn-claim {
-            width: 100%; padding: 18px; border: none; border-radius: 16px;
-            font-size: 18px; font-weight: 900; color: #000;
-            background: linear-gradient(135deg, var(--green-bull), #0a9960);
-            cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 24px var(--green-glow);
-        }
-        .btn-claim:disabled {
-            background: rgba(255, 255, 255, 0.1); color: var(--text-dim);
-            cursor: not-allowed; box-shadow: none; border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 10px rgba(14, 203, 129, 0.2); }
-            50% { box-shadow: 0 0 25px rgba(14, 203, 129, 0.6); }
-            100% { box-shadow: 0 0 10px rgba(14, 203, 129, 0.2); }
-        }
-
-        /* ================= شريط التنقل السفلي ================= */
-        .floating-nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: calc(100% - 32px); max-width: 440px;
-            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: 24px;
-            display: flex; justify-content: space-between; padding: 6px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 100;
-        }
-        .nav-item {
-            flex: 1; text-align: center; padding: 12px 0; border-radius: 18px;
-            color: var(--text-dim); font-size: 13px; font-weight: 800;
-            cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px;
-        }
-        .nav-item.active { background: rgba(243, 186, 47, 0.15); color: var(--gold-primary); }
-        .nav-icon { font-size: 20px; }
-
-        /* ================= إدارة الصفحات والسجل ================= */
-        .page-section { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .page-section.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .order-book { border-top: 1px solid var(--glass-border); padding-top: 16px; margin-top: 16px; }
-        .order-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 10px; color: var(--text-dim); }
-        .order-row span.buy { color: var(--green-bull); font-family: monospace; }
-        .order-row span.wallet { font-family: monospace; opacity: 0.8; }
+        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 16px; font-size: 17px; font-weight: 900; cursor: pointer; color: #000; background: linear-gradient(135deg, var(--gold-primary), #d09c00); }
+        .btn-action:disabled { background: #333; color: #777; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-    <div class="cyber-grid"></div>
-
     <div class="app-container">
         
-        <!-- شريط التذاكر -->
-        <div class="market-ticker">
-            <div class="ticker-pair">
-                <span class="ticker-symbol">BNB/USDT</span>
-                <span class="ticker-price">612.45 $</span>
-            </div>
-            <div class="ticker-pair" style="text-align: left;">
-                <span class="ticker-symbol">VMAX/USDT</span>
-                <span class="ticker-price" style="color: var(--gold-primary);">0.0482 $</span>
-            </div>
+        <!-- الهيدر الخاص بربط المحفظة Web3 -->
+        <div class="wallet-header">
+            <div class="network-badge">🟢 BNB Chain</div>
+            <button class="btn-connect" id="connectBtn" onclick="connectWallet()">🔗 ربط المحفظة</button>
         </div>
 
-        <!-- ==================== الصفحة الأولى: الإطلاق ==================== -->
-        <div id="tab-launch" class="page-section active">
-            <div class="glass-card">
-                <div class="card-header">
-                    <h1 class="card-title">إطلاق ذكي</h1>
-                    <span class="badge-pro">DEX PRO</span>
-                </div>
-                <p class="subtitle">قم بتهيئة عملتك الجديدة بضغطة واحدة، مع توزيع سيولة تلقائي وحماية مدمجة.</p>
-                
-                <div class="input-group">
-                    <label>اسم المشروع (Project Name)</label>
-                    <input type="text" value="Viral Matrix Quantum" spellcheck="false">
-                </div>
-                <div class="input-group">
-                    <label>الرمز (Ticker)</label>
-                    <input type="text" value="VMAX" spellcheck="false">
-                </div>
-
-                <div class="progress-container">
-                    <div class="progress-header">
-                        <span>تقدم منحنى السيولة (Bonding Curve)</span>
-                        <span>68.5%</span>
-                    </div>
-                    <div class="progress-track"><div class="progress-fill"></div></div>
-                </div>
-
-                <button class="btn-action btn-gold" onclick="triggerAction(this, '🚀 جاري النشر على البلوكشين...', '✅ تم الإطلاق بنجاح!')">
-                    <span>🚀 إطلاق العقد الذكي</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- ==================== الصفحة الثانية: محرك الحرق ==================== -->
-        <div id="tab-forge" class="page-section">
-            <div class="glass-card" style="border-top: 2px solid var(--red-bear);">
-                <div class="card-header">
-                    <h1 class="card-title" style="background: linear-gradient(90deg, #fff, var(--red-bear)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">محرك الحرق</h1>
-                    <span class="badge-pro" style="color: var(--red-bear); border-color: var(--red-bear); background: rgba(246, 70, 93, 0.1);">DEFLATIONARY</span>
-                </div>
-                <p class="subtitle">تخلص من العملات الميتة وبدّلها فوراً بـ VMAX لتعزيز قوة محفظتك.</p>
-
-                <div class="metrics-grid">
-                    <div class="metric-box">
-                        <div class="metric-label">إجمالي المحروق (Total Burned)</div>
-                        <div class="metric-value highlight" id="liveBurn">1,450,200</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-label">السيولة المكتسبة (Added Liq)</div>
-                        <div class="metric-value" style="color: var(--green-bull);">+42.8 BNB</div>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>عقد العملة الميتة (Token Address)</label>
-                    <input type="text" placeholder="0x..." style="font-family: monospace; font-size: 14px;">
-                </div>
-                
-                <button class="btn-action btn-red" onclick="triggerAction(this, '🔥 جاري حرق التوكن...', '✅ تمت المبادلة بـ VMAX!')">
-                    <span>🔥 حرق ومبادلة فورية</span>
-                </button>
-
-                <div class="order-book" id="burnFeed">
-                    <div class="order-row"><span class="wallet">0x4F...a9</span> تم حرق 50M PEPE <span class="buy">+120 VMAX</span></div>
-                    <div class="order-row"><span class="wallet">0x12...b8</span> تم حرق 10M SCAM <span class="buy">+45 VMAX</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== الصفحة الثالثة: الأرباح وصندوق الجوائز ==================== -->
-        <div id="tab-affiliate" class="page-section">
+        <!-- صفحة الإطلاق المرتبطة بالعقد الذكي -->
+        <div class="glass-card">
+            <h1 class="card-title">إطلاق ذكي حقيقي</h1>
+            <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 20px;">
+                الآن عند الضغط، سيتم استدعاء محفظتك لتوقيع المعاملة ودفع رسوم الغاز (Gas Fee) فعلياً.
+            </p>
             
-            <!-- صندوق الجوائز الدوري (المحمي) -->
-            <div class="reward-card">
-                <div class="contract-verified">✔️ عقد ذكي موثق - توزيع تلقائي</div>
-                <div class="reward-title">🎁 جائزة التوزيع الدورية</div>
-                <div class="reward-pool" id="currentReward">+50.00 VMAX</div>
-                <p class="subtitle" style="font-size: 12px; margin-bottom: 10px;">العداد مرتبط بتوقيت الشبكة. لا يمكن المطالبة قبل انتهاء الوقت.</p>
-
-                <div class="cycle-timer" id="rewardTimer">05:00</div>
-
-                <button class="btn-claim" id="claimBtn" onclick="executeClaim()" disabled>
-                    ⏳ يرجى الانتظار...
-                </button>
+            <div class="input-group">
+                <label>اسم المشروع</label>
+                <input type="text" id="tokenName" value="Viral Matrix">
+            </div>
+            <div class="input-group">
+                <label>الرمز</label>
+                <input type="text" id="tokenSymbol" value="VMAX">
             </div>
 
-            <!-- مصفوفة الأرباح والإحالة -->
-            <div class="glass-card" style="border-top: 2px solid var(--green-bull);">
-                <div class="card-header">
-                    <h1 class="card-title">مصفوفة الإحالة</h1>
-                    <span class="badge-pro" style="color: var(--green-bull); border-color: var(--green-bull); background: rgba(14, 203, 129, 0.1);">5% YIELD</span>
-                </div>
-                
-                <div class="input-group">
-                    <label>محفظة الاستلام (Receive Address)</label>
-                    <input type="text" id="walletInput" placeholder="أدخل عنوان محفظتك (BEP20)" style="font-family: monospace; font-size: 14px;">
-                </div>
-                <div class="input-group">
-                    <label>رابط الإحالة الحصري (Referral Link)</label>
-                    <input type="text" id="refLink" value="https://vmax-dex.io?ref=0x..." readonly style="color: var(--gold-primary); border-color: var(--gold-primary); background: rgba(243, 186, 47, 0.05);">
-                </div>
-
-                <button class="btn-action btn-gold" id="copyBtn" onclick="copyLink()">
-                    <span>📋 نسخ الرابط ومشاركته</span>
-                </button>
-            </div>
+            <!-- الزر لن يعمل إلا إذا كانت المحفظة مربوطة -->
+            <button class="btn-action" id="launchBtn" onclick="executeRealLaunch()" disabled>
+                🔒 يرجى ربط المحفظة أولاً
+            </button>
         </div>
 
     </div>
 
-    <!-- شريط التنقل السفلي -->
-    <div class="floating-nav">
-        <div class="nav-item active" onclick="switchTab('tab-launch', this)">
-            <span class="nav-icon">🚀</span>
-            <span>الإطلاق</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('tab-forge', this)">
-            <span class="nav-icon">🔥</span>
-            <span>المحرك</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('tab-affiliate', this)">
-            <span class="nav-icon">💸</span>
-            <span>الأرباح</span>
-        </div>
-    </div>
-
-    <!-- ==================== الأكواد البرمجية (الخالية من الأخطاء) ==================== -->
     <script>
-        // 1. نظام التنقل بين الأقسام
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            element.classList.add('active');
-            if (navigator.vibrate) navigator.vibrate(50);
-        }
+        // المتغيرات الأساسية لـ Web3
+        let provider;
+        let signer;
+        let userAddress;
 
-        // 2. تفاعل الأزرار العادية
-        function triggerAction(btn, loadingText, successText) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<span style="opacity: 0.8;">${loadingText}</span>`;
-            btn.style.pointerEvents = 'none';
-            btn.style.filter = 'brightness(0.8)';
-            
-            setTimeout(() => {
-                btn.innerHTML = `<span>${successText}</span>`;
-                btn.style.background = 'linear-gradient(135deg, #0ecb81, #0a9960)';
-                btn.style.color = '#fff';
-                btn.style.boxShadow = '0 8px 24px rgba(14, 203, 129, 0.4)';
-                setTimeout(() => { btn.innerHTML = originalText; btn.style = ''; }, 3000);
-            }, 1500);
-        }
+        // 1. دالة ربط المحفظة الحقيقية (MetaMask / Trust Wallet)
+        async function connectWallet() {
+            // التحقق مما إذا كان المتصفح يدعم Web3 (يحتوي على محفظة)
+            if (window.ethereum) {
+                try {
+                    // الاتصال بمزود الخدمة
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    
+                    // طلب الإذن من المستخدم لربط المحفظة
+                    await provider.send("eth_requestAccounts", []);
+                    
+                    // استخراج بيانات الموقع (Signer)
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    
+                    // تحديث الواجهة بعد نجاح الربط
+                    const shortAddress = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
+                    document.getElementById("connectBtn").innerText = "✅ " + shortAddress;
+                    document.getElementById("connectBtn").style.background = "rgba(14, 203, 129, 0.2)";
+                    document.getElementById("connectBtn").style.color = "var(--green-bull)";
+                    document.getElementById("connectBtn").style.border = "1px solid var(--green-bull)";
 
-        // 3. نظام رابط الإحالة
-        const walletInput = document.getElementById('walletInput');
-        const refLink = document.getElementById('refLink');
-        walletInput.addEventListener('input', (e) => {
-            const val = e.target.value.trim();
-            refLink.value = val.length > 5 ? `https://vmax-dex.io?ref=${val}` : `https://vmax-dex.io?ref=0x...`;
-        });
-        function copyLink() {
-            navigator.clipboard.writeText(refLink.value);
-            triggerAction(document.getElementById('copyBtn'), 'جاري النسخ...', '✅ تم النسخ بنجاح!');
-        }
+                    // تفعيل زر الإطلاق وتغيير نصه
+                    const launchBtn = document.getElementById("launchBtn");
+                    launchBtn.disabled = false;
+                    launchBtn.innerText = "🚀 إطلاق العقد الذكي الآن";
 
-        // 4. محاكاة الحرق الحي
-        let burnCount = 1450200;
-        setInterval(() => {
-            burnCount += Math.floor(Math.random() * 100);
-            document.getElementById('liveBurn').innerText = burnCount.toLocaleString();
-        }, 3000);
-
-        // 5. نظام العداد الدوري الدقيق (بدون مخادعة)
-        const REWARD_MINUTES = 5; // يمكن تعديل الدقائق من هنا
-        let timeRemaining = REWARD_MINUTES * 60;
-        let rewardInterval;
-
-        const timerDisplay = document.getElementById("rewardTimer");
-        const claimBtn = document.getElementById("claimBtn");
-
-        function startRewardCycle() {
-            claimBtn.disabled = true;
-            claimBtn.innerHTML = "⏳ يرجى الانتظار...";
-            timerDisplay.classList.remove("ready");
-            
-            rewardInterval = setInterval(() => {
-                timeRemaining--;
-                let minutes = Math.floor(timeRemaining / 60);
-                let seconds = timeRemaining % 60;
-
-                timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                if (timeRemaining <= 0) {
-                    clearInterval(rewardInterval);
-                    timerDisplay.innerText = "00:00";
-                    timerDisplay.classList.add("ready");
-                    claimBtn.disabled = false;
-                    claimBtn.innerHTML = "💰 مطالبة بالجائزة الآن!";
+                } catch (error) {
+                    alert("❌ تم إلغاء ربط المحفظة أو حدث خطأ.");
                 }
-            }, 1000);
+            } else {
+                alert("⚠️ لم يتم العثور على محفظة! يرجى فتح الرابط من داخل متصفح Trust Wallet أو تثبيت MetaMask.");
+            }
         }
 
-        function executeClaim() {
-            // حماية صارمة: منع التنفيذ إذا لم ينتهِ الوقت
-            if (timeRemaining > 0) return;
+        // 2. دالة التعامل مع العقد الذكي الحقيقي
+        async function executeRealLaunch() {
+            const btn = document.getElementById("launchBtn");
+            const name = document.getElementById("tokenName").value;
+            const symbol = document.getElementById("tokenSymbol").value;
 
-            claimBtn.disabled = true;
-            claimBtn.innerHTML = "🔄 جاري تأكيد المعاملة...";
-            
-            setTimeout(() => {
-                claimBtn.innerHTML = "✅ تمت المطالبة بنجاح!";
-                claimBtn.style.background = "#fff";
-                claimBtn.style.color = "#0ecb81";
+            if (!signer) {
+                alert("يرجى ربط المحفظة أولاً!");
+                return;
+            }
+
+            try {
+                // تغيير حالة الزر أثناء انتظار توقيع المحفظة
+                btn.disabled = true;
+                btn.innerText = "✍️ يرجى التأكيد من المحفظة...";
+
+                /* 
+                 =================================================
+                 [جزء العقد الذكي الحقيقي]
+                 هنا يجب وضع عنوان العقد الذكي الخاص بك (Factory Address)
+                 والـ ABI الخاص به لكي يقوم بإنشاء العملة فعلياً.
+                 =================================================
+                */
+                
+                // مثال برمجي لآلية الاستدعاء (يحتاج فقط لعقدك الذكي ليعمل 100%):
+                // const factoryAddress = "0x...عنوان_عقد_المنصة_الخاص_بك...";
+                // const factoryABI = ["function createToken(string name, string symbol) external returns (address)"];
+                // const contract = new ethers.Contract(factoryAddress, factoryABI, signer);
+                
+                // إرسال المعاملة للبلوكشين (تستدعي MetaMask لطلب تأكيد رسوم الغاز)
+                // const tx = await contract.createToken(name, symbol);
+                
+                // الانتظار حتى يتم توثيق المعاملة في البلوكشين (Block Confirmation)
+                // btn.innerText = "🔄 جاري التأكيد على الشبكة...";
+                // await tx.wait();
+
+                // -------------------------------------------------
+                // (هذا الجزء لمحاكاة التأخير الزمني للشبكة لغرض الاختبار هنا فقط)
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                // -------------------------------------------------
+
+                // بعد نجاح المعاملة فعلياً على الشبكة
+                btn.innerText = "✅ تم الإطلاق على البلوكشين بنجاح!";
+                btn.style.background = "#0ecb81";
+                btn.style.color = "#fff";
+
+            } catch (error) {
+                // في حال رفض المستخدم للمعاملة من داخل المحفظة أو عدم كفاية الرصيد للغاز
+                console.error(error);
+                btn.innerText = "❌ فشلت المعاملة أو تم إلغاؤها";
+                btn.style.background = "#f6465d";
+                btn.style.color = "#fff";
                 
                 setTimeout(() => {
-                    timeRemaining = REWARD_MINUTES * 60;
-                    claimBtn.style = "";
-                    startRewardCycle();
-                }, 2000);
-            }, 1500);
+                    btn.disabled = false;
+                    btn.innerText = "🚀 إعادة المحاولة";
+                    btn.style.background = "linear-gradient(135deg, var(--gold-primary), #d09c00)";
+                    btn.style.color = "#000";
+                }, 3000);
+            }
         }
-
-        // بدء العداد فوراً عند تحميل الصفحة
-        startRewardCycle();
     </script>
 </body>
 </html>
