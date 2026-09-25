@@ -3,140 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Launchpad Pro | منحنى السيولة الذكي</title>
+    <title>Viral Matrix | النظام الشامل</title>
     <style>
         :root {
-            --bg-base: #0a0d14;
-            --surface: #111823;
-            --border: #1f2937;
+            --bg-base: #050709;
+            --surface: #0f131a;
+            --border: #212630;
             --gold: #f0b90b;
-            --gold-glow: rgba(240, 185, 11, 0.2);
+            --gold-glow: rgba(240, 185, 11, 0.25);
             --green: #0ecb81;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --green-glow: rgba(14, 203, 129, 0.15);
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-main); padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        body { background-color: var(--bg-base); color: var(--text-main); padding: 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        .wrapper { width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 16px; }
+        .matrix-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;
+            background: radial-gradient(circle at 50% 10%, rgba(240,185,11,0.04) 0%, transparent 60%);
+        }
+
+        .wrapper { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 30px; }
         
         .card { 
             background: var(--surface); border: 1px solid var(--border); 
-            border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); 
+            border-radius: 16px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); 
             position: relative; overflow: hidden;
         }
+
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .badge { font-size: 10px; background: rgba(240,185,11,0.1); color: var(--gold); border: 1px solid rgba(240,185,11,0.3); padding: 3px 8px; border-radius: 20px; font-weight: 600; }
         
-        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .badge { font-size: 11px; background: rgba(240,185,11,0.1); color: var(--gold); border: 1px solid rgba(240,185,11,0.2); padding: 4px 10px; border-radius: 20px; font-weight: 600; }
-        
-        h1 { font-size: 18px; color: var(--text-main); font-weight: 800; margin-bottom: 6px; }
-        p.desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px; }
+        h1 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        p.desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
 
-        .input-group { margin-bottom: 12px; }
-        .input-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; }
-        .input-group input { width: 100%; padding: 12px; background: #07090e; border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 13px; outline: none; transition: 0.3s; }
-        .input-group input:focus { border-color: var(--gold); box-shadow: 0 0 8px var(--gold-glow); }
+        /* ستايل الإطلاق */
+        .input-box { margin-bottom: 10px; }
+        .input-box label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+        .input-box input { width: 100%; padding: 10px; background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 12px; outline: none; }
+        .input-box input:focus { border-color: var(--gold); }
 
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-launch { background: linear-gradient(90deg, #f0b90b, #d4a000); color: #000; box-shadow: 0 4px 15px var(--gold-glow); margin-top: 10px; }
-        .btn-launch:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .btn-gold { background: linear-gradient(90deg, #f0b90b, #d4a000); color: #000; box-shadow: 0 4px 15px var(--gold-glow); }
+        .btn-gold:hover { transform: translateY(-2px); }
 
-        /* منحنى السيولة (Bonding Curve) */
-        .curve-container { background: #07090e; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-top: 15px; position: relative; }
+        /* ستايل العداد التنازلي */
+        .quantum-box { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; }
+        .timer-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 8px 0; }
+        .time-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
+        .time-val { font-size: 20px; font-weight: 800; color: var(--gold); font-family: monospace; }
+        .time-lbl { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+        .time-sep { font-size: 18px; color: var(--gold); font-weight: bold; }
+
+        /* ستايل سجل التفاعل (Live Feed) */
+        .live-feed { margin-top: 10px; max-height: 90px; overflow-y: hidden; font-size: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+        .feed-item { display: flex; justify-content: space-between; color: var(--text-muted); padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,0.03); }
+        .feed-item span:last-child { color: var(--green); font-family: monospace; }
+
+        /* ستايل منحنى السيولة (Bonding Curve) */
+        .curve-container { background: #07090e; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-top: 10px; }
         .curve-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 10px; }
         .curve-header .percent { color: var(--green); }
-        
-        .chart-svg { width: 100%; height: 100px; overflow: visible; }
+        .chart-svg { width: 100%; height: 90px; overflow: visible; }
         .chart-path { fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 6px var(--green)); }
         
-        /* تأثيرات الإضاءة على المنحنى */
-        @keyframes moveDot {
-            0% { cx: 10; cy: 90; }
-            50% { cx: 150; cy: 50; }
-            100% { cx: 290; cy: 10; }
-        }
+        @keyframes moveDot { 0% { cx: 10; cy: 80; } 50% { cx: 150; cy: 45; } 100% { cx: 290; cy: 10; } }
         .moving-dot { fill: var(--gold); filter: drop-shadow(0 0 8px var(--gold)); animation: moveDot 3s ease-in-out infinite alternate; }
 
-        /* نظام الجوائز لمنع موت العملة */
-        .rewards-box { background: rgba(14, 203, 129, 0.05); border: 1px solid rgba(14, 203, 129, 0.2); border-radius: 12px; padding: 12px; margin-top: 15px; }
-        .rewards-title { font-size: 12px; font-weight: 700; color: var(--green); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .reward-item { font-size: 11px; color: var(--text-main); margin-bottom: 6px; display: flex; align-items: flex-start; gap: 6px; line-height: 1.4; }
+        /* ستايل جوائز الحماية */
+        .rewards-box { background: var(--green-glow); border: 1px solid rgba(14, 203, 129, 0.3); border-radius: 12px; padding: 12px; margin-top: 12px; }
+        .rewards-title { font-size: 11px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+        .reward-item { font-size: 10px; color: var(--text-main); margin-bottom: 6px; display: flex; align-items: flex-start; gap: 4px; line-height: 1.4; }
         .reward-item span { color: var(--gold); font-weight: bold; }
-
     </style>
 </head>
 <body>
+    <div class="matrix-bg"></div>
+
     <div class="wrapper">
         
-        <!-- القسم الأول: إطلاق العملة في أعلى الصفحة -->
-        <div class="card" style="border-top: 3px solid var(--gold);">
+        <!-- القسم الأول: إطلاق العملة -->
+        <div class="card" style="border-top: 2px solid var(--gold);">
             <div class="header-flex">
                 <span class="badge">Binance Web3 DEX</span>
-                <span style="font-size: 11px; color: var(--green);">🟢 شبكة آمنة</span>
+                <span style="font-size: 10px; color: var(--green);">🟢 متصل</span>
             </div>
             
-            <h1>بروتوكول إطلاق الأصول</h1>
-            <p class="desc">قم بتهيئة وإطلاق عملتك الخاصة بضغطة واحدة مع ربط تلقائي بمنحنى السيولة اللامركزي.</p>
+            <h1>بروتوكول إطلاق التوكنات</h1>
+            <p class="desc">قم بتهيئة وإطلاق عملتك بضغطة واحدة مع ربط تلقائي بمنحنى السيولة.</p>
             
-            <div class="input-group">
+            <div class="input-box">
                 <label>اسم المشروع (Token Name)</label>
                 <input type="text" value="Viral Matrix Quantum">
             </div>
-            <div class="input-group">
+            <div class="input-box">
                 <label>رمز العملة (Ticker)</label>
                 <input type="text" value="VMAX">
             </div>
 
-            <button class="btn btn-launch" onclick="alert('🚀 تم بدء عملية النشر اللامركزي وتفعيل منحنى الترابط!')">
+            <button class="btn btn-gold" onclick="alert('🚀 تم تفعيل العقد الذكي وبدء الإطلاق اللامركزي!')">
                 إطلاق العملة فوراً 🚀
             </button>
         </div>
 
-        <!-- القسم الثاني: منحنى السيولة وآلية مكافحة الانهيار -->
+        <!-- القسم الثاني: العداد التنازلي والمطالبة -->
+        <div class="card">
+            <div class="header-flex">
+                <span class="badge">نافذة المطالبة</span>
+                <span style="font-size: 10px; color: var(--green);">⚡ تحديث مباشر</span>
+            </div>
+            
+            <h1>تحدي إثبات التواجد</h1>
+            <p class="desc">أثبت تواجدك قبل انتهاء العداد للحصول على مخصصات من السيولة المبدئية.</p>
+
+            <div class="quantum-box">
+                <div class="timer-grid">
+                    <div class="time-block">
+                        <div class="time-val" id="minutes">02</div>
+                        <div class="time-lbl">دقيقة</div>
+                    </div>
+                    <div class="time-sep">:</div>
+                    <div class="time-block">
+                        <div class="time-val" id="seconds">59</div>
+                        <div class="time-lbl">ثانية</div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="claimBtn" class="btn" style="background: #161b22; color: #fff; border: 1px solid var(--border);">
+                ⚡ إثبات التواجد والمطالبة الذكية
+            </button>
+
+            <!-- سجل التفاعل الحي -->
+            <div class="live-feed" id="liveFeed">
+                <div class="feed-item"><span>0x4f...9a سجل تفاعلاً ناجحاً</span><span>+1,250 VMAX</span></div>
+                <div class="feed-item"><span>0x12...b8 تدقيق العقد بنجاح</span><span>Verified</span></div>
+            </div>
+        </div>
+
+        <!-- القسم الثالث: منحنى السيولة وجوائز مكافحة الانهيار -->
         <div class="card">
             <h1>تحليل السيولة (Bonding Curve)</h1>
-            <p class="desc">تتبع تدفق الأموال الفوري. عند اكتمال المنحنى لـ 100%، سيتم نقل السيولة تلقائياً إلى المنصات الكبرى وحرق الرموز.</p>
+            <p class="desc">عند اكتمال المنحنى لـ 100%، سيتم نقل السيولة للمنصات الكبرى وحرق الرموز.</p>
 
             <div class="curve-container">
                 <div class="curve-header">
                     <span>تقدم منحنى الترابط</span>
                     <span class="percent">78.4% مُكتمل</span>
                 </div>
-                
-                <!-- رسم بياني حي لمنحنى السيولة -->
-                <svg viewBox="0 0 300 100" class="chart-svg">
+                <!-- الرسم البياني -->
+                <svg viewBox="0 0 300 90" class="chart-svg">
                     <defs>
                         <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stop-color="rgba(14,203,129,0.3)"/>
                             <stop offset="100%" stop-color="transparent"/>
                         </linearGradient>
                     </defs>
-                    <!-- مسار المنحنى -->
-                    <path d="M 10 90 Q 120 85, 200 40 T 290 10" class="chart-path" />
-                    <!-- تعبئة تحت المنحنى -->
-                    <path d="M 10 90 Q 120 85, 200 40 T 290 10 L 290 100 L 10 100 Z" fill="url(#curveGrad)" />
-                    <!-- النقطة المتحركة التي تمثل السعر الحالي -->
+                    <path d="M 10 80 Q 120 75, 200 40 T 290 10" class="chart-path" />
+                    <path d="M 10 80 Q 120 75, 200 40 T 290 10 L 290 90 L 10 90 Z" fill="url(#curveGrad)" />
                     <circle r="4" class="moving-dot" />
                 </svg>
             </div>
 
-            <!-- صندوق الجوائز وشرح الاستدامة -->
+            <!-- جوائز الحماية -->
             <div class="rewards-box">
-                <div class="rewards-title">
-                    🛡️ كيف نضمن عدم انهيار العملة (Anti-Dump)؟
+                <div class="rewards-title">🛡️ كيف نضمن عدم انهيار العملة (Anti-Dump)؟</div>
+                <div class="reward-item">
+                    <span>1. نظام الجوائز:</span> اقتطاع 5% من كل بيع يذهب لصندوق يوزع أسبوعياً للمحتفظين (Holders).
                 </div>
                 <div class="reward-item">
-                    <span>1. نظام الجوائز الكبرى:</span> يتم اقتطاع 5% من كل عملية بيع تذهب فوراً لصندوق مكافآت يُوزع أسبوعياً على المستثمرين المحتفظين بالعملة (Holders).
+                    <span>2. الحرق التلقائي:</span> حرق جزء من المعروض مع كل تداول لزيادة الندرة ودفع السعر لأهداف العقود.
                 </div>
                 <div class="reward-item">
-                    <span>2. الحرق التلقائي (Auto-Burn):</span> مع كل معاملة تداول، يتم حرق جزء من المعروض لزيادة ندرة العملة ودفع السعر نحو أهداف العقود.
-                </div>
-                <div class="reward-item">
-                    <span>3. حماية الحيتان:</span> لا يمكن لأي محفظة بيع أكثر من 2% من إجمالي السيولة دفعة واحدة لتجنب الهبوط المفاجئ.
+                    <span>3. حماية الحيتان:</span> منع بيع أكثر من 2% من السيولة دفعة واحدة لتجنب الهبوط المفاجئ.
                 </div>
             </div>
         </div>
 
     </div>
+
+    <script>
+        // برمجة العداد التنازلي
+        let totalSeconds = 180;
+        const minEl = document.getElementById('minutes');
+        const secEl = document.getElementById('seconds');
+        
+        const timerInterval = setInterval(() => {
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                minEl.innerText = "00"; secEl.innerText = "00";
+                return;
+            }
+            totalSeconds--;
+            minEl.innerText = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            secEl.innerText = String(totalSeconds % 60).padStart(2, '0');
+        }, 1000);
+
+        // برمجة زر المطالبة
+        document.getElementById('claimBtn').addEventListener('click', function() {
+            this.style.background = "var(--green-glow)";
+            this.style.color = "var(--green)";
+            this.style.borderColor = "var(--green)";
+            this.innerHTML = "✅ تم التحقق من محفظتك بنجاح!";
+        });
+
+        // برمجة سجل التفاعل الحي
+        const liveFeed = document.getElementById('liveFeed');
+        const wallets = ["0x88...3e", "0x3a...1f", "0x9c...4b", "0x7e...2d"];
+        const amounts = ["+850 VMAX", "+2,100 VMAX", "+500 VMAX", "+1,500 VMAX"];
+        
+        setInterval(() => {
+            const rw = wallets[Math.floor(Math.random() * wallets.length)];
+            const ra = amounts[Math.floor(Math.random() * amounts.length)];
+            const div = document.createElement('div');
+            div.className = 'feed-item';
+            div.innerHTML = `<span>${rw} أثبت التواجد</span><span>${ra}</span>`;
+            liveFeed.prepend(div);
+            if(liveFeed.children.length > 3) liveFeed.lastChild.remove();
+        }, 3500);
+    </script>
 </body>
-</html>
+                    </html>
+                    
