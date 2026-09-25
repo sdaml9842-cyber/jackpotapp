@@ -3,186 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viral Matrix Quantum | Web3 DApp</title>
+    <title>Viral Matrix Quantum | Mainnet Integration</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- استدعاء مكتبة Web3 الحقيقية (Ethers.js) -->
+    <!-- مكتبة Web3 الحقيقية -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #020408; --glass-bg: rgba(14, 18, 25, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --bg-dark: #020408; --glass-bg: rgba(14, 18, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.08);
             --gold-primary: #f3ba2f; --gold-glow: rgba(243, 186, 47, 0.4);
-            --green-bull: #0ecb81; --red-bear: #f6465d;
+            --green-bull: #0ecb81; --green-glow: rgba(14, 203, 129, 0.2);
             --text-light: #ffffff; --text-dim: #848e9c;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+
         body { background-color: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; padding-bottom: 90px; }
-        
+
         .app-container { width: 100%; max-width: 480px; padding: 16px; display: flex; flex-direction: column; gap: 20px; }
 
-        /* ================= زر ربط المحفظة الحقيقي ================= */
-        .wallet-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--glass-bg); padding: 12px 16px;
-            border: 1px solid var(--glass-border); border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-        }
+        /* ================= شريط المحفظة الحقيقي ================= */
+        .wallet-header { display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
         .network-badge { font-size: 12px; font-weight: 800; color: var(--gold-primary); background: rgba(243, 186, 47, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); }
-        .btn-connect {
-            background: linear-gradient(135deg, var(--green-bull), #0a9960);
-            color: #fff; border: none; padding: 8px 16px; border-radius: 10px;
-            font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px var(--green-glow);
-            transition: 0.3s;
-        }
+        .btn-connect { background: linear-gradient(135deg, var(--green-bull), #0a9960); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px var(--green-glow); transition: 0.3s; }
 
-        /* ================= الكروت والمدخلات ================= */
-        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        .card-title { font-size: 24px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--gold-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px;}
-        .input-group { margin-bottom: 18px; }
-        .input-group label { display: block; font-size: 13px; color: var(--text-dim); font-weight: 800; margin-bottom: 8px; }
-        .input-group input { width: 100%; padding: 16px; background: rgba(0,0,0,0.4); border: 1.5px solid var(--glass-border); border-radius: 16px; color: #fff; font-size: 16px; font-weight: 800; outline: none; }
+        /* ================= كارت قريباً (Coming Soon) ================= */
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 24px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); margin-top: 20px; }
+        .status-icon { font-size: 50px; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
         
-        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 16px; font-size: 17px; font-weight: 900; cursor: pointer; color: #000; background: linear-gradient(135deg, var(--gold-primary), #d09c00); }
-        .btn-action:disabled { background: #333; color: #777; cursor: not-allowed; }
+        .card-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+        .card-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 24px; }
+        
+        .badge-dev { background: rgba(243, 186, 47, 0.1); border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; display: inline-block; }
+
+        /* ================= شريط التنقل السفلي ================= */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .floating-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 440px; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; display: flex; justify-content: space-between; padding: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 100; }
+        .nav-item { flex: 1; text-align: center; padding: 10px 0; border-radius: 18px; color: var(--text-dim); font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item.active { background: rgba(243, 186, 47, 0.15); color: var(--gold-primary); }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         
-        <!-- الهيدر الخاص بربط المحفظة Web3 -->
+        <!-- الهيدر الخاص بربط المحفظة Web3 (حقيقي 100%) -->
         <div class="wallet-header">
             <div class="network-badge">🟢 BNB Chain</div>
             <button class="btn-connect" id="connectBtn" onclick="connectWallet()">🔗 ربط المحفظة</button>
         </div>
 
-        <!-- صفحة الإطلاق المرتبطة بالعقد الذكي -->
-        <div class="glass-card">
-            <h1 class="card-title">إطلاق ذكي حقيقي</h1>
-            <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 20px;">
-                الآن عند الضغط، سيتم استدعاء محفظتك لتوقيع المعاملة ودفع رسوم الغاز (Gas Fee) فعلياً.
-            </p>
-            
-            <div class="input-group">
-                <label>اسم المشروع</label>
-                <input type="text" id="tokenName" value="Viral Matrix">
+        <!-- ==================== قسم الإطلاق (قريباً - تم إخفاء الواجهة الوهمية) ==================== -->
+        <div id="tab-launch" class="page-section active">
+            <div class="glass-card">
+                <div class="status-icon">🏗️</div>
+                <h1 class="card-title">منصة الإطلاق الذكي</h1>
+                <p class="card-desc">
+                    جارٍ ربط وتدقيق العقود الذكية على شبكة BNB Chain. سيتم تفعيل واجهة إنشاء العملات تلقائياً بمجرد إتمام الربط الحقيقي.
+                </p>
+                <div class="badge-dev">🔒 قريباً - تحت ربط البلوكشين</div>
             </div>
-            <div class="input-group">
-                <label>الرمز</label>
-                <input type="text" id="tokenSymbol" value="VMAX">
-            </div>
+        </div>
 
-            <!-- الزر لن يعمل إلا إذا كانت المحفظة مربوطة -->
-            <button class="btn-action" id="launchBtn" onclick="executeRealLaunch()" disabled>
-                🔒 يرجى ربط المحفظة أولاً
-            </button>
+        <!-- ==================== قسم محرك الحرق (قريباً) ==================== -->
+        <div id="tab-forge" class="page-section">
+            <div class="glass-card">
+                <div class="status-icon">🔥</div>
+                <h1 class="card-title">محرك الحرق التنافسي</h1>
+                <p class="card-desc">
+                    هذا القسم مخصص للمبادلة وحرق العملات عبر عقود ذكية آمنة وموثوقة.
+                </p>
+                <div class="badge-dev" style="color: var(--green-bull); border-color: var(--green-bull); background: var(--green-glow);">⚡ قيد التطوير</div>
+            </div>
+        </div>
+
+        <!-- ==================== قسم الأرباح (قريباً) ==================== -->
+        <div id="tab-affiliate" class="page-section">
+            <div class="glass-card">
+                <div class="status-icon">💸</div>
+                <h1 class="card-title">نظام المكافآت والإحالات</h1>
+                <p class="card-desc">
+                    سيتم تفعيل توزيع الأرباح التلقائي وعقود الإحالة فور إطلاق المنصة رسمياً.
+                </p>
+                <div class="badge-dev">💎 قريباً</div>
+            </div>
         </div>
 
     </div>
 
-    <script>
-        // المتغيرات الأساسية لـ Web3
-        let provider;
-        let signer;
-        let userAddress;
+    <!-- شريط التنقل السفلي -->
+    <div class="floating-nav">
+        <div class="nav-item active" onclick="switchTab('tab-launch', this)">
+            <span style="font-size: 20px;">🚀</span><span>الإطلاق</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-forge', this)">
+            <span style="font-size: 20px;">🔥</span><span>المحرك</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-affiliate', this)">
+            <span style="font-size: 20px;">💸</span><span>الأرباح</span>
+        </div>
+    </div>
 
-        // 1. دالة ربط المحفظة الحقيقية (MetaMask / Trust Wallet)
+    <!-- ==================== كود ربط المحفظة الحقيقي ==================== -->
+    <script>
+        // التنقل بين الصفحات
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        // إعدادات Web3 الحقيقية
+        let provider, signer, userAddress;
+
         async function connectWallet() {
-            // التحقق مما إذا كان المتصفح يدعم Web3 (يحتوي على محفظة)
             if (window.ethereum) {
                 try {
-                    // الاتصال بمزود الخدمة
                     provider = new ethers.providers.Web3Provider(window.ethereum);
-                    
-                    // طلب الإذن من المستخدم لربط المحفظة
                     await provider.send("eth_requestAccounts", []);
-                    
-                    // استخراج بيانات الموقع (Signer)
                     signer = provider.getSigner();
                     userAddress = await signer.getAddress();
                     
-                    // تحديث الواجهة بعد نجاح الربط
+                    // تحديث زر الربط بعنوان المحفظة الحقيقي
                     const shortAddress = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
-                    document.getElementById("connectBtn").innerText = "✅ " + shortAddress;
-                    document.getElementById("connectBtn").style.background = "rgba(14, 203, 129, 0.2)";
-                    document.getElementById("connectBtn").style.color = "var(--green-bull)";
-                    document.getElementById("connectBtn").style.border = "1px solid var(--green-bull)";
-
-                    // تفعيل زر الإطلاق وتغيير نصه
-                    const launchBtn = document.getElementById("launchBtn");
-                    launchBtn.disabled = false;
-                    launchBtn.innerText = "🚀 إطلاق العقد الذكي الآن";
+                    const btn = document.getElementById("connectBtn");
+                    btn.innerText = "✅ " + shortAddress;
+                    btn.style.background = "rgba(14, 203, 129, 0.2)";
+                    btn.style.color = "var(--green-bull)";
+                    btn.style.border = "1px solid var(--green-bull)";
 
                 } catch (error) {
-                    alert("❌ تم إلغاء ربط المحفظة أو حدث خطأ.");
+                    alert("❌ تم إلغاء ربط المحفظة.");
                 }
             } else {
-                alert("⚠️ لم يتم العثور على محفظة! يرجى فتح الرابط من داخل متصفح Trust Wallet أو تثبيت MetaMask.");
-            }
-        }
-
-        // 2. دالة التعامل مع العقد الذكي الحقيقي
-        async function executeRealLaunch() {
-            const btn = document.getElementById("launchBtn");
-            const name = document.getElementById("tokenName").value;
-            const symbol = document.getElementById("tokenSymbol").value;
-
-            if (!signer) {
-                alert("يرجى ربط المحفظة أولاً!");
-                return;
-            }
-
-            try {
-                // تغيير حالة الزر أثناء انتظار توقيع المحفظة
-                btn.disabled = true;
-                btn.innerText = "✍️ يرجى التأكيد من المحفظة...";
-
-                /* 
-                 =================================================
-                 [جزء العقد الذكي الحقيقي]
-                 هنا يجب وضع عنوان العقد الذكي الخاص بك (Factory Address)
-                 والـ ABI الخاص به لكي يقوم بإنشاء العملة فعلياً.
-                 =================================================
-                */
-                
-                // مثال برمجي لآلية الاستدعاء (يحتاج فقط لعقدك الذكي ليعمل 100%):
-                // const factoryAddress = "0x...عنوان_عقد_المنصة_الخاص_بك...";
-                // const factoryABI = ["function createToken(string name, string symbol) external returns (address)"];
-                // const contract = new ethers.Contract(factoryAddress, factoryABI, signer);
-                
-                // إرسال المعاملة للبلوكشين (تستدعي MetaMask لطلب تأكيد رسوم الغاز)
-                // const tx = await contract.createToken(name, symbol);
-                
-                // الانتظار حتى يتم توثيق المعاملة في البلوكشين (Block Confirmation)
-                // btn.innerText = "🔄 جاري التأكيد على الشبكة...";
-                // await tx.wait();
-
-                // -------------------------------------------------
-                // (هذا الجزء لمحاكاة التأخير الزمني للشبكة لغرض الاختبار هنا فقط)
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                // -------------------------------------------------
-
-                // بعد نجاح المعاملة فعلياً على الشبكة
-                btn.innerText = "✅ تم الإطلاق على البلوكشين بنجاح!";
-                btn.style.background = "#0ecb81";
-                btn.style.color = "#fff";
-
-            } catch (error) {
-                // في حال رفض المستخدم للمعاملة من داخل المحفظة أو عدم كفاية الرصيد للغاز
-                console.error(error);
-                btn.innerText = "❌ فشلت المعاملة أو تم إلغاؤها";
-                btn.style.background = "#f6465d";
-                btn.style.color = "#fff";
-                
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerText = "🚀 إعادة المحاولة";
-                    btn.style.background = "linear-gradient(135deg, var(--gold-primary), #d09c00)";
-                    btn.style.color = "#000";
-                }, 3000);
+                alert("⚠️ الرجاء فتح الرابط داخل متصفح يدعم Web3 مثل Trust Wallet أو MetaMask.");
             }
         }
     </script>
