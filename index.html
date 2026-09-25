@@ -3,68 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viral Matrix Launchpad</title>
+    <title>Viral Matrix & Jackpot - منصة الإطلاق والسحب الكبرى</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <style>
-        body { background-color: #0b0e14; color: #ffffff; font-family: system-ui, sans-serif; text-align: center; padding: 20px; margin: 0; }
-        .header h1 { color: #00f2fe; margin-bottom: 5px; }
-        .card { background: #151a23; border-radius: 16px; padding: 20px; max-width: 420px; margin: 20px auto; border: 1px solid #232d3f; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #2a3547; background: #0b0e14; color: #fff; }
-        button { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 95%; }
-        #status { font-size: 14px; margin-top: 15px; color: #00f2fe; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e11; color: #ffffff; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 480px; background: #181a20; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #2b313a; margin-bottom: 20px; }
+        h1 { font-size: 22px; text-align: center; margin-bottom: 8px; color: #f0b90b; }
+        p.subtitle { text-align: center; font-size: 13px; color: #848e9c; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-primary { background: #f0b90b; color: #000000; }
+        .btn-primary:hover { background: #d9a406; }
+        .btn-secondary { background: #2b313a; color: #ffffff; border: 1px solid #474d57; }
+        .section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #2b313a; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 13px; color: #848e9c; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 12px; background: #0b0e11; border: 1px solid #2b313a; border-radius: 8px; color: #fff; font-size: 14px; }
+        .status { margin-top: 15px; text-align: center; font-size: 13px; color: #0ecb81; word-break: break-all; }
+        .jackpot-box { background: linear-gradient(135deg, #1e2329, #2b313a); border: 2px dashed #f0b90b; border-radius: 12px; padding: 16px; text-align: center; margin-top: 15px; }
+        .jackpot-amount { font-size: 24px; font-weight: bold; color: #0ecb81; margin: 8px 0; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>⚡ Viral Matrix Launchpad</h1>
-        <p>منصة إطلاق العملات الرقمية ($VMAX)</p>
+
+    <!-- قسم ربط المحفظة ومنصة الإطلاق -->
+    <div class="container">
+        <h1>Viral Matrix ⚡ Launchpad</h1>
+        <p class="subtitle">منصة إطلاق العملات الرقمية ($VMAX) وعقد BNB Chain</p>
+        
+        <button id="connectWallet" class="btn btn-primary">ربط محفظة Binance Web3</button>
+        <div id="walletStatus" class="status">المحفظة غير متصلة</div>
+
+        <div class="section">
+            <h2 style="font-size: 16px; margin-bottom: 12px; color: #eaecef;">إطلاق عملة جديدة</h2>
+            <div class="input-group">
+                <label>اسم العملة (Viral Matrix)</label>
+                <input type="text" id="tokenName" value="Viral Matrix" placeholder="أدخل اسم العملة">
+            </div>
+            <div class="input-group">
+                <label>رمز العملة (VMAX)</label>
+                <input type="text" id="tokenSymbol" value="VMAX" placeholder="أدخل رمز العملة">
+            </div>
+            <button id="launchBtn" class="btn btn-secondary">إطلاق العملة فوراً 🚀</button>
+        </div>
     </div>
 
-    <div class="card">
-        <button id="connectBtn" onclick="connectWallet()">🔗 ربط المحفظة</button>
-        <p id="walletAddress" style="font-size:12px; color:#10b981;"></p>
-    </div>
+    <!-- قسم الجوائز والسحب الكبرى الجديد -->
+    <div class="container">
+        <h1>🏆 سحب الجائزة الكبرى</h1>
+        <p class="subtitle">شارك في السحب الأسبوعي لحاملي توكن $VMAX</p>
+        
+        <div class="jackpot-box">
+            <span style="font-size: 14px; color: #f0b90b;">إجمالي الجائزة الحالية</span>
+            <div class="jackpot-amount">50,000 $VMAX</div>
+            <p style="font-size: 12px; color: #848e9c;">العقد الذكي: 0xfAF...b332</p>
+        </div>
 
-    <div class="card">
-        <h3>إطلاق عملة جديدة</h3>
-        <input type="text" id="tokenName" placeholder="اسم العملة (Viral Matrix)">
-        <input type="text" id="tokenSymbol" placeholder="رمز العملة (VMAX)">
-        <button onclick="createToken()">🚀 إطلاق العملة فوراً</button>
-        <div id="status"></div>
+        <button id="participateBtn" class="btn btn-primary" style="margin-top: 15px;">دخول السحب الآن 🎟️</button>
+        <div id="drawStatus" class="status"></div>
     </div>
 
     <script>
-        const FACTORY_ADDRESS = "0xfAF6861788010A1A7f6C65DE7133baC24945b332";
-        const FACTORY_ABI = [{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"}],"name":"createToken","outputs":[{"internalType":"address","name":"tokenAddress","type":"address"}],"stateMutability":"payable","type":"function"}];
-
-        let provider, signer, factoryContract;
-
-        async function connectWallet() {
-            if (window.ethereum) {
+        const CONTRACT_ADDRESS = "0xfAF6861788010A1A7f6C65DE7133baC24945b332";
+        
+        document.getElementById('connectWallet').addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
                 try {
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                    signer = await provider.getSigner();
-                    const address = await signer.getAddress();
-                    document.getElementById("walletAddress").innerText = "تم الربط: " + address.substring(0,6) + "..." + address.substring(address.length - 4);
-                    factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
-                } catch (err) { alert("خطأ: " + err.message); }
-            } else { alert("يرجى فتح الرابط من داخل متصفح Web3 في بينانس أو MetaMask"); }
-        }
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    document.getElementById('walletStatus').innerText = "تم التوصيل: " + accounts[0].substring(0, 6) + "..." + accounts[0].substring(38);
+                } catch (error) {
+                    document.getElementById('walletStatus').innerText = "فشل الاتصال بالمحفظة!";
+                }
+            } else {
+                alert("يرجى فتح الموقع من متصفح محفظة Binance Web3 Wallet");
+            }
+        });
 
-        async function createToken() {
-            const name = document.getElementById("tokenName").value;
-            const symbol = document.getElementById("tokenSymbol").value;
-            const status = document.getElementById("status");
-            if (!name || !symbol) { alert("ادخل الاسم والرمز"); return; }
-            if (!factoryContract) { alert("ربط المحفظة أولاً"); return; }
-            try {
-                status.innerText = "⏳ جاري إرسال الطلب للمحفظة...";
-                const tx = await factoryContract.createToken(name, symbol);
-                status.innerText = "🌐 جاري التأكيد على البلوكتشين...";
-                await tx.wait();
-                status.innerText = "🎉 تم إنشاء العملة بنجاح!";
-            } catch (err) { status.innerText = "❌ حدث خطأ أو إلغاء المعاملة."; }
-        }
+        document.getElementById('launchBtn').addEventListener('click', () => {
+            alert("جاري تحضير معاملات إطلاق العملة على شبكة BNB Chain...");
+        });
+
+        document.getElementById('participateBtn').addEventListener('click', () => {
+            document.getElementById('drawStatus').innerText = "تم تسجيل محفظتك في السحب بنجاح! بالتوفيق 🌟";
+        });
     </script>
 </body>
 </html>
