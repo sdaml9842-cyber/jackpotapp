@@ -68,7 +68,7 @@
                             <option value="50">50 BNB (مؤسسي)</option>
                         </select>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">رسوم الإنشاء عبر المصنع: 0.01 BNB</p>
+                    <p class="text-xs text-gray-500 mt-2">رسوم الإنشاء عبر العقد: 0.01 BNB (creationFee)</p>
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
                         </div>
                         <div>
                             <h2 class="text-xl font-bold" id="activeTokenName">اختر أو أدخل عقد العملة</h2>
-                            <p class="text-xs text-gray-400" id="activeTokenSymbol">التداول الفوري عبر منحنى الترابط</p>
+                            <p class="text-xs text-gray-400" id="activeTokenSymbol">التداول الفوري عبر منحنى الترابط (Bonding Curve)</p>
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -100,19 +100,19 @@
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div class="bg-gray-950/60 border border-gray-800/80 p-4 rounded-2xl">
-                        <span class="text-xs text-gray-400 block mb-1">احتياطي BNB</span>
+                        <span class="text-xs text-gray-400 block mb-1">احتياطي BNB (realBnb)</span>
                         <span class="text-lg font-bold text-green-400" id="statBnbReserve">0.00 BNB</span>
                     </div>
                     <div class="bg-gray-950/60 border border-gray-800/80 p-4 rounded-2xl">
-                        <span class="text-xs text-gray-400 block mb-1">احتياطي الرموز</span>
+                        <span class="text-xs text-gray-400 block mb-1">احتياطي الرموز (realToken)</span>
                         <span class="text-lg font-bold text-purple-400" id="statTokenReserve">0</span>
                     </div>
                     <div class="bg-gray-950/60 border border-gray-800/80 p-4 rounded-2xl">
-                        <span class="text-xs text-gray-400 block mb-1">حالة التخرج</span>
+                        <span class="text-xs text-gray-400 block mb-1">حالة التخرج (isGraduated)</span>
                         <span class="text-lg font-bold text-yellow-400" id="statGraduationStatus">قيد التداول</span>
                     </div>
                     <div class="bg-gray-950/60 border border-gray-800/80 p-4 rounded-2xl">
-                        <span class="text-xs text-gray-400 block mb-1">صندوق المكافآت</span>
+                        <span class="text-xs text-gray-400 block mb-1">صندوق المكافآت (Bounty)</span>
                         <span class="text-lg font-bold text-blue-400" id="statBountyPool">0 BNB</span>
                     </div>
                 </div>
@@ -127,24 +127,24 @@
                     <!-- Buy Section -->
                     <div id="buySection" class="space-y-4">
                         <div>
-                            <label class="block text-sm text-gray-400 mb-1">المبلغ بالمتر (BNB)</label>
+                            <label class="block text-sm text-gray-400 mb-1">المبلغ المراد الشراء به (BNB)</label>
                             <input type="number" id="buyBnbAmount" placeholder="0.1" step="0.01" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-pink-500 text-white">
                         </div>
                         <button id="buyBtn" onclick="buyTokens()" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2">
                             <i class="fa-solid fa-cart-shopping"></i>
-                            <span>شراء العملات 🪙</span>
+                            <span>شراء العملات عبر المنحنى 🪙</span>
                         </button>
                     </div>
 
                     <!-- Sell Section -->
                     <div id="sellSection" class="space-y-4 hidden">
                         <div>
-                            <label class="block text-sm text-gray-400 mb-1">كمية الرموز للبيع</label>
+                            <label class="block text-sm text-gray-400 mb-1">كمية الرموز للبيع (Token Amount)</label>
                             <input type="number" id="sellTokenAmount" placeholder="1000" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 focus:outline-none focus:border-pink-500 text-white">
                         </div>
                         <button id="sellBtn" onclick="sellTokens()" class="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2">
                             <i class="fa-solid fa-coins"></i>
-                            <span>بيع الرموز 💸</span>
+                            <span>بيع الرموز واسترداد BNB 💸</span>
                         </button>
                     </div>
                 </div>
@@ -152,7 +152,7 @@
 
             <div class="mt-6 flex justify-between items-center text-xs text-gray-500 flex-wrap gap-2">
                 <span>Factory Address: <span id="factoryAddressDisplay" class="text-purple-400">قيد الاتصال...</span></span>
-                <button id="gradBtn" onclick="checkGraduation()" class="underline hover:text-white cursor-pointer">التحقق من التخرج / تنفيذ التداول على المنصة</button>
+                <button id="gradBtn" onclick="checkGraduation()" class="underline hover:text-white cursor-pointer font-bold text-yellow-500">تنفيذ التخرج إلى DEX (Graduate)</button>
             </div>
         </section>
 
@@ -160,19 +160,22 @@
 
     <!-- Footer -->
     <footer class="text-center py-6 border-t border-gray-800 text-gray-500 text-sm">
-        جميع الحقوق محفوظة &copy; 2026 - NexusMeme Autonomous Launchpad
+        جميع الحقوق محفوظة &copy; 2026 - NexusMeme Autonomous Launchpad (Connected to ViralInstitutionalToken)
     </footer>
 
-    <!-- Script Integration Logic -->
+    <!-- Script Integration Logic (Matched 100% to your Solidity Contract) -->
     <script>
+        // ضع عنوان عقد الـ ViralLaunchpadFactory الخاص بك هنا بعد نشره:
         const FACTORY_ADDRESS = "0xYOUR_DEPLOYED_FACTORY_ADDRESS_HERE"; 
         
+        // ABI لعقد المصنع (ViralLaunchpadFactory) مستخرج من كودك تماماً
         const FACTORY_ABI = [
             "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) external payable returns (address)",
             "function creationFee() external view returns (uint256)",
             "event TokenCreated(address indexed tokenAddress, string name, string symbol, address indexed creator, uint256 graduationTargetBnb)"
         ];
 
+        // ABI لعقد العملة المؤسسية (ViralInstitutionalToken) مستخرج من كودك تماماً
         const TOKEN_ABI = [
             "function name() external view returns (string)",
             "function symbol() external view returns (string)",
@@ -190,12 +193,11 @@
         let provider, signer, factoryContract, activeTokenContract;
         let currentAccount = null;
 
-        // دالة مساعدة لتفعيل/تعطيل حالة التحميل للأزرار
         function setButtonLoading(buttonId, isLoading, originalText) {
             const btn = document.getElementById(buttonId);
             if (isLoading) {
                 btn.classList.add('btn-loading');
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التنفيذ...`;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التنفيذ على البلوكشين...`;
             } else {
                 btn.classList.remove('btn-loading');
                 btn.innerHTML = originalText;
@@ -236,12 +238,20 @@
             setButtonLoading("createBtn", true);
 
             try {
-                const fee = ethers.parseEther("0.01");
+                // استدعاء رسوم الإنشاء creationFee من العقد أو دفع 0.01 BNB افتراضياً
+                let fee = ethers.parseEther("0.01");
+                try {
+                    fee = await factoryContract.creationFee();
+                } catch(e) {}
+
                 const targetBnb = ethers.parseEther(target);
                 
+                // استدعاء دالة createViralToken الموجودة في عقدك الذكي
                 const tx = await factoryContract.createViralToken(name, symbol, targetBnb, { value: fee });
-                await tx.wait();
-                alert("تم إنشاء العملة وإطلاقها بنجاح! 🚀");
+                alert("جاري إرسال معاملة الإنشاء إلى البلوكشين...");
+                const receipt = await tx.wait();
+                
+                alert("تم إنشاء العملة وإطلاقها بنجاح عبر عقد المصنع! 🚀");
             } catch (err) {
                 console.error(err);
                 alert("حدث خطأ أثناء الإنشاء: " + (err.reason || err.message));
@@ -252,7 +262,7 @@
 
         async function loadTokenContract() {
             const address = document.getElementById("tokenAddressInput").value;
-            if (!address || !ethers.isAddress(address)) { alert("يرجى إدخال عنوان عقد صحيح!"); return; }
+            if (!address || !ethers.isAddress(address)) { alert("يرجى إدخال عنوان عقد صحيح (0x...)!"); return; }
 
             const originalHTML = document.getElementById("loadBtn").innerHTML;
             document.getElementById("loadBtn").innerText = "جاري...";
@@ -261,6 +271,7 @@
                 const targetSigner = signer || provider;
                 activeTokenContract = new ethers.Contract(address, TOKEN_ABI, targetSigner);
 
+                // جلب البيانات من المتغيرات العامة في عقدك الذكي
                 const name = await activeTokenContract.name();
                 const symbol = await activeTokenContract.symbol();
                 const bnbRes = await activeTokenContract.realBnbReserve();
@@ -272,11 +283,11 @@
                 document.getElementById("activeTokenSymbol").innerText = symbol;
                 document.getElementById("statBnbReserve").innerText = ethers.formatEther(bnbRes) + " BNB";
                 document.getElementById("statTokenReserve").innerText = ethers.formatUnits(tokenRes, 18);
-                document.getElementById("statGraduationStatus").innerText = graduated ? "متخرجة لـ DEX 🎉" : "قيد التداول (Curve)";
+                document.getElementById("statGraduationStatus").innerText = graduated ? "متخرجة لـ DEX 🎉" : "قيد التداول (Bonding Curve)";
                 document.getElementById("statBountyPool").innerText = ethers.formatEther(bounty) + " BNB";
             } catch (err) {
                 console.error(err);
-                alert("فشل تحميل العقد. تأكد من العنوان الصحيحة.");
+                alert("فشل تحميل العقد. تأكد من أن العنوان يعود لعملة ميم منشأة عبر النظام.");
             } finally {
                 document.getElementById("loadBtn").innerText = originalHTML;
             }
@@ -292,9 +303,10 @@
 
             try {
                 const valueWei = ethers.parseEther(bnbVal);
+                // دالة buy في عقدك تستقبل (minTokensOut, referrer)
                 const tx = await activeTokenContract.buy(0, ethers.ZeroAddress, { value: valueWei });
                 await tx.wait();
-                alert("تم الشراء بنجاح! 🪙");
+                alert("تم الشراء بنجاح عبر منحنى الترابط! 🪙");
                 loadTokenContract();
             } catch (err) {
                 console.error(err);
@@ -315,9 +327,12 @@
             try {
                 const amountWei = ethers.parseUnits(tokenAmount, 18);
                 
-                const approveTx = await activeTokenContract.approve(await activeTokenContract.getAddress(), amountWei);
+                // الموافقة لعقد العملة بخصم الكمية قبل البيع
+                const contractAddress = await activeTokenContract.getAddress();
+                const approveTx = await activeTokenContract.approve(contractAddress, amountWei);
                 await approveTx.wait();
 
+                // دالة sell في عقدك تستقبل (tokenAmount, minBnbOut, referrer)
                 const tx = await activeTokenContract.sell(amountWei, 0, ethers.ZeroAddress);
                 await tx.wait();
                 alert("تم البيع واسترداد الـ BNB بنجاح! 💸");
@@ -331,16 +346,17 @@
         }
 
         async function checkGraduation() {
-            if (!activeTokenContract || !signer) { alert("يرجى تحميل العقد أولاً!"); return; }
+            if (!activeTokenContract || !signer) { alert("يرجى تحميل عقد العملة أولاً!"); return; }
             try {
+                // استدعاء دالة graduate الموجودة في عقدك الذكي
                 const tx = await activeTokenContract.graduate();
-                alert("جاري تخرج العملة إلى منصة التداول اللامركزية (DEX)...");
+                alert("جاري تخرج العملة وربط السيولة بـ DEX...");
                 await tx.wait();
-                alert("مبروك! تخرجت العملة بنجاح وأُضيفت سيولة DEX 🥂");
+                alert("مبروك! تخرجت العملة بنجاح وأُضيفت السيولة للمنصة اللامركزية 🥂");
                 loadTokenContract();
             } catch (err) {
                 console.error(err);
-                alert("لم يتم استيفاء هدف التخرج بعد أو حدث خطأ: " + (err.reason || err.message));
+                alert("لم يتم استيفاء هدف التخرج (Graduation Target) بعد أو حدث خطأ: " + (err.reason || err.message));
             }
         }
 
