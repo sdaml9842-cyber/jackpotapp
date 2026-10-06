@@ -80,10 +80,7 @@
 </div>
 
 <script>
-    // عنوان عقد المصنع المنشور على شبكة Base
     const FACTORY_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
-    
-    // ABI المصنع الأساسية
     const FACTORY_ABI = [
         "function createViralToken(string memory name, string memory symbol, uint256 graduationTargetBnb) external payable returns (address)",
         "function creationFee() external view returns (uint256)"
@@ -94,31 +91,39 @@
     async function connectWallet() {
         if (window.ethereum) {
             try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                
-                const network = await provider.getNetwork();
-                if (network.chainId !== 8453) {
-                    try {
+                // التأكد أولاً من التبديل الإجباري لشبكة Base قبل ربط المزود
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x2105' }], // 8453 بالـ Hex
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
                         await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x2105' }],
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x2105',
+                                chainName: 'Base Mainnet',
+                                rpcUrls: ['https://mainnet.base.org'],
+                                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                                blockExplorerUrls: ['https://basescan.org']
+                            }]
                         });
-                    } catch (switchError) {
-                        alert("يرجى تحويل شبكة محفظتك إلى Base Mainnet يدويّاً.");
-                        return;
                     }
                 }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum, { name: "base", chainId: 8453 });
+                await provider.send("eth_requestAccounts", []);
 
                 signer = provider.getSigner();
                 const address = await signer.getAddress();
                 document.getElementById("connectBtn").innerText = "متصل: " + address.substring(0, 6) + "..." + address.substring(38);
-                document.getElementById("walletStatus").innerText = "تمت الاتصال بنجاح بـ Base Network";
+                document.getElementById("walletStatus").innerText = "متصل بنجاح بشبكة Base";
                 
                 factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
             } catch (error) {
                 console.error(error);
-                alert("فشل ربط المحفظة!");
+                alert("فشل ربط المحفظة: " + error.message);
             }
         } else {
             alert("يرجى استخدام متصفح يدعم Web3 مثل MetaMask أو Mises Browser.");
@@ -142,16 +147,15 @@
         }
 
         try {
-            // تحديد الرسوم بدقة لتساوي 0.05$ تقريباً (0.0000184 ETH)
             const lowFee = ethers.utils.parseUnits("0.0000184", "ether");
 
-            alert("جاري إرسال معاملة إطلاق التوكن برسوم مخفضة (0.05$) على شبكة Base...");
+            alert("جاري إرسال معاملة إطلاق التوكن على شبكة Base...");
             
             const tx = await factoryContract.createViralToken(name, symbol, graduationTargetBnb, { value: lowFee });
             alert("تم إرسال المعاملة بنجاح! رقم المعاملة: " + tx.hash);
             
             const receipt = await tx.wait();
-            alert("تم إطلاق العملة بنجاح تام برسوم 0.05$ على شبكة Base! 🎉");
+            alert("تم إطلاق العملة بنجاح تام على شبكة Base! 🎉");
         } catch (error) {
             console.error(error);
             alert("حدث خطأ أثناء الإطلاق: " + (error.data?.message || error.message));
