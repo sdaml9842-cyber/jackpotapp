@@ -43,7 +43,6 @@
         }
         .header p { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 
-        /* شريط جاهزية العقد */
         .readiness-bar-container {
             background: #0b0f19; border: 1px solid var(--border-color);
             border-radius: 8px; padding: 8px; margin-bottom: 12px;
@@ -52,16 +51,15 @@
         .progress-bar { width: 100%; height: 6px; background: #1f2937; border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--accent-green); width: 50%; transition: width 0.3s ease; }
 
-        /* معاينة حية للبطاقة */
         .live-preview {
             background: linear-gradient(135deg, #1f2937, #0b0f19);
             border: 1px dashed var(--accent-blue); border-radius: 12px;
             padding: 10px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
         }
-        .preview-avatar { width: 40px; height: 40px; border-radius: 50%; background: #0052ff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; overflow: hidden; }
+        .preview-avatar { width: 40px; height: 40px; border-radius: 50%; background: #0052ff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; overflow: hidden; flex-shrink: 0; }
         .preview-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .preview-info { font-size: 11px; }
-        .preview-info .p-name { font-weight: 700; color: #fff; }
+        .preview-info { font-size: 11px; overflow: hidden; }
+        .preview-info .p-name { font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .preview-info .p-symbol { color: #38bdf8; font-size: 9px; }
 
         .btn {
@@ -112,6 +110,7 @@
         }
 
         .status-box { font-size: 10px; text-align: center; padding: 7px; background: #0b0f19; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 10px; color: #38bdf8; word-break: break-all; }
+        .contract-info { font-size: 9px; color: var(--text-muted); text-align: center; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -119,10 +118,9 @@
 <div class="app-container">
     <div class="header">
         <h1>⚡ ChainPump Base</h1>
-        <p>Next-Gen Secure Launchpad</p>
+        <p>Target Contract Integration</p>
     </div>
 
-    <!-- شريط جاهزية العقد التفاعلي -->
     <div class="readiness-bar-container">
         <div class="readiness-text">
             <span>مؤشر جاهزية الإطلاق</span>
@@ -133,7 +131,6 @@
         </div>
     </div>
 
-    <!-- معاينة حية لشكل العملة -->
     <div class="live-preview">
         <div class="preview-avatar" id="previewAvatarBox"><i class="fa-solid fa-coins"></i></div>
         <div class="preview-info">
@@ -147,7 +144,6 @@
     </button>
     <div class="wallet-status" id="walletAddress">المحفظة غير متصلة</div>
 
-    <!-- إعدادات الرمز وشعاره -->
     <div class="section-card">
         <div class="section-title"><i class="fa-solid fa-coins"></i> إعدادات الرمز وشعاره</div>
         <div class="form-group">
@@ -160,7 +156,7 @@
         </div>
 
         <div class="form-group" style="margin-bottom: 0;">
-            <label>مصدر شعار الرمز (مع خيارات الذكاء الاصطناعي السريعة)</label>
+            <label>مصدر شعار الرمز</label>
             <div class="logo-tabs">
                 <button class="logo-tab active" id="tabDoodle" onclick="switchLogoTab('doodle')">🎨 رسم يدوي</button>
                 <button class="logo-tab" id="tabAi" onclick="switchLogoTab('ai')">✨ ذكاء اصطناعي</button>
@@ -192,7 +188,6 @@
         </div>
     </div>
 
-    <!-- الشراء الأولي ورسوم المنصة -->
     <div class="section-card">
         <div class="section-title"><i class="fa-solid fa-shield-halved"></i> الشراء الأولي ورسوم المنصة</div>
         <div class="form-group">
@@ -205,20 +200,22 @@
         </div>
     </div>
 
-    <!-- الإطلاق المباشر -->
     <div class="section-card" style="margin-bottom: 0;">
         <div class="section-title"><i class="fa-solid fa-rocket"></i> الإطلاق الفوري على شبكة Base</div>
         <button class="btn btn-green" onclick="launchTokenOnBase()">
-            <i class="fa-solid fa-rocket"></i> نشر العقد على شبكة Base ⚡
+            <i class="fa-solid fa-rocket"></i> تنفيذ وإرسال للعقد ⚡
         </button>
+        <div class="contract-info">العقد المستهدف: 0xb641...1A7a</div>
     </div>
 
-    <div class="status-box" id="statusBox">الحالة: جاهز للإطلاق على شبكة Base</div>
+    <div class="status-box" id="statusBox">الحالة: جاهز للاتصال بالعقد المخصص</div>
 </div>
 
 <script>
+    const TARGET_CONTRACT_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
     const ETH_PRICE_USD = 2700;
     let customLogoDataUrl = null;
+    let connectedSigner = null;
 
     function updatePriceEstimation() {
         const ethVal = parseFloat(document.getElementById("devBuyAmount").value) || 0;
@@ -270,7 +267,6 @@
     window.onload = function() {
         initCanvas();
         updatePriceEstimation();
-        // استعادة المسودة تلقائياً إن وجدت
         const saved = localStorage.getItem("chainpump_draft");
         if(saved) {
             try {
@@ -341,19 +337,32 @@
         const prompt = promptInput ? encodeURIComponent(promptInput) : "crypto cyberpunk token logo vector";
         const resultContainer = document.getElementById("aiResultContainer");
         
-        document.getElementById("statusBox").innerText = "الحالة: جاري توليد شعار الذكاء الاصطناعي...";
-        resultContainer.innerHTML = "<p style='font-size:9px; color:#38bdf8; margin-top:4px;'>جاري معالجة الصورة...</p>";
+        document.getElementById("statusBox").innerText = "الحالة: جاري توليد شعار الذكاء الاصطناعي ومعالجته...";
+        resultContainer.innerHTML = "<p style='font-size:9px; color:#38bdf8; margin-top:4px;'>جاري تحميل الصورة...</p>";
         
         const imageUrl = `https://image.pollinations.ai/prompt/${prompt}?width=180&height=180&nologo=true`;
         
-        const img = document.createElement("img");
+        const img = new Image();
+        img.crossOrigin = "anonymous";
         img.src = imageUrl;
         img.onload = function() {
+            try {
+                const tempCanvas = document.createElement("canvas");
+                tempCanvas.width = img.width;
+                tempCanvas.height = img.height;
+                const tCtx = tempCanvas.getContext("2d");
+                tCtx.drawImage(img, 0, 0);
+                customLogoDataUrl = tempCanvas.toDataURL("image/png");
+            } catch(err) {
+                customLogoDataUrl = imageUrl;
+            }
+
             resultContainer.innerHTML = "";
-            resultContainer.appendChild(img);
-            customLogoDataUrl = imageUrl;
-            document.getElementById("previewAvatarBox").innerHTML = `<img src="${imageUrl}">`;
-            document.getElementById("statusBox").innerText = "الحالة: تم إنشاء الشعار بنجاح وتحديث المعاينة";
+            const displayImg = document.createElement("img");
+            displayImg.src = customLogoDataUrl;
+            resultContainer.appendChild(displayImg);
+            document.getElementById("previewAvatarBox").innerHTML = `<img src="${customLogoDataUrl}">`;
+            document.getElementById("statusBox").innerText = "الحالة: تم إنشاء وحفظ الشعار بنجاح";
         };
         img.onerror = function() {
             resultContainer.innerHTML = "<p style='font-size:9px; color:#ef4444;'>تعذر التوليد، حاول مرة أخرى</p>";
@@ -375,7 +384,7 @@
     }
 
     async function connectWallet() {
-        if (!window.ethereum) { alert("يرجى استخدام متصفح يدعم Web3"); return; }
+        if (!window.ethereum) { alert("يرجى استخدام متصفح يدعم Web3 (مثل Mises أو Kiwi)"); return; }
         try {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
@@ -393,11 +402,11 @@
                 }
             }
 
-            const signer = provider.getSigner();
-            const address = await signer.getAddress();
+            connectedSigner = provider.getSigner();
+            const address = await connectedSigner.getAddress();
             document.getElementById("walletAddress").innerText = "متصل: " + address.substring(0, 6) + "..." + address.substring(address.length - 4);
             document.getElementById("walletBtn").innerText = "متصل بشبكة Base ✓";
-            document.getElementById("statusBox").innerText = "الحالة: متصل بنجاح على شبكة Base";
+            document.getElementById("statusBox").innerText = "الحالة: متصل بنجاح وجاهز للتفاعل مع العقد";
         } catch (err) {
             document.getElementById("statusBox").innerText = "الحالة: فشل اتصال المحفظة";
         }
@@ -406,24 +415,31 @@
     async function launchTokenOnBase() {
         const symbol = document.getElementById("tokenSymbol").value;
         const devBuy = document.getElementById("devBuyAmount").value;
+        
         if (!window.ethereum) { alert("يرجى ربط المحفظة أولاً"); return; }
         
         try {
-            document.getElementById("statusBox").innerText = "الحالة: جاري إرسال المعاملة على شبكة Base...";
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
+            if (!connectedSigner) {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                connectedSigner = provider.getSigner();
+            }
+
+            document.getElementById("statusBox").innerText = "الحالة: يرجى تأكيد المعاملة الموجهة للعقد المستهدف...";
             
-            const tx = await signer.sendTransaction({
-                to: await signer.getAddress(),
+            // إرسال المعاملة مباشرة للعقد المحدد بدقة
+            const tx = await connectedSigner.sendTransaction({
+                to: TARGET_CONTRACT_ADDRESS,
                 value: ethers.utils.parseEther(devBuy)
             });
             
             document.getElementById("statusBox").innerText = "الحالة: بانتظار تأكيد الكتلة على Base...";
             await tx.wait();
-            document.getElementById("statusBox").innerText = `الحالة: تم إطلاق $${symbol} بنجاح على Base`;
-            alert("تم إطلاق المشروع بنجاح على شبكة Base.");
+            
+            document.getElementById("statusBox").innerText = `الحالة: تم إطلاق $${symbol} والتفاعل مع العقد بنجاح!`;
+            alert(`تم إرسال المعاملة بنجاح إلى العقد:\n${TARGET_CONTRACT_ADDRESS}`);
         } catch (error) {
-            document.getElementById("statusBox").innerText = "الحالة: تم إلغاء المعاملة أو فشل التنفيذ";
+            console.error(error);
+            document.getElementById("statusBox").innerText = "الحالة: تم إلغاء المعاملة أو حدث خطأ في التنفيذ";
         }
     }
 </script>
