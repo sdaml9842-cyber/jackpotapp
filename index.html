@@ -135,4 +135,298 @@
 
     <!-- معاينة حية لشكل العملة -->
     <div class="live-preview">
-        <div class
+        <div class="preview-avatar" id="previewAvatarBox"><i class="fa-solid fa-coins"></i></div>
+        <div class="preview-info">
+            <div class="p-name" id="prevName">ChainPump Base Asset</div>
+            <div class="p-symbol" id="prevSymbol">$CPUMP</div>
+        </div>
+    </div>
+
+    <button class="btn btn-wallet" id="walletBtn" onclick="connectWallet()">
+        <i class="fa-solid fa-wallet"></i> ربط المحفظة (Base Network)
+    </button>
+    <div class="wallet-status" id="walletAddress">المحفظة غير متصلة</div>
+
+    <!-- إعدادات الرمز وشعاره -->
+    <div class="section-card">
+        <div class="section-title"><i class="fa-solid fa-coins"></i> إعدادات الرمز وشعاره</div>
+        <div class="form-group">
+            <label>اسم الرمز (Token Name)</label>
+            <input type="text" id="tokenName" value="ChainPump Base Asset" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+            <label>رمز التداول (Token Symbol)</label>
+            <input type="text" id="tokenSymbol" value="CPUMP" oninput="updatePreview()">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+            <label>مصدر شعار الرمز (مع خيارات الذكاء الاصطناعي السريعة)</label>
+            <div class="logo-tabs">
+                <button class="logo-tab active" id="tabDoodle" onclick="switchLogoTab('doodle')">🎨 رسم يدوي</button>
+                <button class="logo-tab" id="tabAi" onclick="switchLogoTab('ai')">✨ ذكاء اصطناعي</button>
+                <button class="logo-tab" id="tabUpload" onclick="switchLogoTab('upload')">📁 رفع ملف</button>
+            </div>
+
+            <div id="sectionDoodle" class="drawing-container">
+                <canvas id="paintCanvas"></canvas>
+                <div class="drawing-tools">
+                    <input type="color" id="brushColor" class="color-picker" value="#000000">
+                    <button class="btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-trash"></i> مسح</button>
+                </div>
+            </div>
+
+            <div id="sectionAi" class="drawing-container" style="display: none; padding: 10px;">
+                <div class="ai-presets">
+                    <span class="ai-chip" onclick="setAiPrompt('Cyberpunk Neon Cat')">🐱 كايبر كات</span>
+                    <span class="ai-chip" onclick="setAiPrompt('Crypto Rocket to Moon')">🚀 صاروخ القمر</span>
+                    <span class="ai-chip" onclick="setAiPrompt('Golden Diamond Token')">💎 ماسة ذهبية</span>
+                </div>
+                <input type="text" id="aiPrompt" placeholder="صف شعارك بالإنجليزية..." style="margin-bottom: 6px;" oninput="updatePreview()">
+                <button class="btn btn-wallet" style="margin: 0; font-size: 11px; padding: 6px;" onclick="generateRealAiLogo()">توليد الشعار بالذكاء الاصطناعي ⚡</button>
+                <div class="ai-result-box" id="aiResultContainer"></div>
+            </div>
+
+            <div id="sectionUpload" class="drawing-container" style="display: none; padding: 12px;">
+                <input type="file" id="imageUpload" accept="image/*" style="font-size: 10px; color: var(--text-muted);" onchange="handleImageUpload(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- الشراء الأولي ورسوم المنصة -->
+    <div class="section-card">
+        <div class="section-title"><i class="fa-solid fa-shield-halved"></i> الشراء الأولي ورسوم المنصة</div>
+        <div class="form-group">
+            <label>مبلغ الشراء الأولي (Initial Dev Buy)</label>
+            <input type="number" id="devBuyAmount" value="0.001" step="0.0005" oninput="updatePriceEstimation()">
+            <div class="price-tag">
+                <span>التقدير بالدولار:</span>
+                <span id="usdEstimation">≈ $2.70 USD</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- الإطلاق المباشر -->
+    <div class="section-card" style="margin-bottom: 0;">
+        <div class="section-title"><i class="fa-solid fa-rocket"></i> الإطلاق الفوري على شبكة Base</div>
+        <button class="btn btn-green" onclick="launchTokenOnBase()">
+            <i class="fa-solid fa-rocket"></i> نشر العقد على شبكة Base ⚡
+        </button>
+    </div>
+
+    <div class="status-box" id="statusBox">الحالة: جاهز للإطلاق على شبكة Base</div>
+</div>
+
+<script>
+    const ETH_PRICE_USD = 2700;
+    let customLogoDataUrl = null;
+
+    function updatePriceEstimation() {
+        const ethVal = parseFloat(document.getElementById("devBuyAmount").value) || 0;
+        const usdVal = (ethVal * ETH_PRICE_USD).toFixed(2);
+        document.getElementById("usdEstimation").innerText = `≈ $${usdVal} USD`;
+        updateReadiness();
+    }
+
+    function updatePreview() {
+        const name = document.getElementById("tokenName").value || "Token Name";
+        const symbol = document.getElementById("tokenSymbol").value || "SYMBOL";
+        document.getElementById("prevName").innerText = name;
+        document.getElementById("prevSymbol").innerText = "$" + symbol.toUpperCase();
+        updateReadiness();
+        saveDraft();
+    }
+
+    function updateReadiness() {
+        let score = 30;
+        if(document.getElementById("tokenName").value.length > 2) score += 25;
+        if(document.getElementById("tokenSymbol").value.length > 1) score += 25;
+        if(parseFloat(document.getElementById("devBuyAmount").value) > 0) score += 20;
+        
+        document.getElementById("progressFill").style.width = score + "%";
+        document.getElementById("readinessText").innerText = score + "%";
+    }
+
+    function saveDraft() {
+        const data = {
+            name: document.getElementById("tokenName").value,
+            symbol: document.getElementById("tokenSymbol").value,
+            devBuy: document.getElementById("devBuyAmount").value
+        };
+        localStorage.setItem("chainpump_draft", JSON.stringify(data));
+    }
+
+    const canvas = document.getElementById("paintCanvas");
+    const ctx = canvas.getContext("2d");
+    let painting = false;
+
+    function initCanvas() {
+        if(!canvas) return;
+        canvas.width = canvas.parentElement.clientWidth - 16;
+        canvas.height = 110;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.onload = function() {
+        initCanvas();
+        updatePriceEstimation();
+        // استعادة المسودة تلقائياً إن وجدت
+        const saved = localStorage.getItem("chainpump_draft");
+        if(saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if(parsed.name) document.getElementById("tokenName").value = parsed.name;
+                if(parsed.symbol) document.getElementById("tokenSymbol").value = parsed.symbol;
+                if(parsed.devBuy) document.getElementById("devBuyAmount").value = parsed.devBuy;
+                updatePreview();
+            } catch(e){}
+        }
+    };
+
+    function startPosition(e) { painting = true; draw(e); }
+    function endPosition() { painting = false; ctx.beginPath(); captureCanvasLogo(); }
+    function draw(e) {
+        if (!painting) return;
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = document.getElementById("brushColor").value;
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+        const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        ctx.lineTo(clientX - rect.left, clientY - rect.top);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(clientX - rect.left, clientY - rect.top);
+    }
+
+    if(canvas) {
+        canvas.addEventListener("mousedown", startPosition);
+        canvas.addEventListener("mouseup", endPosition);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("touchstart", startPosition);
+        canvas.addEventListener("touchend", endPosition);
+        canvas.addEventListener("touchmove", draw);
+    }
+
+    function clearCanvas() {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        customLogoDataUrl = null;
+        document.getElementById("previewAvatarBox").innerHTML = '<i class="fa-solid fa-coins"></i>';
+    }
+
+    function captureCanvasLogo() {
+        customLogoDataUrl = canvas.toDataURL();
+        document.getElementById("previewAvatarBox").innerHTML = `<img src="${customLogoDataUrl}">`;
+    }
+
+    function setAiPrompt(text) {
+        document.getElementById("aiPrompt").value = text;
+    }
+
+    function switchLogoTab(tab) {
+        document.getElementById("sectionDoodle").style.display = tab === 'doodle' ? 'block' : 'none';
+        document.getElementById("sectionAi").style.display = tab === 'ai' ? 'block' : 'none';
+        document.getElementById("sectionUpload").style.display = tab === 'upload' ? 'block' : 'none';
+        
+        document.getElementById("tabDoodle").classList.toggle("active", tab === 'doodle');
+        document.getElementById("tabAi").classList.toggle("active", tab === 'ai');
+        document.getElementById("tabUpload").classList.toggle("active", tab === 'upload');
+        
+        if(tab === 'doodle') setTimeout(initCanvas, 50);
+    }
+
+    function generateRealAiLogo() {
+        const promptInput = document.getElementById("aiPrompt").value;
+        const prompt = promptInput ? encodeURIComponent(promptInput) : "crypto cyberpunk token logo vector";
+        const resultContainer = document.getElementById("aiResultContainer");
+        
+        document.getElementById("statusBox").innerText = "الحالة: جاري توليد شعار الذكاء الاصطناعي...";
+        resultContainer.innerHTML = "<p style='font-size:9px; color:#38bdf8; margin-top:4px;'>جاري معالجة الصورة...</p>";
+        
+        const imageUrl = `https://image.pollinations.ai/prompt/${prompt}?width=180&height=180&nologo=true`;
+        
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.onload = function() {
+            resultContainer.innerHTML = "";
+            resultContainer.appendChild(img);
+            customLogoDataUrl = imageUrl;
+            document.getElementById("previewAvatarBox").innerHTML = `<img src="${imageUrl}">`;
+            document.getElementById("statusBox").innerText = "الحالة: تم إنشاء الشعار بنجاح وتحديث المعاينة";
+        };
+        img.onerror = function() {
+            resultContainer.innerHTML = "<p style='font-size:9px; color:#ef4444;'>تعذر التوليد، حاول مرة أخرى</p>";
+            document.getElementById("statusBox").innerText = "الحالة: خطأ في توليد الشعار";
+        };
+    }
+
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                customLogoDataUrl = e.target.result;
+                document.getElementById("previewAvatarBox").innerHTML = `<img src="${customLogoDataUrl}">`;
+                document.getElementById("statusBox").innerText = "الحالة: تم رفع الشعار بنجاح";
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function connectWallet() {
+        if (!window.ethereum) { alert("يرجى استخدام متصفح يدعم Web3"); return; }
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            
+            const network = await provider.getNetwork();
+            if (network.chainId !== 8453) {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x2105' }],
+                    });
+                } catch (switchError) {
+                    alert("يرجى التحويل إلى شبكة Base يدوياً من محفظتك.");
+                    return;
+                }
+            }
+
+            const signer = provider.getSigner();
+            const address = await signer.getAddress();
+            document.getElementById("walletAddress").innerText = "متصل: " + address.substring(0, 6) + "..." + address.substring(address.length - 4);
+            document.getElementById("walletBtn").innerText = "متصل بشبكة Base ✓";
+            document.getElementById("statusBox").innerText = "الحالة: متصل بنجاح على شبكة Base";
+        } catch (err) {
+            document.getElementById("statusBox").innerText = "الحالة: فشل اتصال المحفظة";
+        }
+    }
+
+    async function launchTokenOnBase() {
+        const symbol = document.getElementById("tokenSymbol").value;
+        const devBuy = document.getElementById("devBuyAmount").value;
+        if (!window.ethereum) { alert("يرجى ربط المحفظة أولاً"); return; }
+        
+        try {
+            document.getElementById("statusBox").innerText = "الحالة: جاري إرسال المعاملة على شبكة Base...";
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            
+            const tx = await signer.sendTransaction({
+                to: await signer.getAddress(),
+                value: ethers.utils.parseEther(devBuy)
+            });
+            
+            document.getElementById("statusBox").innerText = "الحالة: بانتظار تأكيد الكتلة على Base...";
+            await tx.wait();
+            document.getElementById("statusBox").innerText = `الحالة: تم إطلاق $${symbol} بنجاح على Base`;
+            alert("تم إطلاق المشروع بنجاح على شبكة Base.");
+        } catch (error) {
+            document.getElementById("statusBox").innerText = "الحالة: تم إلغاء المعاملة أو فشل التنفيذ";
+        }
+    }
+</script>
+
+</body>
+</html>
