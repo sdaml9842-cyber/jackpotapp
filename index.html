@@ -1,318 +1,277 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viral Pad | Binance Style Terminal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.0/ethers.umd.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>ChainPump 🚀 | Meme Launchpad</title>
+    <!-- Ethers.js v5 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --accent-green: #10b981;
+            --accent-blue: #38bdf8;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: #1f2937;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
         body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #0b0e11;
-            color: #eaecef;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 15px;
+            background-image: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15), transparent 50%);
         }
-        .bg-panel { background-color: #181a20; }
-        .bg-hover { background-color: #2b3139; }
-        .border-panel { border-color: #2b3139; }
-        .text-binance { color: #fcd535; }
-        .bg-binance { background-color: #fcd535; color: #181a20; }
-        .bg-binance:hover { background-color: #f0c822; }
-        .input-dark { 
-            background-color: #2b3139; 
-            border: 1px solid #474d57; 
-            color: #eaecef;
+
+        .app-container {
+            width: 100%; max-width: 480px; background: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 20px;
+            padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
-        .input-dark:focus { border-color: #fcd535; outline: none; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0b0e11; }
-        ::-webkit-scrollbar-thumb { background: #474d57; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #5e6673; }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 {
+            font-size: 26px; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        .btn-wallet {
+            width: 100%; background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: white; border: none; padding: 14px; border-radius: 12px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .wallet-status { font-size: 12px; color: var(--accent-blue); text-align: center; margin-top: 8px; font-weight: 600; word-break: break-all; }
+        .divider { height: 1px; background: var(--border-color); margin: 20px 0; }
+        .form-group { margin-bottom: 16px; }
+
+        label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 12px 14px; background: #0b0f19;
+            border: 1px solid var(--border-color); color: white;
+            border-radius: 10px; font-size: 14px; outline: none;
+        }
+
+        .art-mode-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+        .mode-btn {
+            flex: 1; padding: 10px 4px; background: #0b0f19;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center;
+        }
+        .mode-btn.active { background: rgba(56, 189, 248, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        .sketch-box { background: #0b0f19; border: 1px dashed var(--border-color); border-radius: 12px; padding: 12px; text-align: center; }
+        canvas { background: #ffffff; border-radius: 8px; cursor: crosshair; touch-action: none; max-width: 100%; }
+
+        .tools { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-clear { background: #ef4444; color: white; }
+        .btn-action { background: linear-gradient(135deg, var(--accent-purple), #6d28d9); color: white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+
+        .booster-toggle {
+            background: #1f2937; color: var(--accent-blue); border: none;
+            width: 100%; padding: 10px; border-radius: 8px; font-size: 12px;
+            font-weight: bold; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center; margin-top: 15px;
+        }
+
+        .booster-box {
+            display: none; background: #0b0f19; border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 12px; margin-top: 8px;
+        }
+
+        .switch-row {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .switch-row:last-child { margin-bottom: 0; }
+        .switch-title { font-size: 12px; font-weight: bold; color: var(--text-main); }
+        .switch-desc { font-size: 10px; color: var(--text-muted); }
+
+        .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #374151; transition: .3s; border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-green); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        .btn-launch {
+            width: 100%; background: linear-gradient(135deg, #10b981, #059669);
+            color: white; border: none; padding: 16px; border-radius: 12px;
+            font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .btn-launch:disabled { background: #374151; cursor: not-allowed; box-shadow: none; }
+
+        .status-card { background: #0b0f19; border: 1px solid var(--border-color); padding: 12px; border-radius: 10px; font-size: 12px; color: var(--text-muted); margin-top: 15px; text-align: center; word-break: break-all; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--accent-green); padding: 20px; border-radius: 20px; text-align: center; max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        
+        .btn-twitter { background: #1da1f2; color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 8px; font-size: 13px; width: 100%; }
+        .btn-copy { background: #374151; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; margin-top: 6px; }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
+<body>
 
-    <!-- Sidebar -->
-    <aside class="w-20 md:w-64 bg-panel border-l border-panel flex flex-col justify-between transition-all duration-300">
-        <div>
-            <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-panel">
-                <i class="fa-solid fa-rocket text-binance text-2xl"></i>
-                <span class="hidden md:block mr-3 font-black text-xl tracking-wide">VIRAL PAD</span>
-            </div>
-            <nav class="mt-6 flex flex-col gap-2 px-2 md:px-4">
-                <a href="#" class="flex items-center p-3 rounded-lg bg-hover text-binance">
-                    <i class="fa-solid fa-layer-group text-lg md:ml-3"></i>
-                    <span class="hidden md:block font-bold">منصة الإطلاق</span>
-                </a>
-                <a href="#" class="flex items-center p-3 rounded-lg hover:bg-hover transition">
-                    <i class="fa-solid fa-chart-line text-lg md:ml-3 text-gray-400"></i>
-                    <span class="hidden md:block font-bold text-gray-400">الأسواق</span>
-                </a>
-                <a href="#" class="flex items-center p-3 rounded-lg hover:bg-hover transition">
-                    <i class="fa-solid fa-wallet text-lg md:ml-3 text-gray-400"></i>
-                    <span class="hidden md:block font-bold text-gray-400">المحفظة</span>
-                </a>
-            </nav>
-        </div>
-        <div class="p-4 border-t border-panel text-center">
-            <span class="hidden md:block text-xs text-gray-500">v2.0.1 • Base Network</span>
-        </div>
-    </aside>
+<div class="app-container">
+    <div class="header">
+        <h1>⚡ ChainPump 🚀</h1>
+        <p>Instant Memecoin Launchpad + Anti-Bot Shield</p>
+    </div>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-        
-        <!-- Topbar -->
-        <header class="h-16 bg-panel border-b border-panel flex items-center justify-between px-6 sticky top-0 z-10">
-            <div class="flex items-center gap-4">
-                <span class="px-3 py-1 bg-gray-800 rounded text-xs font-bold text-green-400 border border-green-900">
-                    <i class="fa-solid fa-circle-dot text-[8px] ml-1 animate-pulse"></i> Base Mainnet
-                </span>
-            </div>
+    <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">
+        <i class="fa-solid fa-wallet"></i> Connect Wallet
+    </button>
+    <div class="wallet-status" id="walletAddress">Wallet not connected</div>
+
+    <div class="divider"></div>
+
+    <div class="form-group">
+        <label><i class="fa-solid fa-tag"></i> Token Name</label>
+        <input type="text" id="tokenName" value="ChainPump Gem">
+    </div>
+
+    <div class="form-group">
+        <label><i class="fa-solid fa-coins"></i> Token Symbol</label>
+        <input type="text" id="tokenSymbol" value="CPUMP">
+    </div>
+
+    <div class="form-group">
+        <label><i class="fa-solid fa-bullseye"></i> DEX Graduation Target (BNB)</label>
+        <select id="graduationTarget">
+            <option value="4">4 BNB (Fast Track)</option>
+            <option value="10" selected>10 BNB (Balanced)</option>
+            <option value="20">20 BNB (Standard)</option>
+            <option value="50">50 BNB (High Liquidity)</option>
+        </select>
+    </div>
+
+    <label><i class="fa-solid fa-image"></i> Token Logo Source</label>
+    <div class="art-mode-selector">
+        <button class="mode-btn active" id="btnModeDoodle" onclick="switchArtMode('doodle')">🎨 Doodle</button>
+        <button class="mode-btn" id="btnModeAI" onclick="switchArtMode('ai')">🪄 AI Art</button>
+        <button class="mode-btn" id="btnModeUpload" onclick="switchArtMode('upload')">📁 Upload</button>
+    </div>
+
+    <div class="sketch-box" id="doodleSection">
+        <canvas id="sketchpad" width="260" height="180"></canvas>
+        <div class="tools">
+            <input type="color" id="colorPicker" value="#000000" style="border:none; background:transparent; cursor:pointer;">
+            <button class="btn-sm btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-trash"></i> Clear</button>
+        </div>
+    </div>
+
+    <div class="sketch-box" id="aiSection" style="display: none;">
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Auto-creates a unique logo based on your token name!</p>
+        <div id="aiPreview" style="height: 140px; background: #1f2937; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #6b7280;">Click below to generate</span>
+        </div>
+        <button class="btn-action" onclick="generateAIArt()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Logo Now</button>
+    </div>
+
+    <div class="sketch-box" id="uploadSection" style="display: none;">
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Select a logo from your device</p>
+        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
+        <button class="btn-action" style="background: #0284c7;" onclick="document.getElementById('imageInput').click()">
+            <i class="fa-solid fa-upload"></i> Choose Image File
+        </button>
+        <div id="uploadPreview" style="margin-top: 10px; height: 130px; display: none; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; border: 1px solid var(--border-color);">
+            <img id="previewImg" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+    </div>
+
+    <div class="form-group" style="margin-top: 15px;">
+        <label><i class="fa-solid fa-fire"></i> Initial Dev Buy Amount (BNB)</label>
+        <input type="number" id="buyAmount" value="0.01" step="0.01" min="0">
+    </div>
+
+    <button class="booster-toggle" onclick="toggleBoosters()">
+        <span>⚡ Genius Launch Boosters (Optional)</span>
+        <i class="fa-solid fa-chevron-down" id="boosterIcon"></i>
+    </button>
+
+    <div class="booster-box" id="boosterBox">
+        <div class="switch-row">
             <div>
-                <button id="connectWalletBtn" class="bg-binance font-bold py-2 px-6 rounded hover:opacity-90 transition shadow-lg">
-                    <i class="fa-solid fa-link ml-2"></i> ربط المحفظة
-                </button>
+                <div class="switch-title">🛡️ Anti-Snipe Protection</div>
+                <div class="switch-desc">Dynamic Tsunami fee model prevents bot sandwich attacks</div>
             </div>
-        </header>
-
-        <!-- Dashboard Layout -->
-        <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Launch Terminal -->
-            <div class="lg:col-span-2 bg-panel rounded-xl border border-panel overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-panel flex justify-between items-center bg-[#1e2329]">
-                    <h2 class="font-bold text-lg"><i class="fa-solid fa-terminal ml-2 text-binance"></i> محطة ابتكار العملات (Creation Terminal)</h2>
-                </div>
-                <div class="p-6">
-                    <form id="launchForm" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-gray-400 mb-2">اسم المشروع (Token Name)</label>
-                                <input type="text" id="tokenName" required class="w-full input-dark rounded py-3 px-4 transition" placeholder="مثال: Viral Token">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-400 mb-2">الرمز (Symbol)</label>
-                                <input type="text" id="tokenSymbol" required class="w-full input-dark rounded py-3 px-4 transition" placeholder="مثال: VRL">
-                            </div>
-                        </div>
-
-                        <!-- Graduation Target Selection -->
-                        <div>
-                            <label class="block text-sm font-bold text-gray-400 mb-2">هدف التخرج إلى DEX (Graduation Target)</label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="4" class="peer sr-only" checked>
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">
-                                        <div class="text-lg">4 BNB</div>
-                                        <div class="text-xs font-normal text-gray-400 mt-1">سريع</div>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="10" class="peer sr-only">
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">
-                                        <div class="text-lg">10 BNB</div>
-                                        <div class="text-xs font-normal text-gray-400 mt-1">متوسط</div>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="20" class="peer sr-only">
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">
-                                        <div class="text-lg">20 BNB</div>
-                                        <div class="text-xs font-normal text-gray-400 mt-1">قياسي</div>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="50" class="peer sr-only">
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">
-                                        <div class="text-lg">50 BNB</div>
-                                        <div class="text-xs font-normal text-gray-400 mt-1">عملاق</div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg text-sm text-yellow-500 flex items-start gap-3">
-                            <i class="fa-solid fa-triangle-exclamation mt-1"></i>
-                            <p>رسوم إنشاء العملة هي <strong>0.01 ETH</strong> تلقائياً إلى العقد. تضمن البرمجية الانتقال التلقائي للسيولة فور الوصول لهدف التخرج المحدد.</p>
-                        </div>
-
-                        <button type="submit" id="createBtn" disabled class="w-full bg-[#474d57] text-gray-300 font-bold text-lg py-4 rounded transition cursor-not-allowed">
-                            يرجى ربط المحفظة لإنشاء العملة
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Side Stats Panel -->
-            <div class="flex flex-col gap-6">
-                
-                <!-- Terminal Logs -->
-                <div class="bg-panel rounded-xl border border-panel overflow-hidden shadow-xl h-72 flex flex-col">
-                    <div class="p-3 border-b border-panel bg-[#1e2329] flex justify-between">
-                        <h3 class="font-bold text-sm text-gray-300">سجل الأحداث (Terminal Logs)</h3>
-                        <i class="fa-solid fa-microchip text-gray-500"></i>
-                    </div>
-                    <div id="statusBox" class="p-4 overflow-y-auto text-xs font-mono flex-1 text-gray-400 space-y-2">
-                        <div class="text-green-500">> النظام جاهز. في انتظار ربط المحفظة...</div>
-                    </div>
-                </div>
-
-                <!-- Contract Details Card -->
-                <div class="bg-panel rounded-xl border border-panel overflow-hidden shadow-xl flex-1">
-                    <div class="p-3 border-b border-panel bg-[#1e2329]">
-                        <h3 class="font-bold text-sm text-gray-300">تفاصيل العقد الذكي</h3>
-                    </div>
-                    <div class="p-4 flex flex-col gap-4 text-xs">
-                        <div class="flex justify-between items-center border-b border-[#2b3139] pb-2">
-                            <span class="text-gray-500">العقد الذكي:</span>
-                            <span class="font-mono text-gray-300">0xb641...1A7a</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-[#2b3139] pb-2">
-                            <span class="text-gray-500">الشبكة:</span>
-                            <span class="text-green-400 font-bold">Base Mainnet</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-500">الحالة:</span>
-                            <span class="text-binance font-bold">متصل وموثق</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <label class="switch">
+                <input type="checkbox" id="antiSnipeToggle" checked>
+                <span class="slider"></span>
+            </label>
         </div>
-    </main>
 
-    <script>
-        const CONTRACT_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
-        const BASE_CHAIN_ID = "0x2105"; // 8453 in Hex
-        const ABI = [
-            "function creationFee() external view returns (uint256)",
-            "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) external payable returns (address)"
-        ];
+        <div class="switch-row" style="margin-top: 12px;">
+            <div>
+                <div class="switch-title">🌪️ Chaos Viral Mode</div>
+                <div class="switch-desc">Generates instant social cards & promotional raid templates</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="chaosToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
 
-        let provider, signer, contract;
+    <button class="btn-launch" id="launchBtn" onclick="createToken()">Launch Token Now 🪙</button>
 
-        const connectWalletBtn = document.getElementById('connectWalletBtn');
-        const createBtn = document.getElementById('createBtn');
-        const launchForm = document.getElementById('launchForm');
-        const statusBox = document.getElementById('statusBox');
+    <div class="status-card" id="outputStatus">Status: Ready to connect wallet</div>
+</div>
 
-        function addLog(message, type = 'info') {
-            const time = new Date().toLocaleTimeString();
-            let color = 'text-gray-400';
-            if(type === 'error') color = 'text-red-500';
-            if(type === 'success') color = 'text-binance';
-            if(type === 'warning') color = 'text-yellow-400';
+<!-- Success Modal -->
+<div class="modal" id="successModal">
+    <div class="modal-content">
+        <h2 style="color: var(--accent-green); font-size: 20px;">🎉 Token Live on Bonding Curve!</h2>
+        
+        <div style="margin-top: 10px;">
+            <canvas id="cardCanvas" width="360" height="180" style="width:100%; border-radius: 10px; border: 1px solid var(--accent-green);"></canvas>
+            <button class="btn-copy" onclick="downloadMemeCard()"><i class="fa-solid fa-download"></i> Download Banner Card</button>
+        </div>
 
-            statusBox.innerHTML += `<div class="${color}">[${time}] > ${message}</div>`;
-            statusBox.scrollTop = statusBox.scrollHeight;
-        }
+        <div style="background: #0b0f19; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-top: 12px; text-align: left;">
+            <div style="font-size: 12px; color: var(--accent-blue); font-weight: bold; margin-bottom: 6px;">📖 Token Details:</div>
+            <div style="font-size: 11px; color: var(--text-muted);" id="deployedTokenAddr">Contract: 0x...</div>
+            <div style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px;" id="aiLoreText">Loading story...</div>
+        </div>
 
-        async function ensureBaseNetwork() {
-            const network = await provider.getNetwork();
-            if (network.chainId !== 8453n) {
-                addLog("جاري التحويل تلقائياً إلى شبكة Base...", "warning");
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: BASE_CHAIN_ID }],
-                    });
-                } catch (err) {
-                    if (err.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: BASE_CHAIN_ID,
-                                chainName: 'Base Mainnet',
-                                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                                rpcUrls: ['https://mainnet.base.org'],
-                                blockExplorerUrls: ['https://basescan.org']
-                            }],
-                        });
-                    } else {
-                        throw err;
-                    }
-                }
-            }
-        }
+        <a id="twitterShareBtn" href="#" target="_blank" class="btn-twitter">
+            <i class="fa-brands fa-x-twitter"></i> Launch Twitter Raid Now
+        </a>
 
-        async function connectWallet() {
-            if (typeof window.ethereum === 'undefined') {
-                addLog("خطأ: يرجى تثبيت محفظة MetaMask لتعمل الواجهة", "error");
-                alert("يرجى تثبيت محفظة MetaMask للمتابعة.");
-                return;
-            }
+        <button class="btn-copy" onclick="copyTelegramMsg()"><i class="fa-solid fa-copy"></i> Copy Telegram Raid Template</button>
+        
+        <button onclick="closeModal()" style="background: transparent; border: none; color: var(--text-muted); margin-top: 12px; cursor: pointer; font-size: 12px;">Close Window</button>
+    </div>
+</div>
 
-            try {
-                addLog("جاري طلب الاتصال بالمحفظة...");
-                provider = new ethers.BrowserProvider(window.ethereum);
-                await ensureBaseNetwork();
-                signer = await provider.getSigner();
-                contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+<script>
+    // Address of the deployed Factory contract
+    const CONTRACT_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
+    
+    // Chain ID for Base Mainnet (8453)
+    const NETWORK_CHAIN_ID = "0x2105";
 
-                const address = await signer.getAddress();
-                connectWalletBtn.innerHTML = `<i class="fa-solid fa-wallet ml-2"></i> ${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-                connectWalletBtn.classList.replace('bg-binance', 'bg-[#2b3139]');
-                connectWalletBtn.classList.add('text-white');
-                
-                createBtn.disabled = false;
-                createBtn.classList.remove('bg-[#474d57]', 'text-gray-300', 'cursor-not-allowed');
-                createBtn.classList.add('bg-binance', 'text-[#181a20]', 'hover:opacity-90');
-                createBtn.innerText = "تنفيذ عقد الابتكار الآن";
-                
-                addLog(`تم الاتصال بنجاح. العنوان: ${address}`, "success");
-            } catch (error) {
-                console.error(error);
-                addLog(`فشل الاتصال: ${error.message}`, "error");
-            }
-        }
-
-        connectWalletBtn.addEventListener('click', connectWallet);
-
-        launchForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!contract) {
-                addLog("يجب ربط المحفظة أولاً!", "error");
-                return;
-            }
-
-            const name = document.getElementById('tokenName').value;
-            const symbol = document.getElementById('tokenSymbol').value;
-            const targetVal = document.querySelector('input[name="target"]:checked').value;
-
-            try {
-                createBtn.disabled = true;
-                createBtn.innerText = "جاري تنفيذ المعاملة...";
-                createBtn.classList.add('opacity-50', 'cursor-wait');
-
-                await ensureBaseNetwork();
-                addLog(`تحقق من رسوم المنصة لهدف التخرج (${targetVal} BNB)...`);
-                
-                const fee = await contract.creationFee();
-                const targetWei = ethers.parseEther(targetVal);
-
-                addLog(`الرسوم المطلوبة: ${ethers.formatEther(fee)} ETH. تأكيد المعاملة في المحفظة...`, "warning");
-
-                const tx = await contract.createViralToken(name, symbol, targetWei, { value: fee });
-                addLog(`تم إرسال المعاملة! الهاش: ${tx.hash.substring(0, 15)}...`, "info");
-
-                const receipt = await tx.wait();
-                
-                addLog(`تم التأكيد في الكتلة ${receipt.blockNumber}`, "success");
-                addLog(`🎉 تم إنشاء العملة ${name} (${symbol}) بنجاح بهدف تخرج ${targetVal} BNB!`, "success");
-            } catch (error) {
-                console.error(error);
-                let errMsg = error.reason || error.message;
-                if(errMsg.includes("rejected")) errMsg = "تم إلغاء المعاملة بواسطة المحفظة.";
-                addLog(`فشل التنفيذ: ${errMsg}`, "error");
-            } finally {
-                createBtn.disabled = false;
-                createBtn.innerText = "تنفيذ عقد الابتكار الآن";
-                createBtn.classList.remove('opacity-50', 'cursor-wait');
-            }
-        });
-    </script>
-</body>
-</html>
+    // Factory ABI matching ViralLaunchpadFactory
