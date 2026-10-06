@@ -3,273 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viral Launchpad | Terminal</title>
+    <title>Viral Launchpad | Binance Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.0/ethers.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #0b0e11; /* Binance Dark Theme */
-            color: #eaecef;
-        }
+        body { font-family: 'Tajawal', sans-serif; background-color: #0b0e11; color: #eaecef; }
         .bg-panel { background-color: #181a20; }
-        .bg-hover { background-color: #2b3139; }
         .border-panel { border-color: #2b3139; }
         .text-binance { color: #fcd535; }
         .bg-binance { background-color: #fcd535; color: #181a20; }
         .bg-binance:hover { background-color: #f0c822; }
-        .input-dark { 
-            background-color: #2b3139; 
-            border: 1px solid #474d57; 
-            color: #eaecef;
-        }
+        .input-dark { background-color: #2b3139; border: 1px solid #474d57; color: #eaecef; }
         .input-dark:focus { border-color: #fcd535; outline: none; }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0b0e11; }
         ::-webkit-scrollbar-thumb { background: #474d57; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #5e6673; }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
+<body class="h-screen flex flex-col justify-between overflow-x-hidden">
 
-    <!-- Sidebar -->
-    <aside class="w-20 md:w-64 bg-panel border-l border-panel flex flex-col justify-between transition-all duration-300">
-        <div>
-            <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-panel">
-                <i class="fa-solid fa-rocket text-binance text-2xl"></i>
-                <span class="hidden md:block mr-3 font-black text-xl tracking-wide">VIRAL PAD</span>
-            </div>
-            <nav class="mt-6 flex flex-col gap-2 px-2 md:px-4">
-                <a href="#" class="flex items-center p-3 rounded-lg bg-hover text-binance">
-                    <i class="fa-solid fa-layer-group text-lg md:ml-3"></i>
-                    <span class="hidden md:block font-bold">منصة الإطلاق</span>
-                </a>
-                <a href="#" class="flex items-center p-3 rounded-lg hover:bg-hover transition">
-                    <i class="fa-solid fa-chart-line text-lg md:ml-3 text-gray-400"></i>
-                    <span class="hidden md:block font-bold text-gray-400">الأسواق</span>
-                </a>
-                <a href="#" class="flex items-center p-3 rounded-lg hover:bg-hover transition">
-                    <i class="fa-solid fa-wallet text-lg md:ml-3 text-gray-400"></i>
-                    <span class="hidden md:block font-bold text-gray-400">المحفظة</span>
-                </a>
-            </nav>
+    <!-- Topbar -->
+    <header class="h-16 bg-panel border-b border-panel flex items-center justify-between px-6">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-rocket text-binance text-2xl"></i>
+            <span class="font-black text-xl text-white">VIRAL LAUNCHPAD</span>
+            <span class="px-2 py-0.5 bg-yellow-500/10 text-binance border border-yellow-500/30 rounded text-xs">Base Network</span>
         </div>
-        <div class="p-4 border-t border-panel text-center">
-            <span class="hidden md:block text-xs text-gray-500">v2.0.1 • Base Network</span>
-        </div>
-    </aside>
+        <button id="connectBtn" class="bg-binance font-bold py-2 px-5 rounded hover:opacity-90 transition">
+            <i class="fa-solid fa-wallet ml-2"></i> ربط المحفظة
+        </button>
+    </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+    <!-- Main Workspace -->
+    <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Topbar -->
-        <header class="h-16 bg-panel border-b border-panel flex items-center justify-between px-6 sticky top-0 z-10">
-            <div class="flex items-center gap-4">
-                <span class="px-3 py-1 bg-gray-800 rounded text-xs font-bold text-green-400 border border-green-900">
-                    <i class="fa-solid fa-circle-dot text-[8px] ml-1 animate-pulse"></i> Base Mainnet
-                </span>
-            </div>
+        <!-- Creation Form -->
+        <div class="lg:col-span-2 bg-panel rounded-xl border border-panel p-6 shadow-2xl flex flex-col justify-between">
             <div>
-                <button id="connectWalletBtn" class="bg-binance font-bold py-2 px-6 rounded hover:opacity-90 transition shadow-lg">
-                    <i class="fa-solid fa-link ml-2"></i> ربط المحفظة
-                </button>
-            </div>
-        </header>
+                <h2 class="text-xl font-bold mb-6 text-binance border-b border-panel pb-3">
+                    <i class="fa-solid fa-plus-circle ml-2"></i> إنشاء عملة جديدة
+                </h2>
 
-        <!-- Dashboard Layout -->
-        <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Launch Terminal (2 Columns on large screens) -->
-            <div class="lg:col-span-2 bg-panel rounded-xl border border-panel overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-panel flex justify-between items-center bg-[#1e2329]">
-                    <h2 class="font-bold text-lg"><i class="fa-solid fa-terminal ml-2 text-binance"></i> محطة ابتكار العملات (Creation Terminal)</h2>
-                </div>
-                <div class="p-6">
-                    <form id="launchForm" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-gray-400 mb-2">اسم المشروع (Token Name)</label>
-                                <input type="text" id="tokenName" required class="w-full input-dark rounded py-3 px-4 transition" placeholder="مثال: Viral Ai Token">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-400 mb-2">الرمز (Symbol)</label>
-                                <input type="text" id="tokenSymbol" required class="w-full input-dark rounded py-3 px-4 transition" placeholder="مثال: VAI">
-                            </div>
-                        </div>
-
+                <form id="tokenForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-bold text-gray-400 mb-2">هدف التخرج إلى منصات DEX (BNB)</label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="4" class="peer sr-only" checked>
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">4 BNB</div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="10" class="peer sr-only">
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">10 BNB</div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="20" class="peer sr-only">
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">20 BNB</div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="target" value="50" class="peer sr-only">
-                                    <div class="p-4 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] hover:bg-[#323942] transition font-bold">50 BNB</div>
-                                </label>
-                            </div>
+                            <label class="block text-sm font-bold text-gray-400 mb-2">اسم العملة</label>
+                            <input type="text" id="name" required class="w-full input-dark rounded p-3" placeholder="مثال: Viral Token">
                         </div>
-
-                        <div class="p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg text-sm text-yellow-500 flex items-start gap-3">
-                            <i class="fa-solid fa-triangle-exclamation mt-1"></i>
-                            <p>رسوم إنشاء العملة هي <strong>0.01 ETH/BNB</strong> وتذهب مباشرة إلى محفظة المنصة. سيتم نشر العملة آلياً على شبكة Base بعقد آمن مقاوم للروبوتات.</p>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-400 mb-2">رمز العملة (Symbol)</label>
+                            <input type="text" id="symbol" required class="w-full input-dark rounded p-3" placeholder="مثال: VRL">
                         </div>
+                    </div>
 
-                        <button type="submit" id="createBtn" disabled class="w-full bg-[#474d57] text-gray-300 font-bold text-lg py-4 rounded transition cursor-not-allowed">
-                            يرجى ربط المحفظة لإنشاء العملة
-                        </button>
-                    </form>
-                </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-400 mb-2">هدف التخرج إلى DEX (محدد بالعقد)</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="target" value="4" class="peer sr-only" checked>
+                                <div class="p-3 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] font-bold">4 ETH/BNB</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="target" value="10" class="peer sr-only">
+                                <div class="p-3 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] font-bold">10 ETH/BNB</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="target" value="20" class="peer sr-only">
+                                <div class="p-3 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] font-bold">20 ETH/BNB</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="target" value="50" class="peer sr-only">
+                                <div class="p-3 text-center rounded border border-[#474d57] peer-checked:border-[#fcd535] peer-checked:text-[#fcd535] bg-[#2b3139] font-bold">50 ETH/BNB</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" disabled class="w-full bg-[#474d57] text-gray-400 py-4 rounded font-bold transition cursor-not-allowed">
+                        قم بربط المحفظة أولاً
+                    </button>
+                </form>
             </div>
 
-            <!-- Side Stats Panel -->
-            <div class="flex flex-col gap-6">
-                
-                <!-- Terminal Logs -->
-                <div class="bg-panel rounded-xl border border-panel overflow-hidden shadow-xl h-64 flex flex-col">
-                    <div class="p-3 border-b border-panel bg-[#1e2329] flex justify-between">
-                        <h3 class="font-bold text-sm text-gray-300">سجل العمليات (Execution Logs)</h3>
-                        <i class="fa-solid fa-microchip text-gray-500"></i>
-                    </div>
-                    <div id="statusBox" class="p-4 overflow-y-auto text-xs font-mono flex-1 text-gray-400 space-y-2">
-                        <div class="text-green-500">> النظام جاهز. في انتظار ربط المحفظة...</div>
-                    </div>
-                </div>
+            <div class="mt-4 p-3 bg-gray-900 rounded border border-panel text-xs text-gray-400">
+                العقد المسجل: <span class="font-mono text-gray-200">0xb641f9B099963443951180Eea91ad59390Bd1A7a</span>
+            </div>
+        </div>
 
-                <!-- Market Info Mockup -->
-                <div class="bg-panel rounded-xl border border-panel overflow-hidden shadow-xl flex-1">
-                    <div class="p-3 border-b border-panel bg-[#1e2329]">
-                        <h3 class="font-bold text-sm text-gray-300">بيانات السوق الحية</h3>
-                    </div>
-                    <div class="p-4 flex flex-col gap-4">
-                        <div class="flex justify-between items-center border-b border-[#2b3139] pb-2">
-                            <div>
-                                <div class="font-bold text-sm">TVL المنصة</div>
-                                <div class="text-xs text-gray-500">إجمالي القيمة المقفلة</div>
-                            </div>
-                            <div class="text-green-400 font-bold">$1,245,000</div>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-[#2b3139] pb-2">
-                            <div>
-                                <div class="font-bold text-sm">عملات متخرجة</div>
-                                <div class="text-xs text-gray-500">تم نقل سيولتها لـ DEX</div>
-                            </div>
-                            <div class="text-white font-bold">12 مشروع</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Terminal Logs -->
+        <div class="bg-panel rounded-xl border border-panel p-4 flex flex-col h-full">
+            <h3 class="text-sm font-bold border-b border-panel pb-2 text-gray-400 mb-3">
+                <i class="fa-solid fa-code ml-1"></i> سجل الأحداث (Logs)
+            </h3>
+            <div id="logs" class="flex-1 bg-[#0b0e11] rounded p-3 font-mono text-xs overflow-y-auto space-y-2 text-gray-300">
+                <div>> النظام في انتظار الاتصال بالمحفظة...</div>
             </div>
         </div>
     </main>
 
     <script>
         const CONTRACT_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
+        const BASE_CHAIN_ID = "0x2105"; // Base Mainnet (8453)
         const ABI = [
             "function creationFee() external view returns (uint256)",
-            "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) external payable returns (address)",
-            "event TokenCreated(address indexed tokenAddress, string name, string symbol, address indexed creator, uint256 graduationTargetBnb)"
+            "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) external payable returns (address)"
         ];
 
         let provider, signer, contract;
 
-        const connectWalletBtn = document.getElementById('connectWalletBtn');
-        const createBtn = document.getElementById('createBtn');
-        const launchForm = document.getElementById('launchForm');
-        const statusBox = document.getElementById('statusBox');
-
-        function addLog(message, type = 'info') {
-            const time = new Date().toLocaleTimeString();
-            let color = 'text-gray-400';
-            if(type === 'error') color = 'text-red-500';
-            if(type === 'success') color = 'text-binance';
-            if(type === 'warning') color = 'text-yellow-400';
-
-            statusBox.innerHTML += `<div class="${color}">[${time}] > ${message}</div>`;
-            statusBox.scrollTop = statusBox.scrollHeight;
+        function log(msg, color = "text-gray-300") {
+            const logsDiv = document.getElementById("logs");
+            logsDiv.innerHTML += `<div class="${color}">> ${msg}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
         }
 
-        async function connectWallet() {
-            if (typeof window.ethereum === 'undefined') {
-                addLog("خطأ: يرجى تثبيت محفظة MetaMask أو استخدام متصفح يدعم Web3", "error");
-                alert("يرجى تثبيت محفظة MetaMask للمتابعة.");
+        async function ensureBaseNetwork() {
+            const network = await provider.getNetwork();
+            if (network.chainId !== 8453n) {
+                log("جاري طلب التحويل إلى شبكة Base...", "text-yellow-400");
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: BASE_CHAIN_ID }],
+                    });
+                } catch (err) {
+                    if (err.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: BASE_CHAIN_ID,
+                                chainName: 'Base Mainnet',
+                                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                                rpcUrls: ['https://mainnet.base.org'],
+                                blockExplorerUrls: ['https://basescan.org']
+                            }],
+                        });
+                    } else {
+                        throw err;
+                    }
+                }
+            }
+        }
+
+        document.getElementById("connectBtn").addEventListener("click", async () => {
+            if (!window.ethereum) {
+                alert("يرجى استخدام متصفح يحتوي على محفظة MetaMask");
                 return;
             }
 
             try {
-                addLog("جاري الاتصال بالمحفظة...");
                 provider = new ethers.BrowserProvider(window.ethereum);
+                await ensureBaseNetwork();
                 signer = await provider.getSigner();
                 contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
                 const address = await signer.getAddress();
-                connectWalletBtn.innerHTML = `<i class="fa-solid fa-wallet ml-2"></i> ${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-                connectWalletBtn.classList.replace('bg-binance', 'bg-[#2b3139]');
-                connectWalletBtn.classList.add('text-white');
+                document.getElementById("connectBtn").innerText = `${address.substring(0,6)}...${address.substring(address.length-4)}`;
                 
-                createBtn.disabled = false;
-                createBtn.classList.remove('bg-[#474d57]', 'text-gray-300', 'cursor-not-allowed');
-                createBtn.classList.add('bg-binance', 'text-[#181a20]', 'hover:opacity-90');
-                createBtn.innerText = "تنفيذ عقد الابتكار الآن";
-                
-                addLog(`تم الاتصال بنجاح. عنوانك: ${address}`, "success");
-            } catch (error) {
-                console.error(error);
-                addLog(`فشل الاتصال: ${error.message}`, "error");
+                const submitBtn = document.getElementById("submitBtn");
+                submitBtn.disabled = false;
+                submitBtn.className = "w-full bg-binance text-[#181a20] py-4 rounded font-bold hover:opacity-90 transition";
+                submitBtn.innerText = "إنشاء العملة الآن";
+
+                log(`تم الاتصال بالمحفظة: ${address}`, "text-green-400");
+            } catch (err) {
+                log(`فشل الاتصال: ${err.message}`, "text-red-400");
             }
-        }
+        });
 
-        connectWalletBtn.addEventListener('click', connectWallet);
-
-        launchForm.addEventListener('submit', async (e) => {
+        document.getElementById("tokenForm").addEventListener("submit", async (e) => {
             e.preventDefault();
-            if (!contract) {
-                addLog("يجب ربط المحفظة أولاً!", "error");
-                return;
-            }
+            if (!contract) return;
 
-            const name = document.getElementById('tokenName').value;
-            const symbol = document.getElementById('tokenSymbol').value;
-            const target = document.querySelector('input[name="target"]:checked').value;
+            const name = document.getElementById("name").value;
+            const symbol = document.getElementById("symbol").value;
+            const targetVal = document.querySelector('input[name="target"]:checked').value;
 
             try {
-                createBtn.disabled = true;
-                createBtn.innerText = "جاري معالجة المعاملة...";
-                createBtn.classList.add('opacity-50', 'cursor-wait');
-
-                addLog(`جاري قراءة رسوم المنصة للعقد ${CONTRACT_ADDRESS}...`);
+                await ensureBaseNetwork();
+                log(`جاري قراءة رسوم الإنشاء للهدف ${targetVal}...`);
+                
                 const fee = await contract.creationFee();
-                const targetWei = ethers.parseEther(target);
+                const targetWei = ethers.parseEther(targetVal); // التحويل الدقيق إلى Wei لتجاوز Revert العقد
 
-                addLog(`الرسوم المطلوبة: ${ethers.formatEther(fee)} ETH. يرجى التأكيد في محفظتك...`, "warning");
-
+                log(`إرسال المعاملة... الرسوم المطلوب إرسالها: ${ethers.formatEther(fee)} ETH`, "text-yellow-400");
+                
                 const tx = await contract.createViralToken(name, symbol, targetWei, { value: fee });
-                addLog(`تم إرسال المعاملة! الهاش: <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline text-blue-400">${tx.hash.substring(0,10)}...</a>`, "info");
+                log(`تم إرسال المعاملة. الهاش: ${tx.hash}`, "text-yellow-400");
 
                 const receipt = await tx.wait();
-                
-                addLog(`تم تأكيد المعاملة في الكتلة ${receipt.blockNumber}`, "success");
-                addLog(`مبروك! تم ابتكار العملة ${name} (${symbol}) بهدف تخرج ${target} BNB بنجاح.`, "success");
-            } catch (error) {
-                console.error(error);
-                let errMsg = error.reason || error.message;
-                if(errMsg.includes("rejected")) errMsg = "تم رفض المعاملة من قبل المستخدم.";
-                addLog(`فشل التنفيذ: ${errMsg}`, "error");
-            } finally {
-                createBtn.disabled = false;
-                createBtn.innerText = "تنفيذ عقد الابتكار الآن";
-                createBtn.classList.remove('opacity-50', 'cursor-wait');
+                log(`تمت المعاملة بنجاح في الكتلة: ${receipt.blockNumber}`, "text-green-400");
+            } catch (err) {
+                log(`خطأ في المعاملة: ${err.reason || err.message}`, "text-red-400");
             }
         });
     </script>
