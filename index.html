@@ -105,4 +105,299 @@
             <div>
                 <!-- Header & Loader -->
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800 flex-wrap gap-4">
-                    <div class="flex items-center gap
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                            <i class="fa-solid fa-chart-line text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold text-white" id="activeTokenName">محطة التداول وإدارة السيولة</h2>
+                            <p class="text-xs text-slate-400" id="activeTokenSymbol">منحنى الترابط الآلي والمراقبة اللحظية</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="tokenAddressInput" placeholder="عنوان عقد العملة (0x...)" class="bg-slate-950 institutional-border rounded-xl px-3 py-2 text-xs w-52 focus:outline-none focus:border-blue-500 text-white font-mono">
+                        <button id="loadBtn" onclick="loadTokenContract()" class="bg-slate-800 hover:bg-slate-700 institutional-border px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">تحميل</button>
+                    </div>
+                </div>
+
+                <!-- Guardians Status Cards Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="guardian-card bg-slate-950 institutional-border p-3.5 rounded-xl">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] text-yellow-400 font-bold">Pikachu</span>
+                            <i class="fa-solid fa-bolt text-yellow-400 text-xs"></i>
+                        </div>
+                        <span class="text-xs font-bold text-emerald-400 block">درع ضد القناصة</span>
+                        <span class="text-[10px] text-slate-400">كتل آمنة 100%</span>
+                    </div>
+                    <div class="guardian-card bg-slate-950 institutional-border p-3.5 rounded-xl">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] text-orange-400 font-bold">Charizard</span>
+                            <i class="fa-solid fa-fire text-orange-400 text-xs"></i>
+                        </div>
+                        <span class="text-xs font-bold text-amber-400 block" id="statGraduationStatus">قيد التداول</span>
+                        <span class="text-[10px] text-slate-400">صاروخ DEX</span>
+                    </div>
+                    <div class="guardian-card bg-slate-950 institutional-border p-3.5 rounded-xl">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] text-purple-400 font-bold">Mewtwo</span>
+                            <i class="fa-solid fa-brain text-purple-400 text-xs"></i>
+                        </div>
+                        <span class="text-xs font-bold text-indigo-400 block" id="statBountyPool">0 BNB</span>
+                        <span class="text-[10px] text-slate-400">خزينة العوائد</span>
+                    </div>
+                    <div class="guardian-card bg-slate-950 institutional-border p-3.5 rounded-xl">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] text-emerald-400 font-bold">Snorlax</span>
+                            <i class="fa-solid fa-shield text-emerald-400 text-xs"></i>
+                        </div>
+                        <span class="text-xs font-bold text-blue-400 block" id="statBnbReserve">0.00 BNB</span>
+                        <span class="text-[10px] text-slate-400">استقرار الحيتان</span>
+                    </div>
+                </div>
+
+                <!-- Buy/Sell Tabs -->
+                <div class="bg-slate-950 institutional-border p-5 rounded-xl">
+                    <div class="flex gap-4 mb-4 border-b border-slate-800 pb-3">
+                        <button onclick="switchTab('buy')" id="buyTabBtn" class="font-bold text-blue-400 border-b-2 border-blue-500 pb-1 cursor-pointer text-xs">شراء أصل آمن (Buy)</button>
+                        <button onclick="switchTab('sell')" id="sellTabBtn" class="font-bold text-slate-400 pb-1 cursor-pointer text-xs">بيع واسترداد السيولة (Sell)</button>
+                    </div>
+
+                    <!-- Buy Section -->
+                    <div id="buySection" class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1.5">المبلغ المدفوع بالـ BNB</label>
+                            <input type="number" id="buyBnbAmount" placeholder="0.1" step="0.01" class="w-full bg-slate-900 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
+                        </div>
+                        <button id="buyBtn" onclick="buyTokens()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span>تأكيد الشراء الفوري عبر المنحنى 🪙</span>
+                        </button>
+                    </div>
+
+                    <!-- Sell Section -->
+                    <div id="sellSection" class="space-y-3 hidden">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1.5">كمية الرموز المراد بيعها</label>
+                            <input type="number" id="sellTokenAmount" placeholder="1000" class="w-full bg-slate-900 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
+                        </div>
+                        <button id="sellBtn" onclick="sellTokens()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-coins"></i>
+                            <span>بيع الرموز واسترداد النقد الفوري 💸</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Details & Graduation Action -->
+            <div class="mt-6 flex justify-between items-center text-xs text-slate-400 flex-wrap gap-2 border-t border-slate-800 pt-4">
+                <span>عنوان العقد المصنع: <span id="factoryAddressDisplay" class="text-blue-400 font-mono">غير متصل</span></span>
+                <button id="gradBtn" onclick="checkGraduation()" class="text-amber-400 hover:text-amber-300 font-bold underline cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-rocket"></i> تنفيذ تخرج السيولة للـ DEX (Charizard Launch)
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-5 border-t border-slate-800 text-slate-500 text-xs">
+        جميع الحقوق محفوظة &copy; 2026 - NexusMeme Institutional Protocol (Protected by Pokemon Guardians Engine)
+    </footer>
+
+    <!-- Web3 Integration Script -->
+    <script>
+        const FACTORY_ADDRESS = "0xYOUR_DEPLOYED_FACTORY_ADDRESS_HERE"; 
+        
+        const FACTORY_ABI = [
+            "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) external payable returns (address)",
+            "function creationFee() external view returns (uint256)",
+            "event TokenCreated(address indexed tokenAddress, string name, string symbol, address indexed creator, uint256 graduationTargetBnb)"
+        ];
+
+        const TOKEN_ABI = [
+            "function name() external view returns (string)",
+            "function symbol() external view returns (string)",
+            "function realBnbReserve() external view returns (uint256)",
+            "function realTokenReserve() external view returns (uint256)",
+            "function isGraduated() external view returns (bool)",
+            "function bountyPoolBalance() external view returns (uint256)",
+            "function buy(uint256 minTokensOut, address referrer) external payable",
+            "function sell(uint256 tokenAmount, uint256 minBnbOut, address referrer) external",
+            "function graduate() external",
+            "function balanceOf(address account) external view returns (uint256)",
+            "function approve(address spender, uint256 amount) external returns (bool)"
+        ];
+
+        let provider, signer, factoryContract, activeTokenContract;
+        let currentAccount = null;
+
+        function setButtonLoading(buttonId, isLoading, originalText) {
+            const btn = document.getElementById(buttonId);
+            if (isLoading) {
+                btn.classList.add('btn-loading');
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري استدعاء طاقة الحراس...`;
+            } else {
+                btn.classList.remove('btn-loading');
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = await provider.getSigner();
+                    currentAccount = await signer.getAddress();
+                    
+                    document.getElementById("walletBtnText").innerText = currentAccount.substring(0, 6) + "..." + currentAccount.slice(-4);
+                    document.getElementById("connectWalletBtn").classList.replace("bg-blue-600", "bg-emerald-600");
+                    
+                    factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+                    document.getElementById("factoryAddressDisplay").innerText = FACTORY_ADDRESS;
+                } catch (err) {
+                    console.error(err);
+                    alert("فشل ربط المحفظة النظامية.");
+                }
+            } else {
+                alert("يرجى تثبيت محفظة متوافقة مع Web3.");
+            }
+        }
+
+        async function createToken() {
+            if (!signer) { alert("يرجى ربط المحفظة أولاً."); return; }
+            const name = document.getElementById("tokenName").value;
+            const symbol = document.getElementById("tokenSymbol").value;
+            const target = document.getElementById("graduationTarget").value;
+
+            if (!name || !symbol) { alert("يرجى إكمال الحقول الإلزامية."); return; }
+
+            const originalHTML = document.getElementById("createBtn").innerHTML;
+            setButtonLoading("createBtn", true);
+
+            try {
+                let fee = ethers.parseEther("0.01");
+                try { fee = await factoryContract.creationFee(); } catch(e) {}
+
+                const targetBnb = ethers.parseEther(target);
+                const tx = await factoryContract.createViralToken(name, symbol, targetBnb, { value: fee });
+                await tx.wait();
+                alert("تم إصدار الأصل بنجاح تحت حماية حراس البوكيمون الرقميين ⚡🔥");
+            } catch (err) {
+                console.error(err);
+                alert("فشل الإصدار: " + (err.reason || err.message));
+            } finally {
+                setButtonLoading("createBtn", false, originalHTML);
+            }
+        }
+
+        async function loadTokenContract() {
+            const address = document.getElementById("tokenAddressInput").value;
+            if (!address || !ethers.isAddress(address)) { alert("يرجى إدخال عنوان عقد صحيح."); return; }
+
+            const originalHTML = document.getElementById("loadBtn").innerHTML;
+            document.getElementById("loadBtn").innerText = "جاري...";
+
+            try {
+                const targetSigner = signer || provider;
+                activeTokenContract = new ethers.Contract(address, TOKEN_ABI, targetSigner);
+
+                const name = await activeTokenContract.name();
+                const symbol = await activeTokenContract.symbol();
+                const bnbRes = await activeTokenContract.realBnbReserve();
+                const graduated = await activeTokenContract.isGraduated();
+                const bounty = await activeTokenContract.bountyPoolBalance();
+
+                document.getElementById("activeTokenName").innerText = name;
+                document.getElementById("activeTokenSymbol").innerText = symbol;
+                document.getElementById("statBnbReserve").innerText = ethers.formatEther(bnbRes) + " BNB";
+                document.getElementById("statGraduationStatus").innerText = graduated ? "تم تخرج Charizard 🎉" : "تداول نشط";
+                document.getElementById("statBountyPool").innerText = ethers.formatEther(bounty) + " BNB";
+            } catch (err) {
+                console.error(err);
+                alert("فشل تحميل بيانات العقد.");
+            } finally {
+                document.getElementById("loadBtn").innerText = originalHTML;
+            }
+        }
+
+        async function buyTokens() {
+            if (!activeTokenContract || !signer) { alert("يرجى تحميل عقد الأصل وربط المحفظة أولاً."); return; }
+            const bnbVal = document.getElementById("buyBnbAmount").value;
+            if (!bnbVal || bnbVal <= 0) { alert("أدخل مبلغ صحيح للشراء."); return; }
+
+            const originalHTML = document.getElementById("buyBtn").innerHTML;
+            setButtonLoading("buyBtn", true);
+
+            try {
+                const valueWei = ethers.parseEther(bnbVal);
+                const tx = await activeTokenContract.buy(0, ethers.ZeroAddress, { value: valueWei });
+                await tx.wait();
+                alert("تم تنفيذ الشراء بنجاح تحت حماية Snorlax 🪙");
+                loadTokenContract();
+            } catch (err) {
+                console.error(err);
+                alert("فشل الشراء: " + (err.reason || err.message));
+            } finally {
+                setButtonLoading("buyBtn", false, originalHTML);
+            }
+        }
+
+        async function sellTokens() {
+            if (!activeTokenContract || !signer) { alert("يرجى تحميل عقد الأصل وربط المحفظة أولاً."); return; }
+            const tokenAmount = document.getElementById("sellTokenAmount").value;
+            if (!tokenAmount || tokenAmount <= 0) { alert("أدخل كمية صحيحة للبيع."); return; }
+
+            const originalHTML = document.getElementById("sellBtn").innerHTML;
+            setButtonLoading("sellBtn", true);
+
+            try {
+                const amountWei = ethers.parseUnits(tokenAmount, 18);
+                const contractAddress = await activeTokenContract.getAddress();
+                
+                const approveTx = await activeTokenContract.approve(contractAddress, amountWei);
+                await approveTx.wait();
+
+                const tx = await activeTokenContract.sell(amountWei, 0, ethers.ZeroAddress);
+                await tx.wait();
+                alert("تم البيع واسترداد السيولة بنجاح 💸");
+                loadTokenContract();
+            } catch (err) {
+                console.error(err);
+                alert("فشل البيع: " + (err.reason || err.message));
+            } finally {
+                setButtonLoading("sellBtn", false, originalHTML);
+            }
+        }
+
+        async function checkGraduation() {
+            if (!activeTokenContract || !signer) { alert("يرجى تحميل عقد الأصل أولاً."); return; }
+            try {
+                const tx = await activeTokenContract.graduate();
+                alert("جاري تفعيل طاقة Charizard لتخرج السيولة إلى الـ DEX...");
+                await tx.wait();
+                alert("تم تخرج العملة وربط السيولة بالمنصة اللامركزية بنجاح 🥂");
+                loadTokenContract();
+            } catch (err) {
+                console.error(err);
+                alert("لم يتم استيفاء شروط التخرج بعد: " + (err.reason || err.message));
+            }
+        }
+
+        function switchTab(tab) {
+            if (tab === 'buy') {
+                document.getElementById('buySection').classList.remove('hidden');
+                document.getElementById('sellSection').classList.add('hidden');
+                document.getElementById('buyTabBtn').className = "font-bold text-blue-400 border-b-2 border-blue-500 pb-1 cursor-pointer text-xs";
+                document.getElementById('sellTabBtn').className = "font-bold text-slate-400 pb-1 cursor-pointer text-xs";
+            } else {
+                document.getElementById('buySection').classList.add('hidden');
+                document.getElementById('sellSection').classList.remove('hidden');
+                document.getElementById('sellTabBtn').className = "font-bold text-blue-400 border-b-2 border-blue-500 pb-1 cursor-pointer text-xs";
+                document.getElementById('buyTabBtn').className = "font-bold text-slate-400 pb-1 cursor-pointer text-xs";
+            }
+        }
+    </script>
+</body>
+</html>
