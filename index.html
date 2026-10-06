@@ -3,114 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusMeme - Pikachu & Poké Ball Launchpad</title>
-    <!-- Tailwind CSS CDN -->
+    <title>منصة إصدار الأصول والأوراق المالية الرقمية</title>
+    <!-- Tailwind CSS للتصميم الاحترافي -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers.js v6 CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
-        .institutional-border { border: 1px solid rgba(234, 179, 8, 0.2); }
-        .pikachu-glow { box-shadow: 0 0 25px rgba(234, 179, 8, 0.15); }
-        .pokeball-btn { transition: all 0.2s ease; }
-        .pokeball-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
-        button:active { transform: scale(0.98); }
-        .btn-loading { opacity: 0.7; pointer-events: none; }
-        @keyframes bounce-ball {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        .animate-bounce-ball { animation: bounce-ball 1.5s infinite ease-in-out; }
+        .institutional-border { border: 1px solid rgba(59, 130, 246, 0.2); }
+        .institutional-glow { box-shadow: 0 0 25px rgba(37, 99, 235, 0.1); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- Navbar -->
-    <nav class="border-b border-slate-800 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3 space-x-reverse">
-            <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30 animate-bounce-ball">
-                <i class="fa-solid fa-bolt text-slate-950 text-xl font-black"></i>
+    <!-- رأس الصفحة -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-xl text-white">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-wide">المنصة المؤسسية لإصدار الأصول</h1>
+                    <span class="text-[10px] text-blue-400 font-mono">Base Network - Institutional Launchpad</span>
+                </div>
             </div>
-            <div>
-                <span class="text-xl font-black tracking-tight text-white">NEXUS <span class="text-amber-400">PIKACHU</span></span>
-                <span class="block text-[10px] text-amber-500 font-bold uppercase tracking-wider">بروتوكول اصطياد الأصول وكرات البوكيمون</span>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="hidden md:flex items-center gap-2 text-xs text-amber-300 bg-slate-900 px-3 py-1.5 rounded-lg institutional-border">
-                <i class="fa-solid fa-circle text-amber-400 text-[8px] animate-pulse"></i>
-                <span>درع بيكاتشو الذكي: نشط</span>
-            </div>
-            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer text-sm">
+            <!-- زر ربط المحفظة -->
+            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-blue-600/20">
                 <i class="fa-solid fa-wallet"></i>
-                <span id="walletBtnText">ربط المحفظة</span>
+                <span id="walletAddressText">ربط المحفظة</span>
             </button>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+    <!-- المحتوى الرئيسي -->
+    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         
-        <!-- Create Token Section (5 Cols) -->
-        <section class="lg:col-span-5 bg-slate-900/90 institutional-border pikachu-glow rounded-2xl p-6 shadow-2xl flex flex-col justify-between backdrop-blur-md">
-            <div>
-                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800">
-                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
-                        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+        <!-- القسم الأيمن والوسط: إنشاء الأصول وإدارتها -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- لوحة إنشاء العملة (Launchpad Form) -->
+            <div class="bg-slate-950 institutional-border institutional-glow p-6 rounded-2xl space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-cube text-blue-400"></i>
+                        <h2 class="text-sm font-bold text-white">إصدار أصل رقمي جديد (Bonding Curve)</h2>
                     </div>
-                    <div>
-                        <h2 class="text-base font-bold text-white">إصدار أصل جديد بكرة البوكيمون</h2>
-                        <p class="text-xs text-slate-400">ولادة العملة داخل كرة الإنشاء الآمنة</p>
+                    <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-lg font-mono">رسم الإصدار: 0.01 ETH</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs text-slate-400">اسم الأصل (Token Name)</label>
+                        <input type="text" id="tokenName" placeholder="مثال: Institutional Asset" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs text-slate-400">رمز الأصل (Token Symbol)</label>
+                        <input type="text" id="tokenSymbol" placeholder="مثال: INST" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1.5">اسم الأصل (Token Name)</label>
-                        <input type="text" id="tokenName" placeholder="مثال: Pikachu Coin" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1.5">رمز التداول (Token Symbol)</label>
-                        <input type="text" id="tokenSymbol" placeholder="مثال: PIKA" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1.5">هدف تخرج كرة البوكيمون (BNB)</label>
-                        <select id="graduationTarget" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 text-white">
-                            <option value="4">4 BNB (كرة بوكيمون العادية)</option>
-                            <option value="10" selected>10 BNB (كرة الدبليو القياسية)</option>
-                            <option value="20">20 BNB (الكرة الفائقة Ultra Ball)</option>
-                            <option value="50">50 BNB (الكرة الرئيسية Master Ball)</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Pikachu Protection Bar -->
-                    <div class="bg-slate-950/80 institutional-border rounded-xl p-3.5 space-y-2 text-xs">
-                        <div class="flex justify-between items-center text-slate-300">
-                            <span>رسوم إطلاق الكرة:</span>
-                            <span class="font-bold text-amber-400">0.01 BNB</span>
-                        </div>
-                        <div class="flex justify-between items-center text-slate-300">
-                            <span>حماية بيكاتشو ضد البوتات:</span>
-                            <span class="font-bold text-emerald-400">صاعقة مانعة للقناصة ⚡</span>
-                        </div>
-                    </div>
-                </div>
+                <button onclick="createToken()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-lg shadow-blue-600/20 cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rocket"></i>
+                    <span>إصدار ونشر الأصل فوراً</span>
+                </button>
             </div>
 
-            <button id="createBtn" onclick="createToken()" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-black py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 text-sm pokeball-btn">
-                <i class="fa-solid fa-baseball text-base"></i>
-                <span>إطلاق كرة البوكيمون وتوليد الأصل 🚀</span>
-            </button>
-        </section>
+            <!-- لوحة التداول وإدارة السيولة -->
+            <div class="bg-slate-950 institutional-border p-6 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i>
+                        <h2 class="text-sm font-bold text-white">نافذة التداول السريع وحساب العوائد</h2>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">الرسوم الأساسية: 1.5%</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    يتم تحويل حصة صانع العملة (33% من صافي الرسوم) ومكافآت الإحالة (33%) بشكل آلي وفوري إلى محفظة المستفيد مع كل عملية تنفيذ عقد تداول.
+                </p>
+            </div>
 
-        <!-- Trading Terminal Section (7 Cols) -->
-        <section class="lg:col-span-7 bg-slate-900/90 institutional-border pikachu-glow rounded-2xl p-6 shadow-2xl flex flex-col justify-between backdrop-blur-md">
-            <div>
-                <!-- Header & Loader -->
-                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800 flex-wrap gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
-                            <i class="fa-solid fa-bolt
+        </div>
+
+        <!-- القسم الأيسر: صندوق الإحالة وعرض النسب -->
+        <div class="space-y-6">
+            
+            <!-- صندوق رابط الإحالة -->
+            <div class="bg-slate-950 institutional-border p-5 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-share-nodes text-blue-400"></i>
+                        <span class="text-xs font-bold text-white">برنامج الإحالة والعوائد</span>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md font-mono">عائد 33%</span>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] text-slate-400">رابط الإحالة الخاص بك:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="referralLinkInput" readonly placeholder="قم بربط المحفظة أولاً..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none">
+                        <button onclick="copyReferralLink()" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- جدول توزيع النسب -->
+                <div class="pt-3 border-t border-slate-800 space-y-2">
+                    <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">تفصيل توزيع الرسوم:</span>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div class="bg-slate-900 border border-slate-800/80 p-2.5 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-400 text-[11px]">المُحيل (Referrer):</span>
+                            <span class="font-bold text-blue-400">33% <span class="text-[9px] text-slate-500">من الصافي</span></span>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800/80 p-2.5 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-400 text-[11px]">صانع العملة (Creator):</span>
+                            <span class="font-bold text-emerald-400">33% <span class="text-[9px] text-slate-500">مباشرة لمحفظتك</span></span>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800/80 p-2.5 rounded-xl flex justify-between items-center">
+                            <span class="text-slate-400 text-[11px]">المنصة والخزينة:</span>
+                            <span class="font-bold text-amber-400">34% <span class="text-[9px] text-slate-500">من الصافي</span></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- تذييل الصفحة -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-4 text-center text-xs text-slate-500">
+        <p>جميع الحقوق محفوظة © 2026 - المنصة المؤسسية اللامركزية</p>
+    </footer>
+
+    <!-- سكربت تفاعل الواجهة والربط -->
+    <script>
+        let userAccount = null;
+
+        // دالة محاكاة ربط المحفظة (MetaMask / Rabby / Phantom)
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0];
+                    updateUIWithAccount(userAccount);
+                } catch (error) {
+                    console.error("تم رفض الاتصال بالمحفظة", error);
+                }
+            } else {
+                alert("يرجى تثبيت محفظة متوافقة مثل MetaMask أو Rabby.");
+            }
+        }
+
+        function updateUIWithAccount(address) {
+            const shortAddr = address.substring(0, 6) + '...' + address.substring(address.length - 4);
+            document.getElementById("walletAddressText").innerText = shortAddr;
+            
+            // تحديث رابط الإحالة تلقائياً بمجرد الاتصال
+            const currentUrl = window.location.origin + window.location.pathname;
+            document.getElementById("referralLinkInput").value = `${currentUrl}?ref=${address}`;
+        }
+
+        function copyReferralLink() {
+            const inputField = document.getElementById("referralLinkInput");
+            if (!inputField.value || inputField.value.includes("قم بربط")) {
+                alert("يرجى ربط المحفظة أولاً لتوليد رابط الإحالة الخاص بك.");
+                return;
+            }
+            navigator.clipboard.writeText(inputField.value);
+            alert("تم نسخ رابط الإحالة بنجاح!");
+        }
+
+        function createToken() {
+            if (!userAccount) {
+                alert("يرجى ربط المحفظة أولاً لإنشاء الأصل الرقمي.");
+                connectWallet();
+                return;
+            }
+            const name = document.getElementById("tokenName").value;
+            const symbol = document.getElementById("tokenSymbol").value;
+            if (!name || !symbol) {
+                alert("يرجى إدخال اسم ورمز الأصل الرقمي بدقة.");
+                return;
+            }
+            alert(`جاري إرسال معاملة إصدار الأصل (${name} - ${symbol}) على شبكة Base... سيتم توجيه رسوم الإنشاء وحصة الصانع لمحفظتك مباشرة.`);
+        }
+
+        // التقاط بارامتر الإحالة إن وجد في الرابط
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            if (ref) {
+                console.log("تم رصد مُحيل نشط للجلسة الحالية:", ref);
+                localStorage.setItem('activeReferrer', ref);
+            }
+        });
+    </script>
+</body>
+</html>
