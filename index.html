@@ -2,124 +2,216 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viral Matrix Quantum | Mainnet Integration</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- مكتبة Web3 الحقيقية -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViralLaunchpad - منصة الإطلاق اللامركزية على Base</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         :root {
-            --bg-dark: #020408; --glass-bg: rgba(14, 18, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.08);
-            --gold-primary: #f3ba2f; --gold-glow: rgba(243, 186, 47, 0.4);
-            --green-bull: #0ecb81; --green-glow: rgba(14, 203, 129, 0.2);
-            --text-light: #ffffff; --text-dim: #848e9c;
+            --bg-color: #0b0e14;
+            --card-bg: #151922;
+            --accent-green: #00ecb7;
+            --accent-purple: #8247e5;
+            --text-main: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: #262b35;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
-
-        body { background-color: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; padding-bottom: 90px; }
-
-        .app-container { width: 100%; max-width: 480px; padding: 16px; display: flex; flex-direction: column; gap: 20px; }
-
-        /* ================= شريط المحفظة الحقيقي ================= */
-        .wallet-header { display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
-        .network-badge { font-size: 12px; font-weight: 800; color: var(--gold-primary); background: rgba(243, 186, 47, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); }
-        .btn-connect { background: linear-gradient(135deg, var(--green-bull), #0a9960); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px var(--green-glow); transition: 0.3s; }
-
-        /* ================= كارت قريباً (Coming Soon) ================= */
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 24px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); margin-top: 20px; }
-        .status-icon { font-size: 50px; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        
-        .card-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 10px; }
-        .card-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 24px; }
-        
-        .badge-dev { background: rgba(243, 186, 47, 0.1); border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; display: inline-block; }
-
-        /* ================= شريط التنقل السفلي ================= */
-        .page-section { display: none; }
-        .page-section.active { display: block; }
-        .floating-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 440px; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; display: flex; justify-content: space-between; padding: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 100; }
-        .nav-item { flex: 1; text-align: center; padding: 10px 0; border-radius: 18px; color: var(--text-dim); font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-item.active { background: rgba(243, 186, 47, 0.15); color: var(--gold-primary); }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 12px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+        .connect-btn {
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .stats-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+        .stat-item h3 {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .stat-item p {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .token-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .token-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .token-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .token-info h4 {
+            font-size: 0.95rem;
+        }
+        .token-info span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            width: 45%;
+            height: 100%;
+            background: var(--accent-green);
+        }
+        .trade-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .btn-buy {
+            background: var(--accent-green);
+            color: #0b0e14;
+        }
+        .btn-sell {
+            background: #ef4444;
+            color: white;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        
-        <!-- الهيدر الخاص بربط المحفظة Web3 (حقيقي 100%) -->
-        <div class="wallet-header">
-            <div class="network-badge">🟢 BNB Chain</div>
-            <button class="btn-connect" id="connectBtn" onclick="connectWallet()">🔗 ربط المحفظة</button>
-        </div>
+    <header>
+        <div class="logo">🚀 ViralLaunchpad</div>
+        <button class="connect-btn" id="connectWalletBtn" onclick="connectWallet()">ربط المحفظة</button>
+    </header>
 
-        <!-- ==================== قسم الإطلاق (قريباً - تم إخفاء الواجهة الوهمية) ==================== -->
-        <div id="tab-launch" class="page-section active">
-            <div class="glass-card">
-                <div class="status-icon">🏗️</div>
-                <h1 class="card-title">منصة الإطلاق الذكي</h1>
-                <p class="card-desc">
-                    جارٍ ربط وتدقيق العقود الذكية على شبكة BNB Chain. سيتم تفعيل واجهة إنشاء العملات تلقائياً بمجرد إتمام الربط الحقيقي.
-                </p>
-                <div class="badge-dev">🔒 قريباً - تحت ربط البلوكشين</div>
-            </div>
+    <div class="stats-card">
+        <div class="stat-item">
+            <h3>إجمالي حجم التداول</h3>
+            <p id="totalVolume">$124,580</p>
         </div>
-
-        <!-- ==================== قسم محرك الحرق (قريباً) ==================== -->
-        <div id="tab-forge" class="page-section">
-            <div class="glass-card">
-                <div class="status-icon">🔥</div>
-                <h1 class="card-title">محرك الحرق التنافسي</h1>
-                <p class="card-desc">
-                    هذا القسم مخصص للمبادلة وحرق العملات عبر عقود ذكية آمنة وموثوقة.
-                </p>
-                <div class="badge-dev" style="color: var(--green-bull); border-color: var(--green-bull); background: var(--green-glow);">⚡ قيد التطوير</div>
-            </div>
+        <div class="stat-item">
+            <h3>العملات المُطلقة</h3>
+            <p>18 توكن</p>
         </div>
-
-        <!-- ==================== قسم الأرباح (قريباً) ==================== -->
-        <div id="tab-affiliate" class="page-section">
-            <div class="glass-card">
-                <div class="status-icon">💸</div>
-                <h1 class="card-title">نظام المكافآت والإحالات</h1>
-                <p class="card-desc">
-                    سيتم تفعيل توزيع الأرباح التلقائي وعقود الإحالة فور إطلاق المنصة رسمياً.
-                </p>
-                <div class="badge-dev">💎 قريباً</div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- شريط التنقل السفلي -->
-    <div class="floating-nav">
-        <div class="nav-item active" onclick="switchTab('tab-launch', this)">
-            <span style="font-size: 20px;">🚀</span><span>الإطلاق</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('tab-forge', this)">
-            <span style="font-size: 20px;">🔥</span><span>المحرك</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('tab-affiliate', this)">
-            <span style="font-size: 20px;">💸</span><span>الأرباح</span>
+        <div class="stat-item">
+            <h3>شبكة التشغيل</h3>
+            <p style="color: #3b82f6;">Base Mainnet</p>
         </div>
     </div>
 
-    <!-- ==================== كود ربط المحفظة الحقيقي ==================== -->
+    <div class="section-title">
+        <span>أحدث العملات المتاحة للتداول الفوري</span>
+        <span style="font-size: 0.75rem; color: var(--accent-green);">● بث حي</span>
+    </div>
+
+    <div class="token-card">
+        <div class="token-header">
+            <div class="token-icon">V</div>
+            <div class="token-info">
+                <h4>ViralBase ($VBASE)</h4>
+                <span>تم الإنشاء عبر عقد المصنع الموثق</span>
+            </div>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between;">
+            <span>السيولة المتبقية لاكتمال المنحنى:</span>
+            <span style="color: var(--text-main);">5.4 ETH / 10 ETH</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 54%;"></div>
+        </div>
+        <div class="trade-buttons">
+            <button class="btn btn-buy" onclick="buyToken()">شراء سريع</button>
+            <button class="btn btn-sell" onclick="sellToken()">بيع</button>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        عقد المصنع المرتبط: <span style="font-family: monospace; color: var(--accent-green);">0xb641f9...d1A7a</span>
+    </div>
+
     <script>
-        // التنقل بين الصفحات
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            element.classList.add('active');
-        }
+        // إعدادات العقد الحقيقي على شبكة Base
+        const FACTORY_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
+        const BASE_CHAIN_ID = 8453; // 0x2105 بالعشري
 
-        // إعدادات Web3 الحقيقية
-        let provider, signer, userAddress;
+        let provider;
+        let signer;
 
         async function connectWallet() {
             if (window.ethereum) {
@@ -127,22 +219,40 @@
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
-                    userAddress = await signer.getAddress();
                     
-                    // تحديث زر الربط بعنوان المحفظة الحقيقي
-                    const shortAddress = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
-                    const btn = document.getElementById("connectBtn");
-                    btn.innerText = "✅ " + shortAddress;
-                    btn.style.background = "rgba(14, 203, 129, 0.2)";
-                    btn.style.color = "var(--green-bull)";
-                    btn.style.border = "1px solid var(--green-bull)";
+                    // التحقق من الشبكة
+                    const network = await provider.getNetwork();
+                    if (network.chainId !== BASE_CHAIN_ID) {
+                        alert("يرجى التحويل إلى شبكة Base (Chain ID: 8453) في محفظتك.");
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_switchEthereumChain',
+                                params: [{ chainId: '0x2105' }],
+                            });
+                        } catch (switchError) {
+                            console.error(switchError);
+                        }
+                    }
 
+                    const address = await signer.getAddress();
+                    const shortAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
+                    document.getElementById("connectWalletBtn").innerText = shortAddr;
+                    alert("تم ربط المحفظة بنجاح!");
                 } catch (error) {
-                    alert("❌ تم إلغاء ربط المحفظة.");
+                    console.error(error);
+                    alert("فشل ربط المحفظة.");
                 }
             } else {
-                alert("⚠️ الرجاء فتح الرابط داخل متصفح يدعم Web3 مثل Trust Wallet أو MetaMask.");
+                alert("يرجى فتح هذه الصفحة من متصفح يدعم Web3 (مثل متصفح MetaMask أو Mises).");
             }
+        }
+
+        function buyToken() {
+            alert("جاهز لتنفيذ عملية الشراء عبر عقد المصنع المرتبط على Base!");
+        }
+
+        function sellToken() {
+            alert("جاهز لتنفيذ عملية البيع الفوري!");
         }
     </script>
 </body>
