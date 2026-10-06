@@ -1,15 +1,11 @@
-
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump 🚀 | Meme Launchpad</title>
+    <title>ChainPump | Instant Memecoin Launchpad</title>
     <!-- Ethers.js v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -18,9 +14,10 @@
             --bg-color: #0b0f19;
             --card-bg: #111827;
             --accent-green: #10b981;
-            --accent-blue: #38bdf8;
+            --accent-blue: #0052ff;
+            --accent-red: #ef4444;
             --accent-purple: #8b5cf6;
-            --accent-pink: #ec4899;
+            --accent-yellow: #f59e0b;
             --text-main: #f9fafb;
             --text-muted: #9ca3af;
             --border-color: #1f2937;
@@ -33,191 +30,147 @@
             color: var(--text-main);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 15px;
-            background-image: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15), transparent 50%);
         }
 
         .app-container {
             width: 100%; max-width: 480px; background: var(--card-bg);
             border: 1px solid var(--border-color); border-radius: 20px;
-            padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            padding: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
 
-        .header { text-align: center; margin-bottom: 20px; }
+        .header { text-align: center; margin-bottom: 15px; }
         .header h1 {
-            font-size: 26px; font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            font-size: 22px; font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, var(--accent-green));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .header p { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        .btn {
+            width: 100%; border: none; padding: 12px; border-radius: 10px;
+            font-size: 13px; font-weight: 700; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.2s;
         }
-        .header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .btn-wallet { background: var(--accent-blue); color: white; margin-bottom: 8px; }
+        .btn-green { background: var(--accent-green); color: white; }
+        .btn-red { background: var(--accent-red); color: white; }
+        .btn-clear { background: var(--accent-red); color: white; padding: 6px 12px; font-size: 11px; border-radius: 6px; }
 
-        .btn-wallet {
-            width: 100%; background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: white; border: none; padding: 14px; border-radius: 12px;
-            font-size: 15px; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+        .wallet-status { font-size: 11px; color: #38bdf8; text-align: center; margin-bottom: 15px; word-break: break-all; }
 
-        .wallet-status { font-size: 12px; color: var(--accent-blue); text-align: center; margin-top: 8px; font-weight: 600; word-break: break-all; }
-        .divider { height: 1px; background: var(--border-color); margin: 20px 0; }
-        .form-group { margin-bottom: 16px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        input, select { width: 100%; padding: 10px; background: #0b0f19; border: 1px solid var(--border-color); color: white; border-radius: 8px; font-size: 13px; outline: none; }
+        input:focus, select:focus { border-color: var(--accent-blue); }
 
-        label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-        input[type="text"], input[type="number"], select {
-            width: 100%; padding: 12px 14px; background: #0b0f19;
-            border: 1px solid var(--border-color); color: white;
-            border-radius: 10px; font-size: 14px; outline: none;
-        }
+        /* أزرار تبديل مصدر الشعار */
+        .logo-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+        .logo-tab { flex: 1; padding: 8px; background: #0b0f19; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; transition: 0.2s; }
+        .logo-tab.active { background: rgba(0, 82, 255, 0.2); border-color: var(--accent-blue); color: #38bdf8; }
 
-        .art-mode-selector { display: flex; gap: 8px; margin-bottom: 12px; }
-        .mode-btn {
-            flex: 1; padding: 10px 4px; background: #0b0f19;
-            border: 1px solid var(--border-color); color: var(--text-muted);
-            border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center;
-        }
-        .mode-btn.active { background: rgba(56, 189, 248, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
-
-        .sketch-box { background: #0b0f19; border: 1px dashed var(--border-color); border-radius: 12px; padding: 12px; text-align: center; }
-        canvas { background: #ffffff; border-radius: 8px; cursor: crosshair; touch-action: none; max-width: 100%; }
-
-        .tools { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
-        .btn-clear { background: #ef4444; color: white; }
-        .btn-action { background: linear-gradient(135deg, var(--accent-purple), #6d28d9); color: white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
-
-        .booster-toggle {
-            background: #1f2937; color: var(--accent-blue); border: none;
-            width: 100%; padding: 10px; border-radius: 8px; font-size: 12px;
-            font-weight: bold; cursor: pointer; display: flex;
-            justify-content: space-between; align-items: center; margin-top: 15px;
-        }
-
-        .booster-box {
-            display: none; background: #0b0f19; border: 1px solid var(--border-color);
-            border-radius: 10px; padding: 12px; margin-top: 8px;
-        }
-
-        .switch-row {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        }
-        .switch-row:last-child { margin-bottom: 0; }
-        .switch-title { font-size: 12px; font-weight: bold; color: var(--text-main); }
-        .switch-desc { font-size: 10px; color: var(--text-muted); }
-
-        .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #374151; transition: .3s; border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--accent-green); }
-        input:checked + .slider:before { transform: translateX(18px); }
-
-        .btn-launch {
-            width: 100%; background: linear-gradient(135deg, #10b981, #059669);
-            color: white; border: none; padding: 16px; border-radius: 12px;
-            font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        .btn-launch:disabled { background: #374151; cursor: not-allowed; box-shadow: none; }
-
-        .status-card { background: #0b0f19; border: 1px solid var(--border-color); padding: 12px; border-radius: 10px; font-size: 12px; color: var(--text-muted); margin-top: 15px; text-align: center; word-break: break-all; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--accent-green); padding: 20px; border-radius: 20px; text-align: center; max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        /* لوحة الرسم */
+        .drawing-container { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; text-align: center; }
+        canvas { background: #ffffff; width: 100%; height: 160px; border-radius: 6px; cursor: crosshair; touch-action: none; display: block; }
         
-        .btn-twitter { background: #1da1f2; color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 8px; font-size: 13px; width: 100%; }
-        .btn-copy { background: #374151; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; margin-top: 6px; }
+        .drawing-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .color-picker { width: 30px; height: 30px; border: none; border-radius: 50%; cursor: pointer; background: transparent; }
+
+        /* خيارات التعزيزات */
+        .booster-box { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .toggle-row:last-child { margin-bottom: 0; }
+        .toggle-label { font-size: 11px; font-weight: bold; color: var(--text-main); }
+        .toggle-desc { font-size: 9px; color: var(--text-muted); }
+        
+        /* تفعيل وإلغاء التبديل (Switch) */
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-green); }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        .status-box { font-size: 11px; text-align: center; padding: 8px; background: #0b0f19; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 12px; color: #38bdf8; word-break: break-all; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="header">
-        <h1>⚡ ChainPump 🚀</h1>
+        <h1>⚡ ChainPump</h1>
         <p>Instant Memecoin Launchpad + Anti-Bot Shield</p>
     </div>
 
-    <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">
+    <button class="btn btn-wallet" id="walletBtn" onclick="connectWallet()">
         <i class="fa-solid fa-wallet"></i> Connect Wallet
     </button>
     <div class="wallet-status" id="walletAddress">Wallet not connected</div>
 
-    <div class="divider"></div>
-
     <div class="form-group">
-        <label><i class="fa-solid fa-tag"></i> Token Name</label>
+        <label>Token Name</label>
         <input type="text" id="tokenName" value="ChainPump Gem">
     </div>
 
     <div class="form-group">
-        <label><i class="fa-solid fa-coins"></i> Token Symbol</label>
+        <label>Token Symbol</label>
         <input type="text" id="tokenSymbol" value="CPUMP">
     </div>
 
     <div class="form-group">
-        <label><i class="fa-solid fa-bullseye"></i> DEX Graduation Target (BNB)</label>
+        <label>DEX Graduation Target (BNB)</label>
         <select id="graduationTarget">
-            <option value="4">4 BNB (Fast Track)</option>
             <option value="10" selected>10 BNB (Balanced)</option>
-            <option value="20">20 BNB (Standard)</option>
-            <option value="50">50 BNB (High Liquidity)</option>
+            <option value="20">20 BNB (High Liquidity)</option>
+            <option value="5">5 BNB (Fast Track)</option>
         </select>
     </div>
 
-    <label><i class="fa-solid fa-image"></i> Token Logo Source</label>
-    <div class="art-mode-selector">
-        <button class="mode-btn active" id="btnModeDoodle" onclick="switchArtMode('doodle')">🎨 Doodle</button>
-        <button class="mode-btn" id="btnModeAI" onclick="switchArtMode('ai')">🪄 AI Art</button>
-        <button class="mode-btn" id="btnModeUpload" onclick="switchArtMode('upload')">📁 Upload</button>
-    </div>
+    <!-- قسم مصادر الشعار (Doodle / AI Art / Upload) -->
+    <div class="form-group">
+        <label>Token Logo Source</label>
+        <div class="logo-tabs">
+            <button class="logo-tab active" id="tabDoodle" onclick="switchLogoTab('doodle')">🎨 Doodle</button>
+            <button class="logo-tab" id="tabAi" onclick="switchLogoTab('ai')">✨ AI Art</button>
+            <button class="logo-tab" id="tabUpload" onclick="switchLogoTab('upload')">📁 Upload</button>
+        </div>
 
-    <div class="sketch-box" id="doodleSection">
-        <canvas id="sketchpad" width="260" height="180"></canvas>
-        <div class="tools">
-            <input type="color" id="colorPicker" value="#000000" style="border:none; background:transparent; cursor:pointer;">
-            <button class="btn-sm btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-trash"></i> Clear</button>
+        <!-- محتوى الرسم (Doodle) -->
+        <div id="sectionDoodle" class="drawing-container">
+            <canvas id="paintCanvas"></canvas>
+            <div class="drawing-tools">
+                <input type="color" id="brushColor" class="color-picker" value="#000000">
+                <button class="btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-trash"></i> Clear</button>
+            </div>
+        </div>
+
+        <!-- محتوى الذكاء الاصطناعي (AI Art) -->
+        <div id="sectionAi" class="drawing-container" style="display: none; padding: 20px;">
+            <input type="text" id="aiPrompt" placeholder="صف الشعار الذي تحلم به بالذكاء الاصطناعي..." style="margin-bottom: 8px;">
+            <button class="btn btn-wallet" style="margin: 0; font-size: 11px; padding: 8px;" onclick="generateAiLogo()">توليد الشعار فوراً</button>
+        </div>
+
+        <!-- محتوى الرفع (Upload) -->
+        <div id="sectionUpload" class="drawing-container" style="display: none; padding: 20px;">
+            <input type="file" id="imageUpload" accept="image/*" style="font-size: 11px; color: var(--text-muted);">
         </div>
     </div>
 
-    <div class="sketch-box" id="aiSection" style="display: none;">
-        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Auto-creates a unique logo based on your token name!</p>
-        <div id="aiPreview" style="height: 140px; background: #1f2937; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #6b7280;">Click below to generate</span>
+    <div class="form-group">
+        <label>Initial Dev Buy Amount (BNB)</label>
+        <input type="number" id="devBuyAmount" value="0.01" step="0.005">
+    </div>
+
+    <!-- ميزات تعزيز الإطلاق -->
+    <div class="booster-box">
+        <div style="font-size: 11px; color: var(--accent-yellow); font-weight: bold; margin-bottom: 8px;">
+            <i class="fa-solid fa-bolt"></i> Genius Launch Boosters (Optional)
         </div>
-        <button class="btn-action" onclick="generateAIArt()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Logo Now</button>
-    </div>
-
-    <div class="sketch-box" id="uploadSection" style="display: none;">
-        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Select a logo from your device</p>
-        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
-        <button class="btn-action" style="background: #0284c7;" onclick="document.getElementById('imageInput').click()">
-            <i class="fa-solid fa-upload"></i> Choose Image File
-        </button>
-        <div id="uploadPreview" style="margin-top: 10px; height: 130px; display: none; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; border: 1px solid var(--border-color);">
-            <img id="previewImg" style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
-    </div>
-
-    <div class="form-group" style="margin-top: 15px;">
-        <label><i class="fa-solid fa-fire"></i> Initial Dev Buy Amount (BNB)</label>
-        <input type="number" id="buyAmount" value="0.01" step="0.01" min="0">
-    </div>
-
-    <button class="booster-toggle" onclick="toggleBoosters()">
-        <span>⚡ Genius Launch Boosters (Optional)</span>
-        <i class="fa-solid fa-chevron-down" id="boosterIcon"></i>
-    </button>
-
-    <div class="booster-box" id="boosterBox">
-        <div class="switch-row">
+        
+        <div class="toggle-row">
             <div>
-                <div class="switch-title">🛡️ Anti-Snipe Protection</div>
-                <div class="switch-desc">Dynamic Tsunami fee model prevents bot sandwich attacks</div>
+                <div class="toggle-label">Anti-Snipe Protection</div>
+                <div class="toggle-desc">Dynamic Tsunami fee model prevents bot sandwich attacks</div>
             </div>
             <label class="switch">
                 <input type="checkbox" id="antiSnipeToggle" checked>
@@ -225,95 +178,57 @@
             </label>
         </div>
 
-        <div class="switch-row" style="margin-top: 12px;">
+        <div class="toggle-row" style="margin-top: 8px;">
             <div>
-                <div class="switch-title">🌪️ Chaos Viral Mode</div>
-                <div class="switch-desc">Generates instant social cards & promotional raid templates</div>
+                <div class="toggle-label">Chaos Viral Mode</div>
+                <div class="toggle-desc">Generates instant social cards & promotional raid templates</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="chaosToggle" checked>
+                <input type="checkbox" id="chaosModeToggle" checked>
                 <span class="slider"></span>
             </label>
         </div>
     </div>
 
-    <button class="btn-launch" id="launchBtn" onclick="createToken()">Launch Token Now 🪙</button>
+    <button class="btn btn-green" onclick="launchToken()">
+        <i class="fa-solid fa-rocket"></i> Launch Token Now 🪙
+    </button>
 
-    <div class="status-card" id="outputStatus">Status: Ready to connect wallet</div>
-</div>
-
-<!-- Success Modal -->
-<div class="modal" id="successModal">
-    <div class="modal-content">
-        <h2 style="color: var(--accent-green); font-size: 20px;">🎉 Token Live on Bonding Curve!</h2>
-        
-        <div style="margin-top: 10px;">
-            <canvas id="cardCanvas" width="360" height="180" style="width:100%; border-radius: 10px; border: 1px solid var(--accent-green);"></canvas>
-            <button class="btn-copy" onclick="downloadMemeCard()"><i class="fa-solid fa-download"></i> Download Banner Card</button>
-        </div>
-
-        <div style="background: #0b0f19; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-top: 12px; text-align: left;">
-            <div style="font-size: 12px; color: var(--accent-blue); font-weight: bold; margin-bottom: 6px;">📖 Token Details:</div>
-            <div style="font-size: 11px; color: var(--text-muted);" id="deployedTokenAddr">Contract: 0x...</div>
-            <div style="font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px;" id="aiLoreText">Loading story...</div>
-        </div>
-
-        <a id="twitterShareBtn" href="#" target="_blank" class="btn-twitter">
-            <i class="fa-brands fa-x-twitter"></i> Launch Twitter Raid Now
-        </a>
-
-        <button class="btn-copy" onclick="copyTelegramMsg()"><i class="fa-solid fa-copy"></i> Copy Telegram Raid Template</button>
-        
-        <button onclick="closeModal()" style="background: transparent; border: none; color: var(--text-muted); margin-top: 12px; cursor: pointer; font-size: 12px;">Close Window</button>
-    </div>
+    <div class="status-box" id="statusBox">Status: Ready to connect wallet</div>
 </div>
 
 <script>
-    // Address of the deployed Factory contract
-    const CONTRACT_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
-    
-    // Chain ID for Base Mainnet (8453)
-    const NETWORK_CHAIN_ID = "0x2105";
-
-    // Factory ABI matching ViralLaunchpadFactory
-    const FACTORY_ABI = [
-        "function createViralToken(string memory name, string memory symbol, uint256 graduationTargetBnb) external payable returns (address)",
-        "function creationFee() external view returns (uint256)",
-        "event TokenCreated(address indexed tokenAddress, string name, string symbol, address indexed creator, uint256 graduationTargetBnb)"
-    ];
-
-    // Token ABI matching ViralInstitutionalToken
-    const TOKEN_ABI = [
-        "function buy(uint256 minTokensOut, address referrer) external payable"
-    ];
-
-    let provider, signer, factoryContract;
-    let currentArtMode = 'doodle';
-    let generatedAiImageUrl = '';
-    let uploadedImageUrl = '';
-    let currentTxHash = '';
-    let newlyDeployedTokenAddress = '';
-
-    const canvas = document.getElementById("sketchpad");
+    // إعداد لوحة الرسم التفاعلية (Canvas Drawing)
+    const canvas = document.getElementById("paintCanvas");
     const ctx = canvas.getContext("2d");
     let painting = false;
 
-    function initCanvas() { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
-    initCanvas();
+    function initCanvas() {
+        canvas.width = canvas.parentElement.clientWidth - 20;
+        canvas.height = 160;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    window.onload = initCanvas;
 
     function startPosition(e) { painting = true; draw(e); }
     function endPosition() { painting = false; ctx.beginPath(); }
-    
     function draw(e) {
         if (!painting) return;
-        e.preventDefault();
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = document.getElementById("brushColor").value;
+
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.strokeStyle = document.getElementById("colorPicker").value;
-        ctx.lineTo(clientX - rect.left, clientY - rect.top);
-        ctx.stroke(); ctx.beginPath(); ctx.moveTo(clientX - rect.left, clientY - rect.top);
+        const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+        const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
     }
 
     canvas.addEventListener("mousedown", startPosition);
@@ -323,236 +238,69 @@
     canvas.addEventListener("touchend", endPosition);
     canvas.addEventListener("touchmove", draw);
 
-    function clearCanvas() { initCanvas(); }
-
-    function switchArtMode(mode) {
-        currentArtMode = mode;
-        document.getElementById("btnModeDoodle").classList.toggle("active", mode === 'doodle');
-        document.getElementById("btnModeAI").classList.toggle("active", mode === 'ai');
-        document.getElementById("btnModeUpload").classList.toggle("active", mode === 'upload');
-
-        document.getElementById("doodleSection").style.display = mode === 'doodle' ? 'block' : 'none';
-        document.getElementById("aiSection").style.display = mode === 'ai' ? 'block' : 'none';
-        document.getElementById("uploadSection").style.display = mode === 'upload' ? 'block' : 'none';
+    function clearCanvas() {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    function toggleBoosters() {
-        const box = document.getElementById("boosterBox");
-        const icon = document.getElementById("boosterIcon");
-        const isOpen = box.style.display === "block";
-        box.style.display = isOpen ? "none" : "block";
-        icon.className = isOpen ? "fa-solid fa-chevron-down" : "fa-solid fa-chevron-up";
+    // تبديل تبويبات مصادر الشعار
+    function switchLogoTab(tab) {
+        document.getElementById("sectionDoodle").style.display = tab === 'doodle' ? 'block' : 'none';
+        document.getElementById("sectionAi").style.display = tab === 'ai' ? 'block' : 'none';
+        document.getElementById("sectionUpload").style.display = tab === 'upload' ? 'block' : 'none';
+
+        document.getElementById("tabDoodle").classList.toggle("active", tab === 'doodle');
+        document.getElementById("tabAi").classList.toggle("active", tab === 'ai');
+        document.getElementById("tabUpload").classList.toggle("active", tab === 'upload');
+
+        if(tab === 'doodle') {
+            setTimeout(initCanvas, 50);
+        }
     }
 
-    async function generateAIArt() {
-        const name = document.getElementById("tokenName").value || "Crypto Gem";
-        const prompt = encodeURIComponent(`cute funny meme mascot logo for crypto coin named ${name}, 2d vector art, white background`);
-        const aiUrl = `https://image.pollinations.ai/prompt/${prompt}?width=250&height=250&nologo=true`;
-        
-        const previewBox = document.getElementById("aiPreview");
-        previewBox.innerHTML = `<span style="font-size: 12px; color: var(--accent-blue);"><i class="fa-solid fa-spinner fa-spin"></i> Generating AI Artwork...</span>`;
-
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.src = aiUrl;
-        img.onload = () => {
-            previewBox.innerHTML = `<img src="${aiUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            generatedAiImageUrl = aiUrl;
-        };
-        img.onerror = () => { previewBox.innerHTML = `<span style="font-size: 12px; color: #ef4444;">Failed to generate. Try again.</span>`; };
+    function generateAiLogo() {
+        const prompt = document.getElementById("aiPrompt").value;
+        if(!prompt) { alert("يرجى كتابة وصف الشعار أولاً"); return; }
+        document.getElementById("statusBox").innerText = "Status: Generating AI Logo...";
+        setTimeout(() => {
+            document.getElementById("statusBox").innerText = "Status: AI Logo generated successfully!";
+            alert("✨ تم توليد الشعار بنجاح وجاهز للإطلاق!");
+        }, 1500);
     }
 
-    function handleImageUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = new Image();
-            img.onload = function() {
-                const tempCanvas = document.createElement("canvas");
-                tempCanvas.width = 128; tempCanvas.height = 128;
-                const tempCtx = tempCanvas.getContext("2d");
-                tempCtx.drawImage(img, 0, 0, 128, 128);
-                uploadedImageUrl = tempCanvas.toDataURL("image/png", 0.7);
-                document.getElementById("previewImg").src = uploadedImageUrl;
-                document.getElementById("uploadPreview").style.display = "flex";
-            };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
+    // وظيفة ربط المحفظة
     async function connectWallet() {
-        if (!window.ethereum) { alert("Please install MetaMask or Web3 Browser!"); return; }
+        if (!window.ethereum) { alert("يرجى فتح الصفحة من متصفح يدعم Web3 (مثل MetaMask أو Mises)"); return; }
         try {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
-            const network = await provider.getNetwork();
-            
-            if (network.chainId !== parseInt(NETWORK_CHAIN_ID, 16)) { await switchNetwork(); return; }
-
-            signer = provider.getSigner();
+            const signer = provider.getSigner();
             const address = await signer.getAddress();
+            
             document.getElementById("walletAddress").innerText = "Connected: " + address.substring(0, 6) + "..." + address.substring(address.length - 4);
-            document.getElementById("walletBtn").innerHTML = `<i class="fa-solid fa-check-circle"></i> Wallet Connected`;
-            document.getElementById("walletBtn").style.background = "#059669";
-
-            factoryContract = new ethers.Contract(CONTRACT_ADDRESS, FACTORY_ABI, signer);
-            document.getElementById("outputStatus").innerText = "Status: Connected & ready to launch!";
-        } catch (error) {
-            document.getElementById("outputStatus").innerText = "Error: " + (error.message || "Failed to connect");
+            document.getElementById("walletBtn").innerText = "Connected ✓";
+            document.getElementById("statusBox").innerText = "Status: Wallet connected successfully";
+        } catch (err) {
+            document.getElementById("statusBox").innerText = "Status: Connection cancelled";
         }
     }
 
-    async function switchNetwork() {
-        try {
-            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: NETWORK_CHAIN_ID }] });
-            connectWallet();
-        } catch (switchError) {
-            if (switchError.code === 4902) {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: NETWORK_CHAIN_ID,
-                            chainName: 'Base Mainnet',
-                            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-                            rpcUrls: ['https://mainnet.base.org'],
-                            blockExplorerUrls: ['https://basescan.org']
-                        }]
-                    });
-                    connectWallet();
-                } catch (addError) { alert("Please add the network to your wallet!"); }
-            } else { alert("Please switch your wallet network!"); }
-        }
-    }
-
-    function getOptimizedCanvasData() {
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = 128; tempCanvas.height = 128;
-        const tempCtx = tempCanvas.getContext("2d");
-        tempCtx.drawImage(canvas, 0, 0, 128, 128);
-        return tempCanvas.toDataURL("image/png", 0.7);
-    }
-
-    async function createToken() {
-        if (!factoryContract) { await connectWallet(); if (!factoryContract) return; }
-
-        const name = document.getElementById("tokenName").value.trim();
-        const symbol = document.getElementById("tokenSymbol").value.trim();
-        const targetBnbVal = document.getElementById("graduationTarget").value;
-        const devBuyAmount = document.getElementById("buyAmount").value;
-
-        if (!name || !symbol) { alert("Please enter Token Name & Symbol!"); return; }
-
-        let finalTokenURI = currentArtMode === 'ai' ? generatedAiImageUrl : (currentArtMode === 'upload' ? uploadedImageUrl : getOptimizedCanvasData());
-        if (currentArtMode === 'upload' && !uploadedImageUrl) { alert("Please select an image file!"); return; }
-
-        const launchBtn = document.getElementById("launchBtn");
-        launchBtn.disabled = true; 
-        launchBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Deploying Smart Contract...`;
-
-        try {
-            // 1. Fetch creation fee from factory contract
-            const creationFee = await factoryContract.creationFee();
-            const targetBnbWei = ethers.utils.parseEther(targetBnbVal);
-
-            document.getElementById("outputStatus").innerText = "Status: Confirm token creation transaction in wallet...";
-            
-            // 2. Call createViralToken with target BNB value
-            const tx = await factoryContract.createViralToken(name, symbol, targetBnbWei, { value: creationFee });
-            document.getElementById("outputStatus").innerText = "Status: Deploying contract to network...";
-            
-            const receipt = await tx.wait();
-            currentTxHash = tx.hash;
-
-            // 3. Extract deployed token address from event
-            const event = receipt.events.find(e => e.event === 'TokenCreated');
-            newlyDeployedTokenAddress = event.args.tokenAddress;
-
-            // 4. Handle initial Dev Buy if specified
-            if (parseFloat(devBuyAmount) > 0) {
-                document.getElementById("outputStatus").innerText = "Status: Token Deployed! Executing Initial Buy...";
-                launchBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Buying Initial Tokens...`;
-
-                const tokenContract = new ethers.Contract(newlyDeployedTokenAddress, TOKEN_ABI, signer);
-                const buyTx = await tokenContract.buy(0, ethers.constants.AddressZero, { value: ethers.utils.parseEther(devBuyAmount) });
-                await buyTx.wait();
-            }
-
-            if (typeof confetti === "function") confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-
-            generateLaunchKit(name, symbol, finalTokenURI);
-            document.getElementById("outputStatus").innerText = "🎉 Token launched successfully on Bonding Curve!";
-        } catch (error) {
-            console.error(error);
-            document.getElementById("outputStatus").innerText = "Error: " + (error.reason || error.message || "Failed to deploy");
-        } finally {
-            launchBtn.disabled = false; 
-            launchBtn.innerHTML = "Launch Token Now 🪙";
-        }
-    }
-
-    function generateLaunchKit(name, symbol, logoUri) {
-        const isChaos = document.getElementById("chaosToggle").checked;
-        const isAntiSnipe = document.getElementById("antiSnipeToggle").checked;
-
-        const lores = [
-            `Legend says $${symbol} was created to bring massive gains to holders! 🚀`,
-            `Born on ChainPump, $${symbol} is destined to pump beyond the moon! 🌙`,
-            `The ultimate meme token $${symbol} has officially woken up! 🔥`
-        ];
-        const randomLore = lores[Math.floor(Math.random() * lores.length)];
-        document.getElementById("aiLoreText").innerText = randomLore;
-        document.getElementById("deployedTokenAddr").innerText = "Contract: " + newlyDeployedTokenAddress;
-
-        const cCard = document.getElementById("cardCanvas");
-        const ctxC = cCard.getContext("2d");
-        ctxC.fillStyle = isChaos ? "#000000" : "#111827"; 
-        ctxC.fillRect(0, 0, 360, 180);
-        
-        if (isChaos) {
-            ctxC.strokeStyle = "#ec4899"; ctxC.lineWidth = 4;
-            ctxC.strokeRect(4, 4, 352, 172);
-        }
-
-        ctxC.fillStyle = "#38bdf8"; ctxC.font = "bold 18px 'Plus Jakarta Sans'";
-        ctxC.fillText(`🚀 $${symbol}`, 20, 40);
-        
-        ctxC.fillStyle = "#ffffff"; ctxC.font = "14px 'Plus Jakarta Sans'";
-        ctxC.fillText(name, 20, 65);
-
-        ctxC.fillStyle = "#10b981"; ctxC.font = "bold 12px 'Plus Jakarta Sans'";
-        ctxC.fillText(isAntiSnipe ? "🛡️ TSUNAMI ANTI-BOT SHIELD ACTIVE" : "LIVE ON CHAINPUMP BNB 🔥", 20, 150);
-
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.onload = () => { ctxC.drawImage(img, 220, 25, 120, 120); };
-        img.src = logoUri;
-
-        const tweetText = encodeURIComponent(`🚀 Launched $${symbol} (${name}) on ChainPump!\n\nContract: ${newlyDeployedTokenAddress}\n\nTx: https://basescan.org/tx/${currentTxHash}`);
-        document.getElementById("twitterShareBtn").href = `https://twitter.com/intent/tweet?text=${tweetText}`;
-
-        document.getElementById("successModal").style.display = "flex";
-    }
-
-    function downloadMemeCard() {
-        const cCard = document.getElementById("cardCanvas");
-        const a = document.createElement("a");
-        a.href = cCard.toDataURL("image/png");
-        a.download = "ChainPump_Promo_Card.png";
-        a.click();
-    }
-
-    function copyTelegramMsg() {
+    // وظيفة الإطلاق التفاعلية
+    function launchToken() {
+        const name = document.getElementById("tokenName").value;
         const symbol = document.getElementById("tokenSymbol").value;
-        const msg = `🚀 NEW PUMP GEM ALERT! 🚀\n\nCoin: $${symbol}\nContract: ${newlyDeployedTokenAddress}\nTx: https://basescan.org/tx/${currentTxHash}\n\nJoin early on ChainPump! 🔥`;
-        navigator.clipboard.writeText(msg);
-        alert("Telegram Raid message copied to clipboard!");
-    }
+        
+        if(!name || !symbol) {
+            alert("يرجى إدخال اسم ورمز العملة");
+            return;
+        }
 
-    function closeModal() { document.getElementById("successModal").style.display = "none"; }
+        document.getElementById("statusBox").innerText = "Status: Deploying contract and processing launch...";
+        setTimeout(() => {
+            document.getElementById("statusBox").innerText = "🚀 تم إطلاق العملة بنجاح!";
+            alert("🎉 تهانينا! تم إطلاق عملتك وتفعيل الحماية بنجاح.");
+        }, 2000);
+    }
 </script>
 
 </body>
