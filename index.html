@@ -3,382 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABSOLUTE ZENITH // Quantum Cyber Launchpad</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <title>ABSOLUTE ZENITH - The Ultimate Quantum Launchpad</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
-        :root {
-            --bg-deep: #030508;
-            --surface-dark: #0a0f18;
-            --border-glow: #00ffcc22;
-            --neon-green: #00ffcc;
-            --neon-red: #ff0055;
-            --neon-purple: #9d00ff;
-            --text-main: #f8fafc;
-            --text-muted: #64748b;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Courier New', Courier, monospace, 'Segoe UI', Tahoma;
-        }
-        body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            padding: 10px;
-            max-width: 480px;
-            margin: 0 auto;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 10%, #0f172a 0%, #030508 80%);
-            min-height: 100vh;
-        }
-        .header-zenith {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 10px;
-            border-bottom: 1px solid var(--neon-green);
-            background: rgba(10, 15, 24, 0.9);
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo-text {
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-            letter-spacing: 2px;
-        }
-        .connect-btn {
-            background: linear-gradient(45deg, var(--neon-purple), var(--neon-red));
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.8rem;
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
-            transition: 0.3s;
-        }
-        .connect-btn:hover {
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.8);
-        }
-        
-        /* Neural Dopamine FOMO Timer */
-        .fomo-box {
-            background: linear-gradient(135deg, #1a0510, #0a0f18);
-            border: 1px solid var(--neon-red);
-            border-radius: 8px;
-            padding: 12px;
-            margin: 14px 0;
-            text-align: center;
-            box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.2);
-            animation: pulse-border 2s infinite;
-        }
-        @keyframes pulse-border {
-            0% { border-color: var(--neon-red); }
-            50% { border-color: #550022; }
-            100% { border-color: var(--neon-red); }
-        }
-        .fomo-title {
-            font-size: 0.75rem;
-            color: var(--neon-red);
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-        .fomo-timer {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px var(--neon-red);
-            direction: ltr;
-        }
-
-        /* Matrix Arbitrage Radar */
-        .radar-box {
-            background: var(--surface-dark);
-            border: 1px solid var(--border-glow);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 14px;
-            font-size: 0.75rem;
-        }
-        .radar-header {
-            display: flex;
-            justify-content: space-between;
-            color: var(--neon-green);
-            margin-bottom: 6px;
-            border-bottom: 1px dashed #1e293b;
-            padding-bottom: 4px;
-        }
-        .radar-log {
-            color: var(--text-muted);
-            height: 45px;
-            overflow: hidden;
-            position: relative;
-            direction: ltr;
-        }
-        .log-item {
-            animation: fadeInOut 3s infinite;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Quantum Bonding Curve */
-        .zenith-card {
-            background: var(--surface-dark);
-            border: 1px solid var(--neon-green);
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 14px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.05);
-        }
-        .card-top {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .token-avatar {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, var(--neon-green), #004433);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #030508;
-            margin-left: 10px;
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-        .token-meta h3 {
-            font-size: 0.95rem;
-            color: #fff;
-        }
-        .token-meta span {
-            font-size: 0.7rem;
-            color: var(--neon-green);
-        }
-        .quantum-progress {
-            width: 100%;
-            height: 10px;
-            background: #030508;
-            border: 1px solid #1e293b;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .quantum-fill {
-            width: 68.4%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-green), var(--neon-purple));
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin: 10px 0;
-            font-size: 0.75rem;
-            text-align: center;
-        }
-        .stat-box {
-            background: #030508;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #1e293b;
-        }
-        .stat-box span {
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 2px;
-        }
-        .stat-box strong {
-            color: var(--neon-green);
-            direction: ltr;
-            display: inline-block;
-        }
-
-        /* Sub-Planck Execution Buttons */
-        .action-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .btn-zenith {
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-align: center;
-            transition: 0.2s;
-        }
-        .btn-sniper {
-            background: var(--neon-green);
-            color: #030508;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
-        }
-        .btn-sniper:hover {
-            background: #00fff0;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.8);
-        }
-        .btn-panic {
-            background: var(--neon-red);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
-        }
-        .footer-quantum {
-            text-align: center;
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-top: 20px;
-            border-top: 1px solid #1e293b;
-            padding-top: 10px;
-            direction: ltr;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=JetBrains+Mono:wght@700&display=swap');
+        body { font-family: 'Cairo', sans-serif; background-color: #030712; color: #f3f4f6; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glow-purple { box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); }
+        .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); }
+        .glow-red { box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-black to-gray-950">
 
-    <header class="header-zenith">
-        <div class="logo-text">⚡ ABSOLUTE ZENITH</div>
-        <button class="connect-btn" id="connectWalletBtn" onclick="connectWallet()">ربط المحفظة الكمومية</button>
+    <!-- رأس الصفحة / الهيمنة المطلقة -->
+    <header class="w-full max-w-md flex justify-between items-center mb-6 p-4 bg-gray-900/80 border border-purple-500/30 rounded-2xl backdrop-blur-md">
+        <button id="connectWalletBtn" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black px-5 py-2.5 rounded-xl glow-purple transition-all text-sm">
+            ربط المحفظة الكمومية
+        </button>
+        <div class="text-left">
+            <h1 class="text-lg font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">ABSOLUTE</h1>
+            <p class="text-xs font-bold tracking-widest text-purple-400 mono">ZENITH</p>
+        </div>
     </header>
 
-    <!-- Neural Dopamine FOMO Timer -->
-    <div class="fomo-box">
-        <div class="fomo-title">⚠️ إنذار طمع حان وقت الانفجار الحتمي (FOMO VAULT)</div>
-        <div class="fomo-timer" id="fomoCountdown">02:59:45</div>
+    <!-- صندوق الطمع والانفجار الحتمي (FOMO Vault) -->
+    <div class="w-full max-w-md bg-gradient-to-r from-red-950/40 to-black border border-red-600/40 rounded-2xl p-4 mb-4 glow-red text-center">
+        <div class="flex items-center justify-center gap-2 text-red-400 font-bold text-xs mb-1">
+            <span>⚠️</span> إنذار طمع: حان وقت الانفجار الحتمي (FOMO VAULT)
+        </div>
+        <div id="fomoTimer" class="mono text-3xl font-black text-white tracking-widest">02:59:20</div>
     </div>
 
-    <!-- Hyper-Arbitrage Matrix Radar -->
-    <div class="radar-box">
-        <div class="radar-header">
+    <!-- رادار صائدي الفرص وبوتات الهجوم (HFT Matrix) -->
+    <div class="w-full max-w-md bg-black/90 border border-cyan-500/30 rounded-2xl p-4 mb-4">
+        <div class="flex justify-between items-center mb-2 text-xs font-bold text-cyan-400">
             <span>📡 رادار صائدي الفرص (HFT Matrix)</span>
-            <span style="color: var(--neon-green);">● مباشر</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span> مباشر</span>
         </div>
-        <div class="radar-log" id="radarLogs">
-            <div class="log-item">> [ARBITRAGE] Bot #889 injected 4.2 ETH into Factory.</div>
-            <div class="log-item">> [FLASH_LOAN] Liquidity wave verified on Base Mainnet.</div>
-            <div class="log-item">> [WHALE_ALERT] 12.5 ETH buy intercepted & executed.</div>
-        </div>
-    </div>
-
-    <!-- Real-Time Quantum Bonding Curve -->
-    <div class="zenith-card">
-        <div class="card-top">
-            <div class="token-avatar">AZ</div>
-            <div class="token-meta">
-                <h3>Zenith Protocol (<span style="color: var(--neon-green);">\$ZENITH</span>)</h3>
-                <span>معاملة العقد الموثق: Base Network</span>
-            </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-box">
-                <span>حجم التداول الحي</span>
-                <strong id="liveVolume">$842,910</strong>
-            </div>
-            <div class="stat-box">
-                <span>سيولة الانحناء</span>
-                <strong>6.84 / 10 ETH</strong>
-            </div>
-        </div>
-
-        <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between;">
-            <span>الاقتراب من التخرج إلى المنصات الكبرى:</span>
-            <span style="color: var(--neon-green); direction: ltr;">68.4%</span>
-        </div>
-        <div class="quantum-progress">
-            <div class="quantum-fill"></div>
-        </div>
-
-        <div class="action-grid">
-            <button class="btn-zenith btn-sniper" onclick="executeSniper()">قنص فوري (Sub-Planck)</button>
-            <button class="btn-zenith btn-panic" onclick="panicSell()">خروج طوارئ</button>
+        <div id="radarLog" class="mono text-[10px] text-green-400 space-y-1 overflow-hidden h-16 opacity-90">
+            <div>> [HFT_BLOCK] Intercepted predatory bot attack & neutralized fee delta.</div>
+            <div>> [QUANTUM_SYNC] Bonding curve updated via factory vector #0x92.</div>
+            <div>> [BOUNTY_POOL] Arbitrage reward claimed by high-speed execution router.</div>
         </div>
     </div>
 
-    <div class="footer-quantum">
-        FACTORY CONTRACT: <span style="color: var(--neon-green);">0xb641f9B099963443951180Eea91ad59390Bd1A7a</span>
+    <!-- لوحة التداول المركزية للعملة ($ZENITH) -->
+    <div class="w-full max-w-md bg-gray-900/90 border border-purple-500/30 rounded-2xl p-5 mb-4 glow-purple">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h2 class="text-base font-black text-white">Zenith Protocol <span class="text-cyan-400 mono">(<span id="tokenSymbol">$ZENITH</span>)</span></h2>
+                <p class="text-[10px] text-gray-400">معاملة العقد الموثق: <span class="text-purple-400 mono">Base / BSC Mainnet</span></p>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center font-black text-white text-sm glow-cyan">AZ</div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-black/50 border border-gray-800 p-3 rounded-xl text-center">
+                <span class="text-[10px] text-gray-400 block mb-1">سيولة الانحناء (Bonding Curve)</span>
+                <span id="curveLiquidity" class="mono text-xs font-bold text-cyan-300">6.84 / 10 BNB</span>
+            </div>
+            <div class="bg-black/50 border border-gray-800 p-3 rounded-xl text-center">
+                <span class="text-[10px] text-gray-400 block mb-1">حجم التداول الحي</span>
+                <span id="liveVolume" class="mono text-xs font-bold text-purple-300">$842,910</span>
+            </div>
+        </div>
+
+        <!-- شريط التقدم نحو التخرج -->
+        <div class="mb-4">
+            <div class="flex justify-between text-[10px] font-bold mb-1 text-gray-300">
+                <span>الاقتراب من التخرج إلى المنصات الكبرى:</span>
+                <span id="progressText" class="mono text-cyan-400">68.4%</span>
+            </div>
+            <div class="w-full bg-black h-3 rounded-full overflow-hidden p-0.5 border border-gray-800">
+                <div id="progressBar" class="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 h-full rounded-full w-[68.4%] transition-all duration-500"></div>
+            </div>
+        </div>
+
+        <!-- أزرار الهجوم الفوري والطوارئ -->
+        <div class="grid grid-cols-2 gap-3">
+            <button id="emergencyBtn" class="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black py-3 px-4 rounded-xl text-xs transition-all shadow-lg active:scale-95">
+                خروج طوارئ
+            </button>
+            <button id="buyInstantBtn" class="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-black font-black py-3 px-4 rounded-xl text-xs transition-all shadow-lg active:scale-95 glow-cyan">
+                قنص فوري (Sub-Planck)
+            </button>
+        </div>
     </div>
+
+    <!-- عنوان العقد في الأسفل -->
+    <footer class="w-full max-w-md text-center">
+        <p class="text-[9px] text-gray-500 mono truncate px-2">FACTORY CONTRACT: 0xb641f9B099963443951180Eca91ad59390Bd1A7a</p>
+    </footer>
 
     <script>
-        const FACTORY_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
-        const BASE_CHAIN_ID = 8453;
+        // سكربت الربط والتفاعل الحي مع محفظة الويب 3
+        let provider, signer, userAddress;
 
-        let provider;
-        let signer;
-
-        // عداد تنازلي عصبي وهمي متوهج
-        let totalSeconds = 10785;
-        setInterval(() => {
-            if(totalSeconds > 0) totalSeconds--;
-            let hours = Math.floor(totalSeconds / 3600);
-            let minutes = Math.floor((totalSeconds % 3600) / 60);
-            let seconds = totalSeconds % 60;
-            document.getElementById("fomoCountdown").innerText = 
-                String(hours).padStart(2, '0') + ":" + 
-                String(minutes).padStart(2, '0') + ":" + 
-                String(seconds).padStart(2, '0');
-        }, 1000);
-
-        // محاكاة رادار البوتات المتجدد
-        const logMessages = [
-            "> [ARBITRAGE] Smart router optimized gas limits on Base.",
-            "> [WHALE_DETECTED] Large accumulation pulse registered in pool.",
-            "> [QUANTUM_SYNC] Bonding curve updated via factory contract.",
-            "> [HFT_BLOCK] Intercepted predatory bot attack successfully."
-        ];
-        setInterval(() => {
-            const randomLog = logMessages[Math.floor(Math.random() * logMessages.length)];
-            const radarContainer = document.getElementById("radarLogs");
-            radarContainer.innerHTML = `<div class="log-item">${randomLog}</div>` + radarContainer.innerHTML;
-        }, 4000);
-
-        async function connectWallet() {
+        document.getElementById('connectWalletBtn').addEventListener('click', async () => {
             if (window.ethereum) {
                 try {
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
-                    
-                    const network = await provider.getNetwork();
-                    if (network.chainId !== BASE_CHAIN_ID) {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x2105' }],
-                        });
-                    }
-
-                    const address = await signer.getAddress();
-                    const shortAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
-                    document.getElementById("connectWalletBtn").innerText = shortAddr;
-                    alert("⚡ تم الاتصال بالنواة الكمومية بنجاح!");
-                } catch (error) {
-                    console.error(error);
-                    alert("فشل الارتباط الكمومي بالمحفظة.");
+                    userAddress = await signer.getAddress();
+                    document.getElementById('connectWalletBtn').innerText = userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                    document.getElementById('connectWalletBtn').classList.remove('from-purple-600', 'to-pink-600');
+                    document.getElementById('connectWalletBtn').classList.add('from-green-600', 'to-emerald-600');
+                } catch (err) {
+                    console.error(err);
                 }
             } else {
-                alert("يرجى استخدام متصفح مدعوم بـ Web3.");
+                alert('الرجاء استخدام متصفح يدعم Web3 مثل Mises أو Kiwi أو ربط محفظتك.');
             }
-        }
+        });
 
-        function executeSniper() {
-            alert("🚀 جاري تنفيذ القنص الكمومي بأقصى سرعة عبر عقد المصنع المرتبط على Base!");
-        }
-
-        function panicSell() {
-            alert("🛡️ تم تفعيل نظام الحماية الذكي وخروج الطوارئ بنجاح!");
-        }
+        // محاكاة حية لرادار الهجمات وصيد البوتات لتبقي الواجهة حية ومرعبة
+        setInterval(() => {
+            const logs = [
+                "[HFT_BLOCK] Intercepted predatory bot attack & neutralized fee delta.",
+                "[QUANTUM_SYNC] Bonding curve updated via factory vector.",
+                "[ARBITRAGE_BOUNTY] Bot reward distributed successfully.",
+                "[TSUNAMI_FEE] Dynamic tax adjusted to 0.25% for organic buyer."
+            ];
+            const radar = document.getElementById('radarLog');
+            const randomLog = logs[Math.floor(Math.random() * logs.length)];
+            radar.innerHTML = `<div>> ${randomLog}</div>` + radar.innerHTML;
+        }, 4000);
     </script>
 </body>
 </html>
