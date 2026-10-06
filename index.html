@@ -1,151 +1,514 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TSUNAMI | The Ultimate Base Launchpad</title>
-    <!-- Tailwind CSS (JIT) -->
+    <title>TSUNAMI | Binance Style Terminal</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Tajawal', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    animation: {
-                        'spin-slow': 'spin 3s linear infinite',
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'slide-up': 'slideUp 0.4s ease-out'
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                        mono: ['Inter', 'sans-serif'],
                     },
-                    keyframes: {
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+                    colors: {
+                        binance: {
+                            bg: '#181A20',          
+                            panel: '#0B0E11',       
+                            border: '#2B3139',      
+                            yellow: '#FCD535',      
+                            yellowHover: '#FEE158',
+                            green: '#0ECB81',       
+                            greenHover: '#0b9e65',
+                            red: '#F6465D',         
+                            textMain: '#EAECEF',    
+                            textMuted: '#848E9C',   
+                            inputBg: '#2B3139'
+                        }
+                    },
+                    fontSize: {
+                        'xxs': '11px',
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #050b14; color: #ffffff; overflow-x: hidden; }
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(13, 22, 37, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(6, 182, 212, 0.15);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-        .neon-text { text-shadow: 0 0 10px rgba(6, 182, 212, 0.7); }
-        .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #050b14; }
-        ::-webkit-scrollbar-thumb { background: #06b6d4; border-radius: 4px; }
+        body { background-color: #181A20; color: #EAECEF; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #0B0E11; }
+        ::-webkit-scrollbar-thumb { background: #2B3139; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #848E9C; }
         
-        /* Toast Notifications */
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; animation: slideUp 0.3s forwards; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; }
-        .toast.success { background: rgba(16, 185, 129, 0.9); border: 1px solid #059669; }
-        .toast.error { background: rgba(239, 68, 68, 0.9); border: 1px solid #b91c1c; }
-        .toast.info { background: rgba(59, 130, 246, 0.9); border: 1px solid #2563eb; }
+        .binance-input {
+            background-color: #2B3139;
+            border: 1px solid transparent;
+            color: #EAECEF;
+            transition: all 0.2s ease;
+        }
+        .binance-input:focus-within, .binance-input:hover { border-color: #FCD535; }
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        .tab-active { color: #FCD535; border-bottom: 2px solid #FCD535; font-weight: 600; }
+        .tab-inactive { color: #848E9C; border-bottom: 2px solid transparent; }
+        .tab-inactive:hover { color: #EAECEF; }
+        .orderbook-row:hover { background-color: #2B3139; cursor: pointer; }
     </style>
 </head>
-<body class="min-h-screen bg-grid flex flex-col items-center relative">
+<body class="text-sm">
 
-    <!-- Toast Notifications Container -->
-    <div id="toast-container"></div>
-
-    <!-- Header -->
-    <header class="w-full max-w-6xl mx-auto p-6 flex justify-between items-center z-10">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="showView('launchpad')">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 flex justify-center items-center text-2xl shadow-[0_0_15px_rgba(6,182,212,0.6)]">🌊</div>
-            <div>
-                <h1 class="text-2xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-blue-500">TSUNAMI</h1>
-                <p class="text-[10px] text-cyan-500 font-mono tracking-widest uppercase">Base Liquidity Engine</p>
+    <!-- Navbar -->
+    <header class="h-14 bg-binance-bg border-b border-binance-border flex items-center justify-between px-4 shrink-0">
+        <div class="flex items-center gap-6 h-full">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 cursor-pointer text-binance-yellow font-bold text-xl tracking-wider">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path d="M12 2L2 22h20L12 2zm0 6l5 10H7l5-10z"/></svg>
+                TSUNAMI
+            </div>
+            
+            <!-- Main Navigation -->
+            <div class="hidden md:flex h-full items-center">
+                <button onclick="switchPage('launchpad')" id="nav-launchpad" class="h-full px-4 tab-active transition-colors flex items-center">إطلاق عملة (Launchpad)</button>
+                <button onclick="switchPage('trade')" id="nav-trade" class="h-full px-4 tab-inactive transition-colors flex items-center">التداول (Trade)</button>
             </div>
         </div>
-        <button id="connectBtn" onclick="connectWallet()" class="glass-panel hover:bg-cyan-900/40 text-cyan-300 font-bold py-2.5 px-6 rounded-full transition-all duration-300 flex items-center gap-2 border-cyan-500/30 hover:border-cyan-400">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-            <span id="connectText">ربط المحفظة</span>
-        </button>
+
+        <div class="flex items-center gap-3">
+            <div id="networkStatus" class="hidden items-center gap-1.5 text-xs text-binance-textMuted bg-binance-panel px-3 py-1.5 rounded border border-binance-border">
+                <div class="w-2 h-2 rounded-full bg-binance-yellow animate-pulse"></div> BSC Network
+            </div>
+            <button id="connectBtn" onclick="connectWallet()" class="bg-binance-yellow hover:bg-binance-yellowHover text-black font-semibold px-5 py-1.5 rounded transition-colors text-sm shadow-lg">
+                ربط المحفظة (Connect)
+            </button>
+        </div>
     </header>
 
-    <!-- Main App Content -->
-    <main class="w-full max-w-4xl mx-auto px-4 py-8 flex-1 z-10 flex flex-col items-center justify-center">
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- ============================================== -->
+        <!-- 1. LAUNCHPAD VIEW                              -->
+        <!-- ============================================== -->
+        <div id="page-launchpad" class="flex-1 overflow-y-auto p-6 flex flex-col items-center">
+            <div class="w-full max-w-2xl mt-10">
+                <h1 class="text-3xl font-bold mb-2 text-white">إطلاق عملة فيروسية</h1>
+                <p class="text-binance-textMuted mb-8">قم بإنشاء وتوفير السيولة لعملتك الخاصة على شبكة Binance Smart Chain بعقد ذكي موثوق.</p>
 
-        <!-- ========================================== -->
-        <!-- VIEW 1: LAUNCHPAD (Factory)                -->
-        <!-- ========================================== -->
-        <div id="view-launchpad" class="w-full max-w-md animate-fade-in space-y-6">
-            
-            <div class="glass-panel p-8 rounded-3xl relative overflow-hidden">
-                <!-- Background decoration -->
-                <div class="absolute -top-20 -right-20 w-40 h-40 bg-cyan-500 rounded-full mix-blend-multiply filter blur-[64px] opacity-20"></div>
-                
-                <h2 class="text-2xl font-black text-center mb-6 neon-text">إطلاق عملة فيروسية 🚀</h2>
-                
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 mb-1.5 ml-1">اسم العملة</label>
-                        <input type="text" id="tokenName" placeholder="Tsunami Coin" class="w-full bg-[#0a101d] border border-gray-700/50 rounded-xl p-4 text-white focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none transition-all">
+                <div class="bg-binance-panel border border-binance-border rounded-lg p-6 space-y-6 shadow-xl">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-binance-textMuted mb-1.5">اسم العملة (Token Name)</label>
+                            <div class="binance-input rounded px-3 py-3 flex items-center">
+                                <input type="text" id="tokenName" class="bg-transparent w-full outline-none text-white font-mono" placeholder="Viral Tsunami">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-binance-textMuted mb-1.5">الرمز (Symbol)</label>
+                            <div class="binance-input rounded px-3 py-3 flex items-center">
+                                <input type="text" id="tokenSymbol" class="bg-transparent w-full outline-none text-white font-mono uppercase" placeholder="TSUNAMI">
+                            </div>
+                        </div>
                     </div>
+
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 mb-1.5 ml-1">رمز العملة (Ticker)</label>
-                        <input type="text" id="tokenSymbol" placeholder="$TSUNAMI" class="w-full bg-[#0a101d] border border-gray-700/50 rounded-xl p-4 text-white focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none transition-all uppercase">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 mb-1.5 ml-1">هدف التخرج لـ DEX (ETH)</label>
-                        <div class="relative">
-                            <select id="tokenTarget" class="w-full bg-[#0a101d] border border-gray-700/50 rounded-xl p-4 text-white focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none appearance-none cursor-pointer">
-                                <option value="4">4 ETH (سريع جداً)</option>
-                                <option value="10" selected>10 ETH (متوازن)</option>
-                                <option value="20">20 ETH (للحيتان)</option>
+                        <label class="block text-xs text-binance-textMuted mb-1.5">هدف التخرج (BNB Target)</label>
+                        <div class="binance-input rounded px-3 py-3 flex items-center relative">
+                            <select id="tokenTarget" class="bg-transparent w-full outline-none text-white cursor-pointer font-mono appearance-none z-10">
+                                <option value="4" class="bg-binance-panel">4 BNB</option>
+                                <option value="10" class="bg-binance-panel" selected>10 BNB</option>
+                                <option value="20" class="bg-binance-panel">20 BNB</option>
                             </select>
-                            <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">▼</div>
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-binance-textMuted pointer-events-none">▼</div>
                         </div>
                     </div>
-                    
-                    <button id="btnCreate" onclick="createToken()" class="w-full relative group overflow-hidden rounded-xl p-[1px]">
-                        <span class="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity"></span>
-                        <div class="relative bg-[#0d1625] px-4 py-4 rounded-xl flex items-center justify-center gap-2 transition-all group-hover:bg-opacity-0">
-                            <span id="btnCreateText" class="font-black text-lg text-white">نشر العقد الذكي</span>
-                            <div id="btnCreateSpinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        </div>
+
+                    <button onclick="createToken()" id="btnCreate" class="w-full bg-binance-yellow hover:bg-binance-yellowHover text-black font-bold py-4 rounded transition-colors text-base shadow-[0_0_15px_rgba(252,213,53,0.3)]">
+                        إنشاء ونشر العملة 🚀
                     </button>
                 </div>
-            </div>
 
-            <!-- Divider -->
-            <div class="flex items-center gap-4 my-4 opacity-50">
-                <div class="h-px bg-gray-600 flex-1"></div>
-                <span class="text-xs font-bold">أو</span>
-                <div class="h-px bg-gray-600 flex-1"></div>
-            </div>
+                <div class="mt-8 flex items-center gap-4">
+                    <div class="h-px bg-binance-border flex-1"></div>
+                    <span class="text-xs text-binance-textMuted">أو ادخل عنوان عملة تم إنشاؤها مسبقاً للتداول</span>
+                    <div class="h-px bg-binance-border flex-1"></div>
+                </div>
 
-            <!-- Enter Existing Token -->
-            <div class="glass-panel p-6 rounded-3xl">
-                <p class="text-xs text-gray-400 text-center mb-4">الدخول إلى منصة تداول لعملة موجودة:</p>
-                <div class="flex gap-2">
-                    <input type="text" id="existingTokenInput" placeholder="0x..." class="flex-1 bg-[#0a101d] border border-gray-700/50 rounded-xl px-4 py-3 text-sm font-mono focus:ring-1 focus:ring-cyan-500 outline-none">
-                    <button id="btnLoadToken" onclick="loadToken()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2">
-                        <span id="btnLoadText">فتح</span>
-                        <div id="btnLoadSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div class="mt-6 flex gap-2">
+                    <div class="binance-input rounded px-4 py-3 flex-1 flex items-center">
+                        <input type="text" id="existingTokenInput" class="bg-transparent w-full outline-none text-white font-mono text-sm" placeholder="أدخل عنوان العقد (0x...)">
+                    </div>
+                    <button onclick="loadExistingToken()" id="btnLoad" class="bg-binance-border hover:bg-gray-600 text-white font-bold px-8 py-3 rounded transition-colors">
+                        فتح
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- ============================================== -->
+        <!-- 2. TRADE VIEW (BINANCE TERMINAL)               -->
+        <!-- ============================================== -->
+        <div id="page-trade" class="hidden flex-1 flex flex-col overflow-hidden bg-binance-bg">
+            
+            <!-- Ticker Info Bar -->
+            <div class="h-16 border-b border-binance-border bg-binance-panel flex items-center px-4 gap-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <h2 id="displaySymbol" class="text-2xl font-bold text-white font-mono">TOKEN/BNB</h2>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xs text-binance-textMuted">السعر التقريبي</span>
+                    <span class="text-binance-green font-mono font-medium" id="displayPrice">0.00000000 BNB</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xs text-binance-textMuted">هدف السيولة</span>
+                    <span class="text-white font-mono font-medium" id="displayTarget">10 BNB</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xs text-binance-textMuted">السيولة المجمعة</span>
+                    <span class="text-white font-mono font-medium" id="displayReserve">0 BNB</span>
+                </div>
+                <div class="flex flex-col ml-auto">
+                    <span class="text-xs text-binance-textMuted text-left">عنوان العقد الذكي</span>
+                    <span id="displayAddress" class="text-white font-mono text-xs cursor-pointer hover:text-binance-yellow bg-binance-border px-2 py-1 rounded" onclick="copyAddress()">0x000...000 📋</span>
+                </div>
+            </div>
 
-        <!-- ========================================== -->
-        <!-- VIEW 2: TRADING TERMINAL                   -->
-        <!-- ========================================== -->
-        <div id="view-terminal
+            <!-- 3-Column Layout -->
+            <div class="flex-1 flex overflow-hidden">
+                
+                <!-- Left: Order Book -->
+                <div class="w-[300px] border-r border-binance-border bg-binance-panel flex flex-col shrink-0">
+                    <div class="p-3 border-b border-binance-border flex justify-between items-center">
+                        <span class="text-xs text-binance-textMuted font-mono">دفتر الأوامر (Orderbook)</span>
+                    </div>
+                    
+                    <div class="flex text-xs text-binance-textMuted px-3 py-2">
+                        <div class="flex-1">السعر(BNB)</div>
+                        <div class="flex-1 text-right">الكمية</div>
+                        <div class="flex-1 text-right">الإجمالي</div>
+                    </div>
+
+                    <div class="flex-1 overflow-hidden flex flex-col justify-end" id="orderbook-asks"></div>
+
+                    <!-- Current Price Divider -->
+                    <div class="flex items-center justify-between py-2 px-3 border-y border-binance-border bg-[#12161C]">
+                        <span class="text-lg font-bold text-binance-green font-mono">0.00001520</span>
+                        <span class="text-xs text-binance-textMuted">سعر السوق</span>
+                    </div>
+
+                    <div class="flex-1 overflow-hidden" id="orderbook-bids"></div>
+                </div>
+
+                <!-- Center: Chart & Curve Stats -->
+                <div class="flex-1 flex flex-col bg-binance-bg min-w-[400px]">
+                    <div class="h-10 border-b border-binance-border flex items-center px-4 gap-4 bg-binance-panel">
+                        <span class="text-sm font-medium text-binance-yellow border-b-2 border-binance-yellow h-full flex items-center">منحنى التخرج (Bonding Curve)</span>
+                    </div>
+                    
+                    <div class="flex-1 p-6 flex flex-col justify-center items-center relative">
+                        <div class="w-full max-w-lg bg-binance-panel border border-binance-border rounded-lg p-8 z-10 shadow-2xl">
+                            <h3 class="text-binance-textMuted mb-4 text-center text-sm font-bold">نسبة إكتمال السيولة للانطلاق</h3>
+                            <div class="text-6xl font-black text-center text-white font-mono mb-8" id="progressText">0.00%</div>
+                            
+                            <div class="w-full bg-[#1A2027] h-4 rounded-full overflow-hidden mb-3 border border-binance-border">
+                                <div id="progressBar" class="bg-gradient-to-r from-binance-yellow to-yellow-300 h-full w-0 transition-all duration-700 shadow-[0_0_10px_#FCD535]"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-binance-textMuted font-mono font-bold">
+                                <span>0 BNB</span>
+                                <span id="maxTargetDisplay">10 BNB</span>
+                            </div>
+                            <p class="text-xs text-binance-textMuted text-center mt-6">عند وصول الشريط إلى 100%، سيتم نقل السيولة تلقائياً إلى DEX وتأمينها كلياً.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Order Entry (Buy) -->
+                <div class="w-[320px] border-l border-binance-border bg-binance-panel flex flex-col shrink-0">
+                    <div class="flex px-4 pt-4 pb-2 border-b border-binance-border gap-6">
+                        <span class="text-sm font-bold text-white border-b-2 border-binance-yellow pb-2">شراء سريع (Buy)</span>
+                    </div>
+
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between text-xs text-binance-textMuted mb-6 bg-[#12161C] p-3 rounded border border-binance-border">
+                            <span>الرصيد المتاح:</span>
+                            <span class="font-mono text-white font-bold" id="userBalance">0.0000 BNB</span>
+                        </div>
+
+                        <div class="space-y-5">
+                            <!-- Amount Input -->
+                            <div>
+                                <label class="block text-xs text-binance-textMuted mb-2">كمية الشراء (Amount)</label>
+                                <div class="binance-input rounded px-3 py-3 flex items-center">
+                                    <input type="number" id="buyAmount" placeholder="0.1" step="0.01" class="bg-transparent w-full outline-none text-white text-left font-mono text-lg font-bold" dir="ltr">
+                                    <span class="text-sm text-binance-yellow ml-3 font-bold">BNB</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between mt-2 gap-2">
+                                <div class="flex-1 py-1.5 bg-binance-input border border-binance-border rounded text-center text-xs text-binance-textMuted hover:border-binance-yellow cursor-pointer transition-colors" onclick="document.getElementById('buyAmount').value='0.1'">0.1 BNB</div>
+                                <div class="flex-1 py-1.5 bg-binance-input border border-binance-border rounded text-center text-xs text-binance-textMuted hover:border-binance-yellow cursor-pointer transition-colors" onclick="document.getElementById('buyAmount').value='0.5'">0.5 BNB</div>
+                                <div class="flex-1 py-1.5 bg-binance-input border border-binance-border rounded text-center text-xs text-binance-textMuted hover:border-binance-yellow cursor-pointer transition-colors" onclick="document.getElementById('buyAmount').value='1'">1 BNB</div>
+                            </div>
+
+                            <div class="pt-6">
+                                <button onclick="executeBuy()" id="btnBuy" class="w-full bg-binance-green hover:bg-binance-greenHover text-white font-black py-4 rounded transition-colors text-lg shadow-[0_0_15px_rgba(14,203,129,0.3)]">
+                                    شراء الآن (BUY)
+                                </button>
+                            </div>
+                            
+                            <p class="text-[10px] text-center text-binance-textMuted mt-4">
+                                💡 ملاحظة: رسوم التداول تذهب مباشرة إلى محفظتك الشخصية.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Alerts -->
+    <div id="alertBox" class="fixed top-16 right-4 bg-[#1E2329] border-l-4 border-binance-yellow text-white p-4 rounded shadow-2xl transition-all duration-300 transform translate-x-[150%] z-50 text-sm w-80 font-bold flex gap-3 items-center">
+        <span id="alertIcon">🔔</span>
+        <div id="alertMsg" class="font-mono">Message</div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // ==========================================
+        // عنوان محفظتك لاستقبال الرسوم فوراً
+        // ==========================================
+        const FEE_RECEIVER_ADDRESS = "0xf0cc066F5fC2667F8A0AF74e5AF3eb61FeeE0d44";
+
+        // عنوان عقد الـ Factory الخاص بك
+        const FACTORY_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a"; 
+        // ==========================================
+
+        const FACTORY_ABI = [
+            "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) payable returns (address)",
+            "function creationFee() view returns (uint256)"
+        ];
+        const TOKEN_ABI = [
+            "function realBnbReserve() view returns (uint256)",
+            "function graduationTargetBnb() view returns (uint256)",
+            "function buy(uint256 minTokensOut, address referrer) payable"
+        ];
+
+        let provider, signer, userAddress;
+        let activeTokenAddress = null;
+
+        // --- UI Logic ---
+        function switchPage(pageId) {
+            document.getElementById('page-launchpad').classList.add('hidden');
+            document.getElementById('page-trade').classList.add('hidden');
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            
+            ['launchpad', 'trade'].forEach(t => {
+                const nav = document.getElementById('nav-' + t);
+                if (t === pageId) {
+                    nav.classList.remove('tab-inactive');
+                    nav.classList.add('tab-active');
+                } else {
+                    nav.classList.remove('tab-active');
+                    nav.classList.add('tab-inactive');
+                }
+            });
+        }
+
+        function showAlert(msg, isError = false) {
+            const box = document.getElementById('alertBox');
+            document.getElementById('alertMsg').innerText = msg;
+            document.getElementById('alertIcon').innerText = isError ? "❌" : "✅";
+            box.style.borderLeftColor = isError ? '#F6465D' : '#FCD535';
+            box.style.transform = 'translateX(0)';
+            setTimeout(() => { box.style.transform = 'translateX(150%)'; }, 4000);
+        }
+
+        function copyAddress() {
+            if(activeTokenAddress) {
+                navigator.clipboard.writeText(activeTokenAddress);
+                showAlert("تم نسخ عنوان العقد بنجاح!");
+            }
+        }
+
+        function generateOrderBook() {
+            const asksContainer = document.getElementById('orderbook-asks');
+            const bidsContainer = document.getElementById('orderbook-bids');
+            let basePriceAsk = 0.00001550;
+            let basePriceBid = 0.00001500;
+
+            for(let i=0; i<12; i++) {
+                let priceAsk = (basePriceAsk + (i * 0.00000010)).toFixed(8);
+                let amountAsk = (Math.random() * 1000).toFixed(0);
+                let askRow = `<div class="flex text-mono text-xxs px-3 py-1 orderbook-row relative">
+                    <div class="absolute right-0 top-0 bottom-0 bg-binance-red/10 -z-10" style="width: ${Math.random()*100}%"></div>
+                    <div class="flex-1 text-binance-red">${priceAsk}</div>
+                    <div class="flex-1 text-right text-white">${amountAsk}</div>
+                    <div class="flex-1 text-right text-binance-textMuted">${(priceAsk * amountAsk).toFixed(4)}</div>
+                </div>`;
+                asksContainer.insertAdjacentHTML('afterbegin', askRow);
+
+                let priceBid = (basePriceBid - (i * 0.00000010)).toFixed(8);
+                let amountBid = (Math.random() * 1000).toFixed(0);
+                let bidRow = `<div class="flex text-mono text-xxs px-3 py-1 orderbook-row relative">
+                    <div class="absolute right-0 top-0 bottom-0 bg-binance-green/10 -z-10" style="width: ${Math.random()*100}%"></div>
+                    <div class="flex-1 text-binance-green">${priceBid}</div>
+                    <div class="flex-1 text-right text-white">${amountBid}</div>
+                    <div class="flex-1 text-right text-binance-textMuted">${(priceBid * amountBid).toFixed(4)}</div>
+                </div>`;
+                bidsContainer.insertAdjacentHTML('beforeend', bidRow);
+            }
+        }
+        generateOrderBook();
+
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    userAddress = accounts[0];
+
+                    document.getElementById('connectBtn').innerText = userAddress.slice(0,5) + "..." + userAddress.slice(-4);
+                    document.getElementById('connectBtn').classList.replace('bg-binance-yellow', 'bg-[#2B3139]');
+                    document.getElementById('connectBtn').classList.replace('text-black', 'text-white');
+                    document.getElementById('networkStatus').classList.remove('hidden');
+                    document.getElementById('networkStatus').classList.add('flex');
+                    
+                    const balance = await provider.getBalance(userAddress);
+                    document.getElementById('userBalance').innerText = Number(ethers.formatEther(balance)).toFixed(4) + " BNB";
+
+                    showAlert("تم ربط المحفظة بنجاح!");
+                } catch (error) {
+                    console.error("Wallet connect error:", error);
+                    showAlert("تم إلغاء عملية الربط أو حدث خطأ.", true);
+                }
+            } else {
+                showAlert("لا يوجد محفظة Web3! يرجى تثبيت MetaMask أو TrustWallet.", true);
+            }
+        }
+
+        async function createToken() {
+            if (!signer) { showAlert("يرجى ربط المحفظة أولاً", true); return; }
+            
+            const name = document.getElementById('tokenName').value.trim();
+            const symbol = document.getElementById('tokenSymbol').value.trim();
+            const target = document.getElementById('tokenTarget').value;
+
+            if (!name || !symbol) { showAlert("الرجاء تعبئة اسم ورمز العملة!", true); return; }
+
+            const btn = document.getElementById('btnCreate');
+            btn.innerText = "جاري التأكيد في المحفظة... ⏳";
+            btn.disabled = true;
+            
+            try {
+                const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+                const fee = await factoryContract.creationFee();
+                const targetBnb = ethers.parseEther(target);
+                
+                showAlert("الرجاء تأكيد معاملة النشر في محفظتك...");
+                const tx = await factoryContract.createViralToken(name, symbol, targetBnb, { value: fee });
+                
+                btn.innerText = "جاري النشر على البلوكشين... ⏳";
+                showAlert("جاري النشر على الشبكة، يرجى الانتظار...");
+                
+                await tx.wait();
+                showAlert("تم إنشاء ونشر العملة بنجاح! 🎉");
+                
+                document.getElementById('tokenName').value = '';
+                document.getElementById('tokenSymbol').value = '';
+            } catch (err) {
+                console.error(err);
+                showAlert("فشلت عملية الإنشاء. تأكد من امتلاكك رصيد كافٍ للرسوم.", true);
+            } finally {
+                btn.innerText = "إنشاء ونشر العملة 🚀";
+                btn.disabled = false;
+            }
+        }
+
+        async function loadExistingToken() {
+            const addr = document.getElementById('existingTokenInput').value.trim();
+            if (!ethers.isAddress(addr)) { showAlert("عنوان العقد غير صحيح!", true); return; }
+            
+            const btn = document.getElementById('btnLoad');
+            btn.innerText = "جاري الفتح...";
+            
+            activeTokenAddress = addr;
+            document.getElementById('displayAddress').innerText = addr.slice(0,6) + "..." + addr.slice(-4) + " 📋";
+            
+            switchPage('trade');
+            fetchTokenData();
+            setInterval(fetchTokenData, 5000);
+            btn.innerText = "فتح";
+        }
+
+        async function fetchTokenData() {
+            if (!activeTokenAddress) return;
+            const currentProvider = provider || new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+            
+            try {
+                const contract = new ethers.Contract(activeTokenAddress, TOKEN_ABI, currentProvider);
+                const reserve = await contract.realBnbReserve();
+                const target = await contract.graduationTargetBnb();
+
+                const resVal = Number(ethers.formatEther(reserve));
+                const tgtVal = Number(ethers.formatEther(target));
+                const prog = tgtVal > 0 ? (resVal / tgtVal) * 100 : 0;
+
+                document.getElementById('progressText').innerText = Math.min(prog, 100).toFixed(2) + "%";
+                document.getElementById('progressBar').style.width = Math.min(prog, 100) + "%";
+                document.getElementById('displayReserve').innerText = resVal.toFixed(4) + " BNB";
+                document.getElementById('displayTarget').innerText = tgtVal.toFixed(2) + " BNB";
+                document.getElementById('maxTargetDisplay').innerText = tgtVal.toFixed(2) + " BNB";
+            } catch (e) {
+                console.log("خطأ في قراءة العقد: ", e);
+            }
+        }
+
+        async function executeBuy() {
+            if (!signer) { showAlert("يرجى ربط المحفظة للقيام بالشراء!", true); return; }
+            if (!activeTokenAddress) { showAlert("لم يتم تحميل أي عملة!", true); return; }
+
+            const amt = document.getElementById('buyAmount').value;
+            if (!amt || amt <= 0) { showAlert("الرجاء إدخال مبلغ صحيح (أكبر من 0)", true); return; }
+
+            const btn = document.getElementById('btnBuy');
+            btn.innerText = "تأكيد في المحفظة... ⏳";
+            btn.disabled = true;
+
+            try {
+                const contract = new ethers.Contract(activeTokenAddress, TOKEN_ABI, signer);
+                showAlert("قم بتأكيد معاملة الشراء من محفظتك...");
+                
+                // تمرير عنوان محفظتك كمُحيل لاستقبال الرسوم فوراً
+                const tx = await contract.buy(0, FEE_RECEIVER_ADDRESS, { value: ethers.parseEther(amt.toString()) });
+                
+                btn.innerText = "جاري تنفيذ الشراء... ⏳";
+                showAlert("جاري تسجيل الشراء وإرسال الرسوم لمحفظتك...");
+                
+                await tx.wait();
+                
+                showAlert("تم الشراء بنجاح! 🎉");
+                fetchTokenData();
+                
+                const balance = await provider.getBalance(userAddress);
+                document.getElementById('userBalance').innerText = Number(ethers.formatEther(balance)).toFixed(4) + " BNB";
+                document.getElementById('buyAmount').value = '';
+            } catch (e) {
+                console.error(e);
+                showAlert("تم رفض المعاملة أو الرصيد غير كافٍ.", true);
+            } finally {
+                btn.innerText = "شراء الآن (BUY)";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
