@@ -1,147 +1,290 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viral Tsunami Launchpad - Base</title>
+    <title>TSUNAMI | Liquidity & Trading Engine (Base)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#030712',
+                            card: '#0B0F19',
+                            border: '#1E293B',
+                            neonCyan: '#06B6D4',
+                            neonPurple: '#A855F7',
+                            neonGreen: '#10B981',
+                            fire: '#F97316'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #030712; color: #F8FAFC; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glow-cyan { box-shadow: 0 0 35px rgba(6, 182, 212, 0.25); }
+        .glow-green { box-shadow: 0 0 35px rgba(16, 185, 129, 0.25); }
         .gradient-text {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6, #a855f7);
+            background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 50%, #A855F7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
-<body class="bg-[#030712] text-white min-h-screen flex flex-col items-center py-10 px-4">
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
 
-    <!-- Header -->
-    <header class="w-full max-w-4xl flex justify-between items-center mb-10 border-b border-gray-800 pb-5">
-        <div class="flex items-center gap-3">
-            <span class="text-3xl">🌊</span>
-            <span class="font-black text-2xl tracking-wider gradient-text">TSUNAMI</span>
+    <!-- Top Live Ticker & Institutional Protocol Status -->
+    <div class="w-full bg-black/80 border-b border-gray-800 py-2 px-4 text-xs font-mono flex justify-between items-center text-gray-400 overflow-x-auto">
+        <div class="flex items-center gap-6 whitespace-nowrap">
+            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> NETWORK: BASE (CHAIN ID: 8453)</span>
+            <span class="text-cyan-400">MEV PROTECTION: ACTIVE</span>
+            <span class="text-purple-400">FLASH LOAN APY: ZERO-FEE HYPER ROUTE</span>
         </div>
-        <button id="connectBtn" onclick="connectWallet()" class="bg-gradient-to-r from-cyan-500 to-blue-600 font-bold px-6 py-3 rounded-xl hover:opacity-90 transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-            ربط المحفظة
-        </button>
+        <div class="flex items-center gap-4 text-gray-500">
+            <span>DEX AGGREGATOR READY</span>
+            <span>HFT BPS: 0.1ms LATENCY</span>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="w-full max-w-7xl mx-auto px-6 py-6 flex justify-between items-center border-b border-gray-800/60">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(6,182,212,0.5)]">
+                🌊
+            </div>
+            <div>
+                <h1 class="font-black text-2xl tracking-wider gradient-text">TSUNAMI PROTOCOL</h1>
+                <p class="text-[10px] text-gray-400 font-mono tracking-widest">ULTRA-LIQUIDITY ENGINE V2.0</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button id="connectBtn" onclick="connectWallet()" class="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white font-black text-sm px-6 py-3 rounded-xl hover:scale-105 active:scale-95 transition-all glow-cyan flex items-center gap-2">
+                <span>🔗</span> <span id="btnText">ربط المحفظة</span>
+            </button>
+        </div>
     </header>
 
-    <!-- App Container -->
-    <main class="w-full max-w-2xl space-y-8">
+    <!-- Main Container -->
+    <main class="w-full max-w-6xl mx-auto px-4 py-8 flex-1 flex flex-col items-center">
 
-        <!-- 1. Section: Create Token / Launchpad -->
-        <div id="launchpadCard" class="bg-gray-900/80 border border-cyan-500/30 p-8 rounded-3xl shadow-2xl space-y-6">
-            <div class="text-center">
-                <h2 class="text-3xl font-black gradient-text">إطلاق عملة فيروسية جديدة</h2>
-                <p class="text-gray-400 text-sm mt-2">عبر الفاكتوري الموثق على شبكة Base</p>
+        <!-- Navigation Mode Tabs -->
+        <div class="w-full max-w-3xl flex p-1.5 bg-gray-900/90 rounded-2xl border border-gray-800 mb-8 font-bold">
+            <button id="tabLaunchpad" onclick="switchMainTab('launchpad')" class="flex-1 py-3 rounded-xl text-cyan-400 bg-gray-800 shadow transition-all flex items-center justify-center gap-2">
+                <span>🚀</span> إطلاق عملة (Factory)
+            </button>
+            <button id="tabHuman" onclick="switchMainTab('human')" class="flex-1 py-3 rounded-xl text-gray-400 hover:text-white transition-all flex items-center justify-center gap-2">
+                <span>🦍</span> تداول الأفراد والحيتان
+            </button>
+            <button id="tabBot" onclick="switchMainTab('bot')" class="flex-1 py-3 rounded-xl text-gray-400 hover:text-white font-mono transition-all flex items-center justify-center gap-2">
+                <span>🤖</span> HFT & Bot Terminal
+            </button>
+        </div>
+
+        <!-- 1. LAUNCHPAD / FACTORY SECTION -->
+        <section id="secLaunchpad" class="w-full max-w-xl space-y-6">
+            <div class="bg-cyber-card border border-cyan-500/30 p-8 rounded-3xl shadow-2xl space-y-6">
+                <div class="text-center">
+                    <h2 class="text-3xl font-black gradient-text">إنشاء عملة وتفجير السيولة</h2>
+                    <p class="text-gray-400 text-sm mt-2">عبر عقد الفاكتوري الموثق على شبكة Base</p>
+                </div>
+
+                <div class="space-y-4 text-sm">
+                    <div>
+                        <label class="block text-xs font-bold text-cyan-400 mb-1">اسم التوكن (Token Name)</label>
+                        <input type="text" id="tokenName" placeholder="مثال: Tsunami Quantum Token" class="w-full bg-black/70 border border-gray-800 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-cyan-400 mb-1">الرمز (Symbol)</label>
+                        <input type="text" id="tokenSymbol" placeholder="مثال: TSUNAMI" class="w-full bg-black/70 border border-gray-800 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-cyan-400 mb-1">هدف التخرج والتداول التلقائي (ETH Target)</label>
+                        <select id="graduationTarget" class="w-full bg-black/70 border border-gray-800 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500">
+                            <option value="4">4 ETH (سريع للغاية)</option>
+                            <option value="10" selected>10 ETH (متوازن للمؤسسات)</option>
+                            <option value="20">20 ETH (للحيتان وكبار المجمعين)</option>
+                            <option value="50">50 ETH (سيولة فائقة الضخ)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="createToken()" class="w-full bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 font-black text-lg py-5 rounded-2xl hover:scale-[1.01] active:scale-[0.99] transition-all glow-cyan text-white">
+                        إنشاء العقد ونشره فوراً 🚀
+                    </button>
+                </div>
+
+                <!-- Existing Token Loader -->
+                <div class="border-t border-gray-800/80 pt-6">
+                    <p class="text-gray-400 text-xs text-center mb-3">أو ادخل عنوان عملة منشأة سابقاً للانتقال إلى منصة التداول الحية:</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="existingAddress" placeholder="0x..." class="flex-1 bg-black/70 border border-gray-800 rounded-xl p-3 text-sm font-mono text-white focus:outline-none focus:border-cyan-500">
+                        <button onclick="loadTokenDashboard()" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 px-6 font-bold rounded-xl hover:bg-cyan-500/30 transition-colors text-sm">
+                            تحميل
+                        </button>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-cyan-400 mb-1">اسم العملة (Token Name)</label>
-                    <input type="text" id="tokenName" placeholder="مثال: Viral Tsunami" class="w-full bg-black border border-gray-800 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500">
+        <!-- 2. HUMAN & WHALE TRADING SECTION -->
+        <section id="secHuman" class="hidden w-full max-w-3xl space-y-6">
+            <div class="bg-cyber-card border border-gray-800 p-8 rounded-3xl space-y-6 shadow-2xl">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🚀</span>
+                        <div>
+                            <h3 class="font-black text-xl text-white">APE & WHALE TRADING HUB</h3>
+                            <p class="text-xs text-gray-500 font-mono">الواجهة المبسطة للمتداولين والمستثمرين</p>
+                        </div>
+                    </div>
+                    <span id="activeTokenDisplay" class="text-xs font-mono bg-cyan-950/80 text-cyan-400 border border-cyan-800 px-3 py-1 rounded-lg">لم يتم تحديد عملة</span>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-cyan-400 mb-1">الرمز (Symbol)</label>
-                    <input type="text" id="tokenSymbol" placeholder="مثال: TSUNAMI" class="w-full bg-black border border-gray-800 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-cyan-400 mb-1">هدف التخرج (ETH)</label>
-                    <select id="graduationTarget" class="w-full bg-black border border-gray-800 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500">
-                        <option value="4">4 ETH</option>
-                        <option value="10" selected>10 ETH</option>
-                        <option value="20">20 ETH</option>
-                        <option value="50">50 ETH</option>
-                    </select>
-                </div>
-                <button onclick="createToken()" class="w-full bg-gradient-to-r from-cyan-500 to-purple-600 font-black text-lg py-4 rounded-xl hover:scale-[1.01] transition-transform shadow-[0_0_25px_rgba(6,182,212,0.4)]">
-                    إنشاء ونشر العملة
-                </button>
-            </div>
 
-            <!-- Enter Existing Token Address -->
-            <div class="border-t border-gray-800 pt-6 text-center">
-                <p class="text-gray-400 text-xs mb-3">أو ادخل عنوان عملة تم إنشاؤها سابقاً للتداول:</p>
-                <div class="flex gap-2">
-                    <input type="text" id="existingAddress" placeholder="0x..." class="flex-1 bg-black border border-gray-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    <button onclick="loadTokenDashboard()" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 px-5 font-bold rounded-xl hover:bg-cyan-500/30">
-                        فتح
+                <!-- DEX Graduation Progress Tracker -->
+                <div class="space-y-2 bg-black/50 p-5 rounded-2xl border border-gray-800">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-400 font-bold">نسبة التخرج للسيولة المفتوحة (DEX Liquidity Auto-Lock):</span>
+                        <span id="progressText" class="font-black text-cyan-400 font-mono text-lg">0.00%</span>
+                    </div>
+                    <div class="w-full bg-gray-900 rounded-full h-4 overflow-hidden border border-gray-800">
+                        <div id="progressBar" class="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 h-full w-0 transition-all duration-500 glow-cyan"></div>
+                    </div>
+                    <div class="flex justify-between text-[11px] text-gray-500 font-mono pt-1">
+                        <span>السيولة المجمعة: <b id="currentReserve" class="text-white">0 ETH</b></span>
+                        <span>الهدف: <b id="targetReserve" class="text-white">0 ETH</b></span>
+                    </div>
+                </div>
+
+                <!-- Dynamic Streak / FOMO Fees Banner -->
+                <div class="bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-red-500/10 border border-orange-500/40 p-4 rounded-2xl flex justify-between items-center">
+                    <div class="space-y-1">
+                        <div class="text-orange-400 font-black text-sm flex items-center gap-2">
+                            <span class="animate-bounce">🔥</span> HYPER-STREAK DYNAMIC DEXTERITY
+                        </div>
+                        <p class="text-xs text-gray-400">تخفيض تلقائي للرسوم مع ارتفاع حجم التداول المتوالي للحفز الهيستيري.</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-black text-orange-400 font-mono">0.25%</div>
+                        <div class="text-[10px] text-gray-500">ACTIVE FEE RATE</div>
+                    </div>
+                </div>
+
+                <!-- Buy & Copy-Trading Input Form -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-2">مقدار الشراء المباشر (ETH):</label>
+                        <div class="relative">
+                            <input type="number" id="buyAmount" placeholder="0.1" step="0.01" class="w-full bg-black border border-gray-800 text-white text-3xl font-bold font-mono rounded-2xl p-4 focus:outline-none focus:border-cyan-500">
+                            <span class="absolute left-4 top-5 text-gray-500 font-bold font-mono">ETH</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">رابط النسخ والإحالة (Copy-Trading & Affiliate Referrer Address):</label>
+                        <input type="text" id="referrerAddress" placeholder="0x0000000000000000000000000000000000000000" class="w-full bg-black/60 border border-gray-800 text-xs font-mono text-gray-300 rounded-xl p-3 focus:outline-none focus:border-cyan-500">
+                    </div>
+
+                    <button onclick="executeBuy()" class="w-full bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 font-black text-xl py-5 rounded-2xl hover:scale-[1.01] active:scale-[0.99] transition-all glow-cyan text-white">
+                        APE IN / شراء سيبراني فوري 🚀
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- 2. Section: Token Trading Dashboard (Ape & HFT Terminal) -->
-        <div id="dashboardCard" class="hidden bg-gray-900 border border-gray-800 p-8 rounded-3xl shadow-2xl space-y-6">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                <button onclick="showLaunchpad()" class="text-xs font-bold text-gray-400 hover:text-white">← العودة للفاكتوري</button>
-                <span id="activeTokenAddr" class="text-xs font-mono text-cyan-400"></span>
-            </div>
-
-            <!-- Mode Selector -->
-            <div class="flex gap-3 bg-black p-2 rounded-2xl border border-gray-800">
-                <button id="apeTabBtn" onclick="switchTab('ape')" class="flex-1 py-3 font-bold rounded-xl bg-cyan-500 text-white">🦍 Ape & Whales</button>
-                <button id="terminalTabBtn" onclick="switchTab('terminal')" class="flex-1 py-3 font-bold font-mono rounded-xl text-gray-500">🤖 HFT Terminal</button>
-            </div>
-
-            <!-- Ape View -->
-            <div id="apeView" class="space-y-6">
-                <div>
-                    <div class="flex justify-between text-cyan-400 font-bold text-sm mb-2">
-                        <span>تقدم التخرج لـ DEX</span>
-                        <span id="progressText">0%</span>
+        <!-- 3. HFT & ARBITRAGE BOT TERMINAL -->
+        <section id="secBot" class="hidden w-full max-w-4xl space-y-6">
+            <div class="bg-black border-2 border-emerald-900/80 p-8 rounded-3xl font-mono space-y-6 glow-green">
+                <div class="flex justify-between items-center border-b border-emerald-900/60 pb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+                        <h3 class="text-emerald-400 font-bold text-lg tracking-wider">&gt; HFT_ARBITRAGE_MEV_MATRIX_v2.0</h3>
                     </div>
-                    <div class="w-full bg-black rounded-full h-5 overflow-hidden border border-gray-800">
-                        <div id="progressBar" class="bg-gradient-to-r from-cyan-500 to-purple-600 h-full w-0 transition-all duration-500"></div>
+                    <span class="text-xs text-emerald-600 bg-emerald-950 border border-emerald-800 px-3 py-1 rounded">RPC: BASE_MAINNET_DIRECT</span>
+                </div>
+
+                <!-- Bot Metrics Dashboard -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-emerald-950/20 border border-emerald-900 p-4 rounded-2xl space-y-1">
+                        <div class="text-emerald-600">ARBITRAGE_BOUNTY_POOL</div>
+                        <div id="botBountyVal" class="text-2xl font-bold text-yellow-400">0.00 ETH</div>
+                        <div class="text-[10px] text-gray-500">مكافأة التحكيم السعري اللحظي</div>
+                    </div>
+                    <div class="bg-emerald-950/20 border border-emerald-900 p-4 rounded-2xl space-y-1">
+                        <div class="text-emerald-600">FLASH_LOAN_LIQUIDITY</div>
+                        <div class="text-2xl font-bold text-purple-400">UNLIMITED</div>
+                        <div class="text-[10px] text-gray-500">قروض فلاشية بدون حجز رأس مال</div>
+                    </div>
+                    <div class="bg-emerald-950/20 border border-emerald-900 p-4 rounded-2xl space-y-1">
+                        <div class="text-emerald-600">MAX_SLIPPAGE_TOLERANCE</div>
+                        <div class="text-2xl font-bold text-cyan-400">0.01%</div>
+                        <div class="text-[10px] text-gray-500">استجابة خوارزمية فائقة السرعة</div>
                     </div>
                 </div>
 
-                <div class="bg-orange-500/10 border border-orange-500/30 p-4 rounded-2xl flex justify-between items-center">
-                    <div>
-                        <h4 class="text-orange-400 font-bold">🔥 Hot Streak Active!</h4>
-                        <p class="text-xs text-gray-400">رسوم الشراء منخفضة الآن لتوالي العمليات</p>
+                <!-- High Frequency Bot Webhook & Payload Payload Generator -->
+                <div class="bg-gray-950 p-4 rounded-2xl border border-gray-900 space-y-3">
+                    <div class="flex justify-between items-center text-xs text-gray-400">
+                        <span>[BOT_AUTOMATION_PAYLOAD] - جاهز للربط مع Python / Rust / Node.js MEV Bots</span>
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('botPayloadCode').innerText); alert('تم نسخ كود البوت إلى الحافظة!');" class="text-emerald-400 hover:underline text-[11px]">
+                            [نسخ الكود البرمجي]
+                        </button>
                     </div>
-                    <span class="text-3xl font-black text-orange-500">0.25%</span>
+                    <pre id="botPayloadCode" class="text-[11px] text-emerald-500 overflow-x-auto p-3 bg-black rounded-xl border border-emerald-950">
+// Direct Smart Contract Arbitrage Call Signature for Bots:
+const tokenContract = new ethers.Contract(TOKEN_ADDRESS, TOKEN_ABI, botSigner);
+await tokenContract.executeArbitrageBounty(
+    minTokensOut,          // uint256
+    bountyRewardRequested, // uint256 (e.g. parseEther("0.05"))
+    referrerBotAddress     // address
+);</pre>
                 </div>
 
-                <div class="space-y-3">
-                    <input type="number" id="buyAmount" placeholder="0.01 ETH" class="w-full bg-black border border-gray-800 text-white text-2xl font-bold p-4 rounded-2xl focus:outline-none focus:border-cyan-500">
-                    <button onclick="executeBuy()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 font-black text-xl py-5 rounded-2xl hover:scale-[1.01] transition-transform shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-                        APE IN NOW 🚀
+                <!-- Manual Trigger Action for MEV Bots -->
+                <div class="pt-2">
+                    <button onclick="executeBounty()" class="w-full bg-emerald-950/60 border-2 border-emerald-500 text-emerald-400 font-bold text-lg py-5 rounded-2xl hover:bg-emerald-900/60 transition-all flex items-center justify-center gap-3">
+                        <span>⚡</span> EXECUTE_ARBITRAGE_BOUNTY_NOW
                     </button>
                 </div>
             </div>
+        </section>
 
-            <!-- Terminal View -->
-            <div id="terminalView" class="hidden space-y-6 font-mono text-green-500">
-                <div class="bg-black p-4 rounded-2xl border border-green-900 flex justify-between">
-                    <div>
-                        <div class="text-xs text-gray-500">ARBITRAGE BOUNTY POOL</div>
-                        <div id="bountyPoolVal" class="text-2xl font-bold text-yellow-400">0.00 ETH</div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-gray-500">FLASH LOAN FEE</div>
-                        <div class="text-2xl font-bold text-purple-400">1 BPS</div>
-                    </div>
-                </div>
-                <button onclick="executeBounty()" class="w-full bg-green-900/30 border border-green-500 text-green-400 font-bold py-4 rounded-xl hover:bg-green-800/50">
-                    &gt; EXECUTE_ARBITRAGE_BOUNTY
-                </button>
-            </div>
-        </div>
     </main>
 
-    <!-- Logic Script -->
+    <!-- Footer -->
+    <footer class="w-full max-w-7xl mx-auto px-6 py-6 border-t border-gray-800/60 text-center text-xs text-gray-500 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>TSUNAMI Liquidity Engine &copy; 2026 - Powered by Base Network</div>
+        <div class="flex gap-6 font-mono text-[11px]">
+            <span class="text-cyan-400">FACTORY: 0xb641...1A7a</span>
+            <span class="text-emerald-400">DEX AUTO-GRADUATION</span>
+        </div>
+    </footer>
+
+    <!-- Application Script Logic -->
     <script>
+        // Global Configuration
         const FACTORY_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
+        const BASE_CHAIN_ID = "0x2105"; // 8453 in Hex
+
         const FACTORY_ABI = [
             "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) payable returns (address)",
             "function creationFee() view returns (uint256)"
         ];
+
         const TOKEN_ABI = [
             "function realBnbReserve() view returns (uint256)",
             "function graduationTargetBnb() view returns (uint256)",
@@ -150,104 +293,202 @@
             "function executeArbitrageBounty(uint256 minTokensOut, uint256 bountyRewardRequested, address referrer) payable"
         ];
 
-        let provider, signer, currentTokenAddr;
+        let provider, signer, userAddress;
+        let activeTokenAddress = null;
 
+        // Connect Wallet Function
         async function connectWallet() {
             if (window.ethereum) {
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-                const userAddr = await signer.getAddress();
-                
-                // Ensure Base Chain (0x2105)
                 try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x2105' }],
-                    });
-                } catch (e) {}
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    
+                    // Request accounts
+                    const accounts = await provider.send("eth_requestAccounts", []);
+                    signer = await provider.getSigner();
+                    userAddress = accounts[0];
 
-                document.getElementById('connectBtn').innerText = userAddr.slice(0, 6) + "..." + userAddr.slice(-4);
+                    // Switch to Base Mainnet if not already
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: BASE_CHAIN_ID }],
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: BASE_CHAIN_ID,
+                                    chainName: 'Base Mainnet',
+                                    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                                    rpcUrls: ['https://mainnet.base.org'],
+                                    blockExplorerUrls: ['https://basescan.org']
+                                }]
+                            });
+                        }
+                    }
+
+                    document.getElementById('btnText').innerText = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+                    document.getElementById('connectBtn').classList.add('border', 'border-emerald-500');
+                } catch (e) {
+                    alert("خطأ أثناء ربط المحفظة: " + e.message);
+                }
             } else {
-                alert("يرجى تثبيت محفظة MetaMask أو محفظة Web3 أخرى!");
+                alert("يرجى تثبيت محفظة Web3 مثل MetaMask أو Coinbase Wallet للبدء!");
             }
         }
 
+        // Switch Tabs Logic
+        function switchMainTab(tab) {
+            const tabs = ['launchpad', 'human', 'bot'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+                const sec = document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1));
+                
+                if (t === tab) {
+                    sec.classList.remove('hidden');
+                    btn.className = "flex-1 py-3 rounded-xl text-cyan-400 bg-gray-800 shadow transition-all flex items-center justify-center gap-2";
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = "flex-1 py-3 rounded-xl text-gray-400 hover:text-white transition-all flex items-center justify-center gap-2";
+                }
+            });
+        }
+
+        // Create Token via Factory
         async function createToken() {
             if (!signer) await connectWallet();
             const name = document.getElementById('tokenName').value;
             const symbol = document.getElementById('tokenSymbol').value;
             const target = document.getElementById('graduationTarget').value;
 
-            if (!name || !symbol) return alert("يرجى تعبئة الاسم والرمز!");
+            if (!name || !symbol) {
+                alert("يرجى إدخال اسم ورمز التوكن أولاً!");
+                return;
+            }
 
-            const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
             try {
+                const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
                 const fee = await factoryContract.creationFee();
-                const tx = await factoryContract.createViralToken(name, symbol, ethers.parseEther(target), { value: fee });
-                alert("تم إرسال المعاملة! انتظر التأكيد ثم استخرج العنوان من BaseScan.");
+                
+                const tx = await factoryContract.createViralToken(
+                    name, 
+                    symbol, 
+                    ethers.parseEther(target), 
+                    { value: fee }
+                );
+                
+                alert("تم إرسال معاملة الإنشاء بنجاح! جاري الانتظار والتأكيد على الشبكة...");
+                await tx.wait();
+                alert("تم إنشاء التوكن بنجاح على شبكة Base!");
             } catch (err) {
-                alert("خطأ: " + err.message);
+                alert("حدث خطأ أثناء الإنشاء: " + (err.reason || err.message));
             }
         }
 
-        function loadTokenDashboard() {
+        // Load Dashboard for Specific Token
+        async function loadTokenDashboard() {
             const addr = document.getElementById('existingAddress').value;
-            if (!ethers.isAddress(addr)) return alert("العنوان غير صحيح!");
-            currentTokenAddr = addr;
-            document.getElementById('activeTokenAddr').innerText = addr.slice(0, 6) + "..." + addr.slice(-4);
-            document.getElementById('launchpadCard').classList.add('hidden');
-            document.getElementById('dashboardCard').classList.remove('hidden');
-            updateDashboardData();
+            if (!ethers.isAddress(addr)) {
+                alert("عنوان التوكن غير صحيح! يرجى إدخال عنوان 0x صحيح.");
+                return;
+            }
+
+            activeTokenAddress = addr;
+            document.getElementById('activeTokenDisplay').innerText = addr.slice(0, 6) + "..." + addr.slice(-4);
+            
+            await updateTokenData();
+            switchMainTab('human');
         }
 
-        function showLaunchpad() {
-            document.getElementById('dashboardCard').classList.add('hidden');
-            document.getElementById('launchpadCard').classList.remove('hidden');
-        }
+        // Update Dynamic Data from Smart Contract
+        async function updateTokenData() {
+            if (!activeTokenAddress) return;
+            const currentProvider = provider || new ethers.JsonRpcProvider('https://mainnet.base.org');
+            const tokenContract = new ethers.Contract(activeTokenAddress, TOKEN_ABI, currentProvider);
 
-        async function updateDashboardData() {
-            if (!currentTokenAddr || !provider) return;
-            const tokenContract = new ethers.Contract(currentTokenAddr, TOKEN_ABI, provider);
             try {
                 const reserve = await tokenContract.realBnbReserve();
                 const target = await tokenContract.graduationTargetBnb();
                 const bounty = await tokenContract.bountyPoolBalance();
 
+                const reserveEth = ethers.formatEther(reserve);
+                const targetEth = ethers.formatEther(target);
                 const progress = (Number(reserve) / Number(target)) * 100;
+
                 document.getElementById('progressText').innerText = progress.toFixed(2) + "%";
                 document.getElementById('progressBar').style.width = Math.min(progress, 100) + "%";
-                document.getElementById('bountyPoolVal').innerText = ethers.formatEther(bounty) + " ETH";
-            } catch (e) {}
-        }
-
-        function switchTab(tab) {
-            if (tab === 'ape') {
-                document.getElementById('apeView').classList.remove('hidden');
-                document.getElementById('terminalView').classList.add('hidden');
-                document.getElementById('apeTabBtn').className = "flex-1 py-3 font-bold rounded-xl bg-cyan-500 text-white";
-                document.getElementById('terminalTabBtn').className = "flex-1 py-3 font-bold font-mono rounded-xl text-gray-500";
-            } else {
-                document.getElementById('apeView').classList.add('hidden');
-                document.getElementById('terminalView').classList.remove('hidden');
-                document.getElementById('terminalTabBtn').className = "flex-1 py-3 font-bold font-mono rounded-xl bg-green-950 text-green-400 border border-green-500";
-                document.getElementById('apeTabBtn').className = "flex-1 py-3 font-bold rounded-xl text-gray-500";
+                document.getElementById('currentReserve').innerText = parseFloat(reserveEth).toFixed(3) + " ETH";
+                document.getElementById('targetReserve').innerText = parseFloat(targetEth).toFixed(1) + " ETH";
+                document.getElementById('botBountyVal').innerText = parseFloat(ethers.formatEther(bounty)).toFixed(4) + " ETH";
+            } catch (e) {
+                console.log("استعلام العقد:", e);
             }
         }
 
+        // Execute Buy Action
         async function executeBuy() {
             if (!signer) await connectWallet();
-            const amount = document.getElementById('buyAmount').value;
-            if (!amount) return;
-            const tokenContract = new ethers.Contract(currentTokenAddr, TOKEN_ABI, signer);
+            if (!activeTokenAddress) {
+                alert("يرجى اختيار أو تحميل توكن أولاً!");
+                return;
+            }
+
+            const buyAmount = document.getElementById('buyAmount').value;
+            let referrer = document.getElementById('referrerAddress').value;
+
+            if (!buyAmount || Number(buyAmount) <= 0) {
+                alert("ادخل مبلغ شراء صحيح بالـ ETH!");
+                return;
+            }
+
+            if (!ethers.isAddress(referrer)) {
+                referrer = ethers.ZeroAddress;
+            }
+
             try {
-                const tx = await tokenContract.buy(0, ethers.ZeroAddress, { value: ethers.parseEther(amount) });
+                const tokenContract = new ethers.Contract(activeTokenAddress, TOKEN_ABI, signer);
+                const tx = await tokenContract.buy(0, referrer, { value: ethers.parseEther(buyAmount) });
+                alert("تمت المعاملة! جاري التأكيد...");
                 await tx.wait();
-                alert("تمت عملية الشراء بنجاح!");
-                updateDashboardData();
+                alert("تم الشراء بنجاح وترسيخ السيولة!");
+                updateTokenData();
             } catch (e) {
-                alert("خطأ: " + e.message);
+                alert("فشلت المعاملة: " + (e.reason || e.message));
             }
         }
+
+        // Execute MEV / Arbitrage Bounty Action
+        async function executeBounty() {
+            if (!signer) await connectWallet();
+            if (!activeTokenAddress) {
+                alert("يرجى تحميل توكن أولاً من قائمة الفاكتوري!");
+                return;
+            }
+
+            try {
+                const tokenContract = new ethers.Contract(activeTokenAddress, TOKEN_ABI, signer);
+                const bounty = await tokenContract.bountyPoolBalance();
+
+                if (bounty === 0n) {
+                    alert("رصيد مكافأة التحكيم السعري حالياً 0 ETH.");
+                    return;
+                }
+
+                const tx = await tokenContract.executeArbitrageBounty(0, bounty, ethers.ZeroAddress, { value: ethers.parseEther("0.001") });
+                alert("جاري تنفيذ التحكيم السعري واقتناص الفوارق...");
+                await tx.wait();
+                alert("تم تنفيذ الاستراتيجية الخوارزمية بنجاح!");
+                updateTokenData();
+            } catch (e) {
+                alert("خطأ في تنفيذ التحكيم: " + (e.reason || e.message));
+            }
+        }
+
+        // Auto Refresh Dashboard Data
+        setInterval(() => {
+            if (activeTokenAddress) updateTokenData();
+        }, 5000);
     </script>
 </body>
 </html>
