@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusMeme - Institutional Launchpad & Advanced Security Protocol</title>
+    <title>NexusMeme - Institutional Launchpad & Guardian Protocols</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 CDN -->
@@ -14,6 +14,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
         body { font-family: 'Tajawal', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
         .institutional-border { border: 1px solid rgba(59, 130, 246, 0.2); }
+        .guardian-card { transition: all 0.3s ease; }
+        .guardian-card:hover { transform: translateY(-3px); border-color: rgba(59, 130, 246, 0.6); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15); }
         button:active { transform: scale(0.99); }
         .btn-loading { opacity: 0.7; pointer-events: none; }
     </style>
@@ -28,13 +30,13 @@
             </div>
             <div>
                 <span class="text-xl font-black tracking-tight text-white">NEXUSMÉME</span>
-                <span class="block text-[10px] text-blue-400 font-bold uppercase tracking-wider">بروتوكول الأصول المؤسسية الآمنة</span>
+                <span class="block text-[10px] text-blue-400 font-bold uppercase tracking-wider">بروتوكول الأصول وحراس النظام</span>
             </div>
         </div>
         <div class="flex items-center gap-4">
             <div class="hidden md:flex items-center gap-2 text-xs text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg institutional-border">
                 <i class="fa-solid fa-circle text-emerald-400 text-[8px] animate-pulse"></i>
-                <span>حماية القناصة (MEV Shield): مفعلة</span>
+                <span>نظام حراس البوكيمون: نشط</span>
             </div>
             <button id="connectWalletBtn" onclick="connectWallet()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer text-sm">
                 <i class="fa-solid fa-wallet"></i>
@@ -54,154 +56,53 @@
                         <i class="fa-solid fa-file-contract text-xl"></i>
                     </div>
                     <div>
-                        <h2 class="text-base font-bold text-white">إصدار أصل رقمي محمي</h2>
-                        <p class="text-xs text-slate-400">نشر عالي الأمان عبر عقد المصنع الذكي</p>
+                        <h2 class="text-base font-bold text-white">إصدار أصل رقمي مع حراس النظام</h2>
+                        <p class="text-xs text-slate-400">تفعيل خوارزميات الحماية المتقدمة تلقائياً</p>
                     </div>
                 </div>
 
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1.5">اسم الأصل (Token Name)</label>
-                        <input type="text" id="tokenName" placeholder="مثال: Global Institutional Coin" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
+                        <input type="text" id="tokenName" placeholder="مثال: Guardian Asset" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1.5">رمز التداول (Token Symbol)</label>
-                        <input type="text" id="tokenSymbol" placeholder="مثال: GIC" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
+                        <input type="text" id="tokenSymbol" placeholder="مثال: GUA" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1.5">هدف التخرج النظامي (Graduation Target BNB)</label>
                         <select id="graduationTarget" class="w-full bg-slate-950 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
-                            <option value="4">4 BNB (إطلاق سريع)</option>
-                            <option value="10" selected>10 BNB (المعيار المؤسسي الآمن)</option>
-                            <option value="20">20 BNB (سيولة متقدمة)</option>
-                            <option value="50">50 BNB (صندوق سيادي ضخم)</option>
+                            <option value="4">4 BNB (مسار بيكاتشو السريع)</option>
+                            <option value="10" selected>10 BNB (مسار تشاريزارد المعياري)</option>
+                            <option value="20">20 BNB (مسار ميوتو المؤسسي)</option>
+                            <option value="50">50 BNB (مسار صناديق الحيتان الكبرى)</option>
                         </select>
                     </div>
                     
-                    <!-- Advanced Feature Status Box -->
+                    <!-- Guardians Selection Indicator Bar -->
                     <div class="bg-slate-950/80 institutional-border rounded-xl p-3.5 space-y-2 text-xs">
                         <div class="flex justify-between items-center text-slate-300">
                             <span>رسوم الإنشاء الرسمية:</span>
                             <span class="font-bold text-amber-400">0.01 BNB</span>
                         </div>
                         <div class="flex justify-between items-center text-slate-300">
-                            <span>درع منع القناصة (Sniper Shield):</span>
-                            <span class="font-bold text-emerald-400">مفعل تلقائياً</span>
+                            <span>الحراس المفعلون بالعقد:</span>
+                            <span class="font-bold text-emerald-400">Pikachu, Charizard & Mewtwo</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <button id="createBtn" onclick="createToken()" class="mt-6 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 text-sm">
-                <i class="fa-solid fa-lock"></i>
-                <span>إصدار الأصل وتفعيل الحماية السيادية 🚀</span>
+                <i class="fa-solid fa-shield-dog"></i>
+                <span>إصدار الأصل وتفعيل حراسة الأبطال ⚡</span>
             </button>
         </section>
 
-        <!-- Trading Terminal Section (7 Cols) -->
+        <!-- Trading Terminal Section & Guardians Grid (7 Cols) -->
         <section class="lg:col-span-7 bg-slate-900/90 institutional-border rounded-2xl p-6 shadow-2xl flex flex-col justify-between backdrop-blur-md">
             <div>
                 <!-- Header & Loader -->
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800 flex-wrap gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
-                            <i class="fa-solid fa-chart-line text-xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-base font-bold text-white" id="activeTokenName">محطة التداول السيادية والسيولة</h2>
-                            <p class="text-xs text-slate-400" id="activeTokenSymbol">إدارة منحنى الترابط الآلي (Bonding Curve Engine)</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="tokenAddressInput" placeholder="عنوان عقد العملة (0x...)" class="bg-slate-950 institutional-border rounded-xl px-3 py-2 text-xs w-52 focus:outline-none focus:border-blue-500 text-white font-mono">
-                        <button id="loadBtn" onclick="loadTokenContract()" class="bg-slate-800 hover:bg-slate-700 institutional-border px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">تحميل</button>
-                    </div>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                    <div class="bg-slate-950 institutional-border p-3.5 rounded-xl">
-                        <span class="text-[11px] text-slate-400 block mb-1">الاحتياطي النقدي (BNB)</span>
-                        <span class="text-sm font-black text-emerald-400" id="statBnbReserve">0.00 BNB</span>
-                    </div>
-                    <div class="bg-slate-950 institutional-border p-3.5 rounded-xl">
-                        <span class="text-[11px] text-slate-400 block mb-1">احتياطي الرموز المتبقي</span>
-                        <span class="text-sm font-black text-blue-400" id="statTokenReserve">0</span>
-                    </div>
-                    <div class="bg-slate-950 institutional-border p-3.5 rounded-xl">
-                        <span class="text-[11px] text-slate-400 block mb-1">مؤشر حالة السيولة</span>
-                        <span class="text-xs font-black text-amber-400" id="statGraduationStatus">قيد التداول النشط</span>
-                    </div>
-                    <div class="bg-slate-950 institutional-border p-3.5 rounded-xl">
-                        <span class="text-[11px] text-slate-400 block mb-1">صندوق المكافآت والعوائد</span>
-                        <span class="text-sm font-black text-indigo-400" id="statBountyPool">0 BNB</span>
-                    </div>
-                </div>
-
-                <!-- Buy/Sell Tabs -->
-                <div class="bg-slate-950 institutional-border p-5 rounded-xl">
-                    <div class="flex gap-4 mb-4 border-b border-slate-800 pb-3">
-                        <button onclick="switchTab('buy')" id="buyTabBtn" class="font-bold text-blue-400 border-b-2 border-blue-500 pb-1 cursor-pointer text-xs">شراء أصل آمن (Buy)</button>
-                        <button onclick="switchTab('sell')" id="sellTabBtn" class="font-bold text-slate-400 pb-1 cursor-pointer text-xs">بيع واسترداد السيولة (Sell)</button>
-                    </div>
-
-                    <!-- Buy Section -->
-                    <div id="buySection" class="space-y-3">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1.5">المبلغ المدفوع بالـ BNB</label>
-                            <input type="number" id="buyBnbAmount" placeholder="0.1" step="0.01" class="w-full bg-slate-900 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
-                        </div>
-                        <button id="buyBtn" onclick="buyTokens()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 text-sm">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                            <span>تأكيد الشراء الفوري عبر العقد 🪙</span>
-                        </button>
-                    </div>
-
-                    <!-- Sell Section -->
-                    <div id="sellSection" class="space-y-3 hidden">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1.5">كمية الرموز المراد بيعها</label>
-                            <input type="number" id="sellTokenAmount" placeholder="1000" class="w-full bg-slate-900 institutional-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white">
-                        </div>
-                        <button id="sellBtn" onclick="sellTokens()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 text-sm">
-                            <i class="fa-solid fa-coins"></i>
-                            <span>بيع الرموز واسترداد النقد الفوري 💸</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Details & Graduation Action -->
-            <div class="mt-6 flex justify-between items-center text-xs text-slate-400 flex-wrap gap-2 border-t border-slate-800 pt-4">
-                <span>عنوان العقد المصنع: <span id="factoryAddressDisplay" class="text-blue-400 font-mono">غير متصل</span></span>
-                <button id="gradBtn" onclick="checkGraduation()" class="text-amber-400 hover:text-amber-300 font-bold underline cursor-pointer flex items-center gap-1">
-                    <i class="fa-solid fa-rocket"></i> تنفيذ تخرج السيولة للـ DEX (Graduate)
-                </button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="text-center py-5 border-t border-slate-800 text-slate-500 text-xs">
-        جميع الحقوق محفوظة &copy; 2026 - NexusMeme Institutional Protocol (Connected to ViralInstitutionalToken)
-    </footer>
-
-    <!-- Web3 Integration Script -->
-    <script>
-        const FACTORY_ADDRESS = "0xYOUR_DEPLOYED_FACTORY_ADDRESS_HERE"; 
-        
-        const FACTORY_ABI = [
-            "function createViralToken(string name, string symbol, uint256 graduationTargetBnb) external payable returns (address)",
-            "function creationFee() external view returns (uint256)",
-            "event TokenCreated(address indexed tokenAddress, string name, string symbol, address indexed creator, uint256 graduationTargetBnb)"
-        ];
-
-        const TOKEN_ABI = [
-            "function name() external view returns (string)",
-            "function symbol() external view returns (string)",
-            "function realBnbReserve() external view returns (uint256)",
-            "function realTokenReserve() external view returns (uint256)",
-            "function isGraduated() external view returns (bool)",
-            "function bountyPoolBalance() external view returns (uint256)",
-            "function buy(uint256 minTokensOut, address referrer) external payable",
+                    <div class="flex items-center gap
