@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump | Ultimate Multi-Chain Memecoin Launchpad</title>
+    <title>ChainPump | Real Cross-Chain Solana Bridge</title>
     <!-- Ethers.js v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <!-- Li.Fi / Jumper Cross-Chain Widget Script -->
+    <script src="https://unpkg.com/@lifi/widget@3.1.2/dist/index.umd.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -65,19 +67,16 @@
         input, select { width: 100%; padding: 10px; background: #0b0f19; border: 1px solid var(--border-color); color: white; border-radius: 8px; font-size: 13px; outline: none; }
         input:focus, select:focus { border-color: var(--accent-blue); }
 
-        /* أزرار تبديل مصدر الشعار */
         .logo-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
         .logo-tab { flex: 1; padding: 8px; background: #0b0f19; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; transition: 0.2s; }
         .logo-tab.active { background: rgba(0, 82, 255, 0.2); border-color: var(--accent-blue); color: #38bdf8; }
 
-        /* لوحة الرسم */
         .drawing-container { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; text-align: center; }
         canvas { background: #ffffff; width: 100%; height: 150px; border-radius: 6px; cursor: crosshair; touch-action: none; display: block; }
         
         .drawing-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
         .color-picker { width: 30px; height: 30px; border: none; border-radius: 50%; cursor: pointer; background: transparent; }
 
-        /* صندوق التعزيزات القابل للطي */
         .booster-box { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
         .booster-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
         .booster-title { font-size: 11px; color: var(--accent-yellow); font-weight: bold; display: flex; align-items: center; gap: 6px; }
@@ -88,7 +87,6 @@
         .booster-box.open .booster-arrow { transform: rotate(180deg); }
 
         .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .toggle-row:last-child { margin-bottom: 0; }
         .toggle-info { flex: 1; margin-left: 10px; }
         .toggle-label { font-size: 11px; font-weight: bold; color: var(--text-main); }
         .toggle-desc { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
@@ -100,20 +98,25 @@
         input:checked + .slider { background-color: var(--accent-green); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        /* بطاقة الهايب الفيروسي */
         .viral-card-preview {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(0, 82, 255, 0.15));
             border: 1px dashed var(--accent-purple);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 12px;
-            text-align: center;
+            border-radius: 12px; padding: 12px; margin-top: 12px; text-align: center;
         }
         .viral-card-title { font-size: 11px; color: #c084fc; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .viral-box { background: #0b0f19; border-radius: 8px; padding: 10px; font-size: 10px; color: var(--text-muted); text-align: right; word-break: break-all; margin-bottom: 8px; border: 1px solid var(--border-color); }
         .btn-viral { background: var(--accent-purple); color: white; font-size: 11px; padding: 8px; border-radius: 8px; }
 
         .status-box { font-size: 11px; text-align: center; padding: 8px; background: #0b0f19; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 12px; color: #38bdf8; word-break: break-all; }
+
+        /* حاوية أداة الجسر الحقيقي المخفية حتى يتم تفعيلها */
+        #lifi-widget-container {
+            margin-top: 15px;
+            display: none;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -121,7 +124,7 @@
 <div class="app-container">
     <div class="header">
         <h1>⚡ ChainPump</h1>
-        <p>Real Contract & Cross-Chain Solana Bridge Launchpad</p>
+        <p>Real Contract & Live Cross-Chain Solana Bridge</p>
     </div>
 
     <button class="btn btn-wallet" id="walletBtn" onclick="connectWallet()">
@@ -148,7 +151,6 @@
         </select>
     </div>
 
-    <!-- مصادر الشعار -->
     <div class="form-group">
         <label>Token Logo Source</label>
         <div class="logo-tabs">
@@ -176,11 +178,10 @@
     </div>
 
     <div class="form-group">
-        <label>Initial Dev Buy Amount (BNB / Cross-Chain)</label>
+        <label>Initial Dev Buy Amount (BNB)</label>
         <input type="number" id="devBuyAmount" value="0.01" step="0.005">
     </div>
 
-    <!-- قسم التعزيزات القابل للطي -->
     <div class="booster-box" id="boosterBox">
         <div class="booster-header" onclick="toggleBoosters()">
             <div class="booster-title">
@@ -219,16 +220,18 @@
         <i class="fa-solid fa-rocket"></i> Launch Token on BSC 🪙
     </button>
 
-    <!-- زر إطلاق والشراء عبر شبكة سولانا (Cross-Chain Bridge) -->
-    <button class="btn btn-solana" onclick="launchViaSolanaBridge()">
-        <i class="fa-brands fa-solana"></i> Launch & Buy via Solana Bridge ⚡
+    <!-- زر تفعيل نافذة جسر سولانا الحقيقي -->
+    <button class="btn btn-solana" onclick="openRealSolanaBridgeWidget()">
+        <i class="fa-brands fa-solana"></i> Open Live Solana Bridge Swap ⚡
     </button>
 
-    <!-- معاينة بطاقة الهايب الفيروسي -->
+    <!-- الحاوية التي ستظهر فيها أداة التحويل الحقيقية عابرة السلاسل -->
+    <div id="lifi-widget-container"></div>
+
     <div class="viral-card-preview">
         <div class="viral-card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Live Viral Raid Generator</div>
         <div class="viral-box" id="viralTweetText">
-            🚀 Just deployed $<span id="previewSymbol">CPUMP</span> on ChainPump BSC with cross-chain Solana support! Let's pump it to the moon! 🌕💎 #BSC #Solana #Memecoin
+            🚀 Just deployed $<span id="previewSymbol">CPUMP</span> on ChainPump BSC with live Solana bridge support! Let's pump it to the moon! 🌕💎 #BSC #Solana #Memecoin
         </div>
         <button class="btn btn-viral" onclick="copyRaidTemplate()"><i class="fa-solid fa-copy"></i> Copy Raid Tweet</button>
     </div>
@@ -356,50 +359,37 @@
         }
     }
 
-    // إطلاق وشراء عبر جسر سولانا (Cross-Chain Bridge Simulation/Integration)
-    async function launchRealToken() {
-        const name = document.getElementById("tokenName").value;
-        const symbol = document.getElementById("tokenSymbol").value;
-        const devBuy = document.getElementById("devBuyAmount").value;
-
-        if(!name || !symbol) { alert("يرجى أدخال اسم ورمز العملة"); return; }
-        if (!window.ethereum) { alert("يرجى ربط المحفظة أولاً"); return; }
-
-        try {
-            document.getElementById("statusBox").innerText = "Status: Requesting BSC Blockchain Transaction...";
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-
-            const tx = await signer.sendTransaction({
-                to: await signer.getAddress(),
-                value: ethers.utils.parseEther(devBuy)
-            });
-
-            document.getElementById("statusBox").innerText = "Status: Transaction sent! Waiting for confirmation...";
-            await tx.wait();
-
-            document.getElementById("statusBox").innerText = "🚀 تم إطلاق العملة بنجاح على شبكة BSC!";
-            alert("🎉 تم تأكيد المعاملة ونشر العقد وحفظ العملة على الشبكة بنجاح!");
-        } catch (error) {
-            document.getElementById("statusBox").innerText = "Status: Transaction cancelled or failed";
+    // تفعيل الجسر الحقيقي عبر Li.Fi SDK Widget
+    function openRealSolanaBridgeWidget() {
+        const container = document.getElementById("lifi-widget-container");
+        if (container.style.display === "block") {
+            container.style.display = "none";
+            return;
         }
-    }
-
-    async function launchViaSolanaBridge() {
-        const name = document.getElementById("tokenName").value;
-        const symbol = document.getElementById("tokenSymbol").value;
         
-        if(!name || !symbol) { alert("يرجى أدخال اسم ورمز العملة"); return; }
+        container.style.display = "block";
+        document.getElementById("statusBox").innerText = "Status: Loading Live Cross-Chain Bridge Widget...";
 
-        document.getElementById("statusBox").innerText = "Status: Connecting to Solana Cross-Chain Bridge (Li.Fi / Celer)...";
-        
-        setTimeout(() => {
-            document.getElementById("statusBox").innerText = "⚡ جاري معالجة سيولة سولانا وتحويلها لعقد BSC...";
-            setTimeout(() => {
-                document.getElementById("statusBox").innerText = "🚀 تم إطلاق العملة وجسر سيولة Solana بنجاح!";
-                alert("💎 ممتاز! تم ربط سيولة شبكة Solana بنجاح مع عملتك على BSC دون الحاجة لتعديل العقد الأساسي.");
-            }, 2000);
-        }, 1500);
+        // تهيئة واجهة الجسر الحقيقية لربط Solana مع BSC
+        if (window.LiFiWidget) {
+            window.LiFiWidget.render('lifi-widget-container', {
+                integrator: 'ChainPump-DApp',
+                appearance: 'dark',
+                theme: {
+                    palette: {
+                        primary: { main: '#10b981' },
+                        background: { default: '#111827', paper: '#0b0f19' }
+                    }
+                },
+                fromChain: 1151111081099710 // Solana Network ID
+,
+                toChain: 56, // BSC Chain ID
+                fromToken: 'So11111111111111111111111111111111111111112', // SOL
+            });
+            document.getElementById("statusBox").innerText = "⚡ تم تفعيل نافذة الجسر الحقيقي بين Solana و BSC بنجاح!";
+        } else {
+            document.getElementById("statusBox").innerText = "Status: Widget script is loading, please try again in 2 seconds.";
+        }
     }
 </script>
 
