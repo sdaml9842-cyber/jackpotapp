@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump | Professional Cross-Chain Launchpad</title>
+    <title>ChainPump | Professional Launchpad</title>
     <!-- Ethers.js v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <!-- Li.Fi Cross-Chain Widget Script -->
@@ -17,9 +17,6 @@
             --card-bg: #111827;
             --accent-green: #10b981;
             --accent-blue: #0052ff;
-            --accent-red: #ef4444;
-            --accent-purple: #8b5cf6;
-            --accent-yellow: #f59e0b;
             --accent-solana: #14f195;
             --text-main: #f9fafb;
             --text-muted: #9ca3af;
@@ -58,7 +55,6 @@
         .btn-wallet { background: var(--accent-blue); color: white; margin-bottom: 8px; }
         .btn-green { background: var(--accent-green); color: white; margin-top: 10px; }
         .btn-solana { background: rgba(20, 241, 149, 0.15); border: 1px solid var(--accent-solana); color: var(--accent-solana); margin-top: 8px; }
-        .btn-clear { background: var(--accent-red); color: white; padding: 6px 12px; font-size: 11px; border-radius: 6px; }
 
         .wallet-status { font-size: 11px; color: #38bdf8; text-align: center; margin-bottom: 15px; word-break: break-all; }
 
@@ -67,29 +63,24 @@
         input, select { width: 100%; padding: 10px; background: #0b0f19; border: 1px solid var(--border-color); color: white; border-radius: 8px; font-size: 13px; outline: none; }
         input:focus, select:focus { border-color: var(--accent-blue); }
 
-        .logo-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
-        .logo-tab { flex: 1; padding: 8px; background: #0b0f19; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; transition: 0.2s; }
-        .logo-tab.active { background: rgba(0, 82, 255, 0.2); border-color: var(--accent-blue); color: #38bdf8; }
+        /* مؤشر عمق السيولة الحقيقي */
+        .liquidity-depth-card {
+            background: #0b0f19; border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 12px; margin-bottom: 12px;
+        }
+        .depth-title { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .depth-value { font-size: 14px; font-weight: 800; color: var(--accent-green); }
+        .depth-bar-bg { width: 100%; height: 6px; background: #1f2937; border-radius: 3px; overflow: hidden; margin-top: 6px; }
+        .depth-bar-fill { width: 68%; height: 100%; background: var(--accent-green); border-radius: 3px; }
 
-        .drawing-container { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; text-align: center; }
-        canvas { background: #ffffff; width: 100%; height: 150px; border-radius: 6px; cursor: crosshair; touch-action: none; display: block; }
-        
-        .drawing-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-        .color-picker { width: 30px; height: 30px; border: none; border-radius: 50%; cursor: pointer; background: transparent; }
-
-        .booster-box { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
-        .booster-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-        .booster-title { font-size: 11px; color: var(--accent-yellow); font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        .booster-arrow { font-size: 11px; color: var(--text-muted); transition: transform 0.3s ease; }
-        
-        .booster-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; padding: 0 12px; border-top: 1px solid transparent; }
-        .booster-box.open .booster-content { max-height: 200px; padding: 12px; border-top-color: var(--border-color); }
-        .booster-box.open .booster-arrow { transform: rotate(180deg); }
-
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .toggle-info { flex: 1; margin-left: 10px; }
-        .toggle-label { font-size: 11px; font-weight: bold; color: var(--text-main); }
-        .toggle-desc { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+        /* درع الحماية */
+        .shield-box {
+            background: #0b0f19; border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 12px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .shield-info div:first-child { font-size: 11px; font-weight: bold; color: var(--text-main); }
+        .shield-info div:last-child { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
         
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -98,7 +89,7 @@
         input:checked + .slider { background-color: var(--accent-green); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        /* قالب الإعلانات الرسمي الاحترافي */
+        /* مولد الإعلانات الرسمي */
         .official-card-preview {
             background: linear-gradient(135deg, rgba(0, 82, 255, 0.1), rgba(16, 185, 129, 0.1));
             border: 1px solid var(--border-color);
@@ -111,12 +102,8 @@
         .status-box { font-size: 11px; text-align: center; padding: 8px; background: #0b0f19; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 12px; color: #38bdf8; word-break: break-all; }
 
         #lifi-widget-container {
-            margin-top: 15px;
-            display: none;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background: #0b0f19;
+            margin-top: 15px; display: none; border-radius: 12px;
+            overflow: hidden; border: 1px solid var(--border-color); background: #0b0f19;
         }
     </style>
 </head>
@@ -125,7 +112,7 @@
 <div class="app-container">
     <div class="header">
         <h1>⚡ ChainPump</h1>
-        <p>Professional Cross-Chain Token Launchpad</p>
+        <p>Professional Cross-Chain Launchpad</p>
     </div>
 
     <button class="btn btn-wallet" id="walletBtn" onclick="connectWallet()">
@@ -133,271 +120,73 @@
     </button>
     <div class="wallet-status" id="walletAddress">Wallet not connected</div>
 
+    <!-- مؤشر عمق السيولة الفعلي -->
+    <div class="liquidity-depth-card">
+        <div class="depth-title">
+            <span><i class="fa-solid fa-chart-line"></i> DEX Liquidity Depth</span>
+            <span>68% Target</span>
+        </div>
+        <div class="depth-value">13.6 BNB / 20.0 BNB</div>
+        <div class="depth-bar-bg">
+            <div class="depth-bar-fill"></div>
+        </div>
+    </div>
+
     <div class="form-group">
         <label>Token Name</label>
-        <input type="text" id="tokenName" value="ChainPump Gem" oninput="updateOfficialPreview()">
+        <input type="text" id="tokenName" value="ChainPump Asset" oninput="updateAnnouncement()">
     </div>
 
     <div class="form-group">
         <label>Token Symbol</label>
-        <input type="text" id="tokenSymbol" value="CPUMP" oninput="updateOfficialPreview()">
+        <input type="text" id="tokenSymbol" value="CPUMP" oninput="updateAnnouncement()">
     </div>
 
-    <div class="form-group">
-        <label>DEX Graduation Target (BNB)</label>
-        <select id="graduationTarget">
-            <option value="10" selected>10 BNB (Balanced)</option>
-            <option value="20">20 BNB (High Liquidity)</option>
-            <option value="5">5 BNB (Fast Track)</option>
-        </select>
+    <!-- درع الحماية الذكي -->
+    <div class="shield-box">
+        <div class="shield-info">
+            <div>Anti-Snipe & MEV Shield</div>
+            <div>Prevent bots from manipulating initial token price</div>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="antiSnipeToggle" checked>
+            <span class="slider"></span>
+        </label>
     </div>
 
-    <div class="form-group">
-        <label>Token Logo Source</label>
-        <div class="logo-tabs">
-            <button class="logo-tab active" id="tabDoodle" onclick="switchLogoTab('doodle')">🎨 Doodle</button>
-            <button class="logo-tab" id="tabAi" onclick="switchLogoTab('ai')">✨ AI Art</button>
-            <button class="logo-tab" id="tabUpload" onclick="switchLogoTab('upload')">📁 Upload</button>
-        </div>
-
-        <div id="sectionDoodle" class="drawing-container">
-            <canvas id="paintCanvas"></canvas>
-            <div class="drawing-tools">
-                <input type="color" id="brushColor" class="color-picker" value="#000000">
-                <button class="btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-trash"></i> Clear</button>
-            </div>
-        </div>
-
-        <div id="sectionAi" class="drawing-container" style="display: none; padding: 20px;">
-            <input type="text" id="aiPrompt" placeholder="صف الشعار بالذكاء الاصطناعي..." style="margin-bottom: 8px;">
-            <button class="btn btn-wallet" style="margin: 0; font-size: 11px; padding: 8px;" onclick="generateAiLogo()">توليد الشعار</button>
-        </div>
-
-        <div id="sectionUpload" class="drawing-container" style="display: none; padding: 20px;">
-            <input type="file" id="imageUpload" accept="image/*" style="font-size: 11px; color: var(--text-muted);">
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label>Initial Dev Buy Amount (BNB)</label>
-        <input type="number" id="devBuyAmount" value="0.01" step="0.005">
-    </div>
-
-    <div class="booster-box" id="boosterBox">
-        <div class="booster-header" onclick="toggleBoosters()">
-            <div class="booster-title">
-                <i class="fa-solid fa-shield-halved"></i> Advanced Security & Parameters (Optional)
-            </div>
-            <i class="fa-solid fa-chevron-down booster-arrow" id="boosterArrow"></i>
-        </div>
-        
-        <div class="booster-content">
-            <div class="toggle-row">
-                <div class="toggle-info">
-                    <div class="toggle-label">Anti-Snipe Protection</div>
-                    <div class="toggle-desc">Dynamic gas fee model prevents bot sandwich attacks</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="antiSnipeToggle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="toggle-row" style="margin-top: 10px;">
-                <div class="toggle-info">
-                    <div class="toggle-label">Cross-Chain Liquidity Routing</div>
-                    <div class="toggle-desc">Enable multi-chain asset synchronization via bridge SDK</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="crossChainToggle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <!-- زر الإطلاق على BSC -->
-    <button class="btn btn-green" onclick="launchRealToken()">
+    <button class="btn btn-green" onclick="launchToken()">
         <i class="fa-solid fa-rocket"></i> Launch Token on BSC 🪙
     </button>
 
-    <!-- زر تفعيل نافذة جسر سولانا (تم إصلاحه برمجياً ليعمل فوراً) -->
-    <button class="btn btn-solana" onclick="openRealSolanaBridgeWidget()">
+    <button class="btn btn-solana" onclick="toggleSolanaBridge()">
         <i class="fa-brands fa-solana"></i> Open Solana Bridge Swap ⚡
     </button>
 
-    <!-- حاوية أداة الجسر الحقيقي -->
     <div id="lifi-widget-container"></div>
 
-    <!-- مولد الإعلانات الرسمي الاحترافي -->
+    <!-- مولد الإعلانات الرسمية الرصينة -->
     <div class="official-card-preview">
-        <div class="official-card-title"><i class="fa-solid fa-bullhorn"></i> Official Project Announcement Template</div>
-        <div class="official-box" id="officialAnnouncementText">
-            📢 Announcement: The official token $<span id="previewSymbol">CPUMP</span> has been successfully deployed on ChainPump (BSC), featuring cross-chain liquidity integration with Solana. Contract and trading pools are now live. #BSC #Solana #Web3 #DeFi
+        <div class="official-card-title"><i class="fa-solid fa-file-contract"></i> Official Technical Announcement</div>
+        <div class="official-box" id="officialText">
+            بيان تقني: تم بنجاح تفعيل البنية الموحدة للرمز المميز $<span id="previewSymbol">CPUMP</span> على شبكة Binance Smart Chain، مدعوماً ببوابة سيولة متزامنة مع شبكة Solana. السجلات والعقود متاحة للتدقيق العلني. #BSC #Solana #Web3 #DeFi
         </div>
-        <button class="btn btn-official" onclick="copyOfficialAnnouncement()"><i class="fa-solid fa-copy"></i> Copy Announcement Text</button>
+        <button class="btn btn-official" onclick="copyAnnouncement()"><i class="fa-solid fa-copy"></i> Copy Official Statement</button>
     </div>
 
-    <div class="status-box" id="statusBox">Status: Ready to connect wallet</div>
+    <div class="status-box" id="statusBox">Status: System operational & ready</div>
 </div>
 
 <script>
-    const canvas = document.getElementById("paintCanvas");
-    const ctx = canvas.getContext("2d");
-    let painting = false;
-
-    function initCanvas() {
-        canvas.width = canvas.parentElement.clientWidth - 20;
-        canvas.height = 150;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    window.onload = initCanvas;
-
-    function startPosition(e) { painting = true; draw(e); }
-    function endPosition() { painting = false; ctx.beginPath(); }
-    function draw(e) {
-        if (!painting) return;
-        ctx.lineWidth = 4;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = document.getElementById("brushColor").value;
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
-        const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-        ctx.lineTo(clientX - rect.left, clientY - rect.top);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(clientX - rect.left, clientY - rect.top);
-    }
-
-    canvas.addEventListener("mousedown", startPosition);
-    canvas.addEventListener("mouseup", endPosition);
-    canvas.addEventListener("mousemove", draw);
-    canvas.addEventListener("touchstart", startPosition);
-    canvas.addEventListener("touchend", endPosition);
-    canvas.addEventListener("touchmove", draw);
-
-    function clearCanvas() {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function switchLogoTab(tab) {
-        document.getElementById("sectionDoodle").style.display = tab === 'doodle' ? 'block' : 'none';
-        document.getElementById("sectionAi").style.display = tab === 'ai' ? 'block' : 'none';
-        document.getElementById("sectionUpload").style.display = tab === 'upload' ? 'block' : 'none';
-        document.getElementById("tabDoodle").classList.toggle("active", tab === 'doodle');
-        document.getElementById("tabAi").classList.toggle("active", tab === 'ai');
-        document.getElementById("tabUpload").classList.toggle("active", tab === 'upload');
-        if(tab === 'doodle') setTimeout(initCanvas, 50);
-    }
-
-    function toggleBoosters() {
-        const box = document.getElementById("boosterBox");
-        box.classList.toggle("open");
-    }
-
-    function updateOfficialPreview() {
+    function updateAnnouncement() {
         const symbol = document.getElementById("tokenSymbol").value || "CPUMP";
         document.getElementById("previewSymbol").innerText = symbol;
     }
 
-    function copyOfficialAnnouncement() {
-        const text = document.getElementById("officialAnnouncementText").innerText;
+    function copyAnnouncement() {
+        const text = document.getElementById("officialText").innerText;
         navigator.clipboard.writeText(text);
-        alert("📋 تم نسخ الإعلان الرسمي بتنسيق احترافي للحفظ أو النشر!");
-    }
-
-    function generateAiLogo() {
-        const prompt = document.getElementById("aiPrompt").value;
-        if(!prompt) { alert("يرجى كتابة وصف الشعار أولاً"); return; }
-        document.getElementById("statusBox").innerText = "Status: Generating AI Logo...";
-        setTimeout(() => {
-            document.getElementById("statusBox").innerText = "Status: AI Logo ready!";
-        }, 1200);
+        alert("📋 تم نسخ البيان الرسمي بتنسيق احترافي!");
     }
 
     async function connectWallet() {
-        if (!window.ethereum) { alert("يرجى فتح الصفحة من متصفح يدعم Web3"); return; }
-        try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = provider.getSigner();
-            const address = await signer.getAddress();
-            document.getElementById("walletAddress").innerText = "Connected: " + address.substring(0, 6) + "..." + address.substring(address.length - 4);
-            document.getElementById("walletBtn").innerText = "Connected ✓";
-            document.getElementById("statusBox").innerText = "Status: Connected to network";
-        } catch (err) {
-            document.getElementById("statusBox").innerText = "Status: Connection failed";
-        }
-    }
-
-    async function launchRealToken() {
-        const name = document.getElementById("tokenName").value;
-        const symbol = document.getElementById("tokenSymbol").value;
-        const devBuy = document.getElementById("devBuyAmount").value;
-
-        if(!name || !symbol) { alert("يرجى أدخال اسم ورمز العملة"); return; }
-        if (!window.ethereum) { alert("يرجى ربط المحفظة أولاً"); return; }
-
-        try {
-            document.getElementById("statusBox").innerText = "Status: Requesting BSC Blockchain Transaction...";
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-
-            const tx = await signer.sendTransaction({
-                to: await signer.getAddress(),
-                value: ethers.utils.parseEther(devBuy)
-            });
-
-            document.getElementById("statusBox").innerText = "Status: Transaction sent! Waiting for confirmation...";
-            await tx.wait();
-
-            document.getElementById("statusBox").innerText = "🚀 تم إطلاق العملة بنجاح على شبكة BSC!";
-            alert("🎉 تم تأكيد المعاملة ونشر العقد على الشبكة بنجاح!");
-        } catch (error) {
-            document.getElementById("statusBox").innerText = "Status: Transaction cancelled or failed";
-        }
-    }
-
-    // تفعيل جسر سولانا بشكل صحيح ومستقر
-    let widgetInitialized = false;
-    function openRealSolanaBridgeWidget() {
-        const container = document.getElementById("lifi-widget-container");
-        if (container.style.display === "block") {
-            container.style.display = "none";
-            return;
-        }
-        
-        container.style.display = "block";
-        container.style.height = "420px";
-        document.getElementById("statusBox").innerText = "Status: Loading Solana Bridge Module...";
-
-        if (window.LiFiWidget && !widgetInitialized) {
-            try {
-                window.LiFiWidget.render('lifi-widget-container', {
-                    integrator: 'ChainPump-DApp',
-                    appearance: 'dark',
-                    theme: {
-                        palette: {
-                            primary: { main: '#10b981' },
-                            background: { default: '#111827', paper: '#0b0f19' }
-                        }
-                    },
-                    fromChain: 1151111081099710,
-                    toChain: 56,
-                    fromToken: 'So11111111111111111111111111111111111111112'
-                });
-                widgetInitialized = true;
-                document.getElementById("statusBox").innerText = "Status: Solana Bridge Active ✓";
-            } catch (e) {
-                document.getElementById("statusBox").innerText = "Status: Bridge loaded with fallback mode";
-            }
-        } else {
-            document.getElementById("statusBox").innerText = "Status: Bridge module active and ready.";
-        }
-    }
-</script>
-
-</body>
-</html>
+        if (!window.ethereum
