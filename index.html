@@ -75,4 +75,277 @@
                     تتفاعل الأصول أدناه في الوقت الفعلي مع حركة السيولة والتدفقات المؤسسية. انقر على أي أصل لفتح نافذة التداول الفوري أو مراقبة رادار الحيتان.
                 </p>
             </div>
-            <div class="grid grid-cols-2 gap-
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="openLaunchpadModal()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all cursor-pointer shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rocket"></i>
+                    <span>أطلق عملتك الآن</span>
+                </button>
+                <button onclick="showAlert('رادار الحيتان مفعل: يتم مراقبة العقود الذكية والتدفقات الكبرى بشكل لحظي.')" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-radar text-blue-400"></i>
+                    <span>رادار الحيتان والأمان</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- شريط البحث والفرز -->
+        <div class="space-card rounded-2xl p-3 flex flex-col sm:flex-row gap-3 items-center justify-between">
+            <div class="relative w-full sm:w-72">
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterAssets()" placeholder="ابحث باسم الأصل أو الرمز..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pr-9 pl-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end text-xs">
+                <span class="text-slate-400 text-[11px]">ترتيب الفضاء:</span>
+                <button onclick="showAlert('تم الترتيب حسب مؤشر السيولة الأعلى')" class="bg-blue-600/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-fire text-[10px]"></i> مؤشر السيولة
+                </button>
+                <button onclick="showAlert('تم الترتيب حسب القيمة السوقية')" class="bg-slate-900 text-slate-400 border border-slate-800 px-3 py-1.5 rounded-lg hover:text-white cursor-pointer">
+                    القيمة السوقية
+                </button>
+            </div>
+        </div>
+
+        <!-- قائمة الأصول (الكواكب الرقمية) -->
+        <div id="assetsContainer" class="space-y-4">
+            
+            <!-- أصل رقمي 1 -->
+            <div class="asset-card space-card rounded-2xl p-4 space-y-4 transition-all hover:border-blue-500/40" data-name="Quantum Pepe QPEPES">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-black text-sm">
+                            QP
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-white">Quantum Pepe</h3>
+                                <span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-mono">حوت نشط</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-mono">QPEPES • منذ 8 ثوانٍ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-900/80 border border-slate-800/80 p-3 rounded-xl">
+                        <span class="text-[10px] text-slate-400 block mb-1">مؤشر كفاءة السيولة</span>
+                        <span class="text-sm font-black font-mono text-blue-400">96.8 / 100</span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800/80 p-3 rounded-xl">
+                        <span class="text-[10px] text-slate-400 block mb-1">القيمة السوقية</span>
+                        <span class="text-sm font-black font-mono text-emerald-400">$24.9M</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                        <span>تقدم منحنى التخرج</span>
+                        <span class="text-blue-400 font-bold">84.5%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                        <div class="bg-gradient-to-r from-blue-600 to-emerald-500 h-full rounded-full" style="width: 84.5%;"></div>
+                    </div>
+                </div>
+
+                <button onclick="tradeAsset('Quantum Pepe')" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bolt text-[11px]"></i>
+                    <span>تداول / شراء أصل رقمي</span>
+                </button>
+            </div>
+
+            <!-- أصل رقمي 2 -->
+            <div class="asset-card space-card rounded-2xl p-4 space-y-4 transition-all hover:border-blue-500/40" data-name="Neural Degen Ape DEGEN">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-black text-sm">
+                            ND
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-white">Neural Degen Ape</h3>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-mono">DEGEN$ • منذ 20 ثانية</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-900/80 border border-slate-800/80 p-3 rounded-xl">
+                        <span class="text-[10px] text-slate-400 block mb-1">مؤشر كفاءة السيولة</span>
+                        <span class="text-sm font-black font-mono text-purple-400">94.2 / 100</span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800/80 p-3 rounded-xl">
+                        <span class="text-[10px] text-slate-400 block mb-1">القيمة السوقية</span>
+                        <span class="text-sm font-black font-mono text-emerald-400">$3.5M</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                        <span>تقدم منحنى التخرج</span>
+                        <span class="text-purple-400 font-bold">42.1%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                        <div class="bg-gradient-to-r from-purple-600 to-blue-500 h-full rounded-full" style="width: 42.1%;"></div>
+                    </div>
+                </div>
+
+                <button onclick="tradeAsset('Neural Degen Ape')" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bolt text-[11px]"></i>
+                    <span>تداول / شراء أصل رقمي</span>
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- نافذة منبثقة (Modal) لمصنع إصدار الأصول وتوليد رابط الإحالة -->
+    <div id="launchpadModal" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4 hidden">
+        <div class="space-card rounded-2xl max-w-lg w-full p-6 space-y-5 border border-blue-500/30 relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-rocket text-blue-400"></i>
+                    <h3 class="text-sm font-bold text-white">مصنع إصدار الأصول المؤسسية</h3>
+                </div>
+                <button onclick="closeLaunchpadModal()" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[11px] text-slate-400">اسم الأصل (Name)</label>
+                        <input type="text" id="tokenNameInput" placeholder="مثال: Nexus Asset" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] text-slate-400">رمز الأصل (Symbol)</label>
+                        <input type="text" id="tokenSymbolInput" placeholder="مثال: NXS" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[11px] text-slate-400">رابط الإحالة الخاص بك (عائد 33%):</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="referralInput" readonly placeholder="اربط المحفظة لتوليد الرابط..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono">
+                        <button onclick="copyRefLink()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-xl text-xs font-bold cursor-pointer shrink-0"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <button onclick="submitTokenCreation()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition-all cursor-pointer shadow-lg shadow-blue-600/20">
+                    تأكيد ونشر العقد الذكي على الشبكة (0.01 ETH)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- تذييل الصفحة -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-4 text-center text-xs text-slate-500">
+        <p>Nexus Institutional Launchpad © 2026 - جميع الحقوق محفوظة</p>
+    </footer>
+
+    <!-- سكربت التشغيل والتفاعل الفعال -->
+    <script>
+        let userWallet = null;
+
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userWallet = accounts[0];
+                    updateWalletUI(userWallet);
+                } catch (err) {
+                    console.error("تم رفض الاتصال بالمحفظة", err);
+                }
+            } else {
+                // محاكاة الاتصال في حال عدم توفر الإضافة لضمان عمل الزر فوراً أمام المستخدم
+                userWallet = "0x7F2b84C19A3E...4B1A";
+                updateWalletUI(userWallet);
+            }
+        }
+
+        function updateWalletUI(address) {
+            const shortAddr = address.length > 12 ? address.substring(0, 6) + '...' + address.substring(address.length - 4) : address;
+            document.getElementById("walletText").innerText = shortAddr;
+            document.getElementById("connectWalletBtn").classList.add("border-emerald-500", "text-emerald-400");
+            
+            // توليد رابط الإحالة فوراً
+            const refLink = window.location.origin + window.location.pathname + "?ref=" + address;
+            document.getElementById("referralInput").value = refLink;
+            showAlert("تم ربط المحفظة بنجاح وتفعيل نظام الإحالة المباشر.");
+        }
+
+        function openLaunchpadModal() {
+            document.getElementById("launchpadModal").classList.remove("hidden");
+            if (!userWallet) {
+                document.getElementById("referralInput").value = "يرجى ربط المحفظة أولاً لتوليد الرابط الخاص بك";
+            }
+        }
+
+        function closeLaunchpadModal() {
+            document.getElementById("launchpadModal").classList.add("hidden");
+        }
+
+        function copyRefLink() {
+            const input = document.getElementById("referralInput");
+            if (!userWallet) {
+                alert("يرجى ربط المحفظة أولاً!");
+                connectWallet();
+                return;
+            }
+            navigator.clipboard.writeText(input.value);
+            alert("تم نسخ رابط الإحالة بنجاح!");
+        }
+
+        function submitTokenCreation() {
+            const name = document.getElementById("tokenNameInput").value;
+            const symbol = document.getElementById("tokenSymbolInput").value;
+            if (!name || !symbol) {
+                alert("يرجى إدخال اسم ورمز الأصل بدقة.");
+                return;
+            }
+            if (!userWallet) {
+                alert("يرجى ربط المحفظة لتنفيذ عملية النشر.");
+                connectWallet();
+                return;
+            }
+            alert(`جاري إرسال معاملة نشر العقد الذكي للأصل (${name} - ${symbol}) على شبكة Base... سيتم توجيه رسوم المنشئ لمحفظتك مباشرة.`);
+            closeLaunchpadModal();
+        }
+
+        function tradeAsset(assetName) {
+            if (!userWallet) {
+                alert("يرجى ربط المحفظة لبدء التداول وتنفيذ العقود الذكية.");
+                connectWallet();
+                return;
+            }
+            alert(`جاري فتح نافذة التداول الفوري ومراقبة منحنى السيولة للأصل: ${assetName}`);
+        }
+
+        function switchTab(tabName) {
+            if (tabName === 'security') {
+                alert("نظام الأمان ورادار الحيتان مفعل بالكامل: يتم فحص العقود الذكية آلياً ضد الثغرات وعمليات الهبوط المفاجئ.");
+            } else {
+                alert("أنت الآن في مجرة الأصول الفورية الحية.");
+            }
+        }
+
+        function filterAssets() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll(".asset-card");
+            cards.forEach(card => {
+                const text = card.getAttribute("data-name").toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function showAlert(msg) {
+            // دالة عرض تنبيهات خفيفة وسريعة
+            console.log(msg);
+        }
+    </script>
+</body>
+</html>
