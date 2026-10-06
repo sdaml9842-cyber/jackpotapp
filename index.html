@@ -17,7 +17,6 @@
             --accent-blue: #0052ff;
             --accent-red: #ef4444;
             --accent-purple: #8b5cf6;
-            --accent-yellow: #f59e0b;
             --text-main: #f9fafb;
             --text-muted: #9ca3af;
             --border-color: #1f2937;
@@ -33,7 +32,7 @@
         }
 
         .app-container {
-            width: 100%; max-width: 520px; background: var(--card-bg);
+            width: 100%; max-width: 500px; background: var(--card-bg);
             border: 1px solid var(--border-color); border-radius: 20px;
             padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
@@ -55,12 +54,11 @@
         .btn-green { background: var(--accent-green); color: white; }
         .btn-red { background: var(--accent-red); color: white; }
         .btn-purple { background: var(--accent-purple); color: white; }
-        .btn-yellow { background: var(--accent-yellow); color: #0b0f19; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .wallet-status { font-size: 12px; color: #38bdf8; text-align: center; margin-top: 6px; word-break: break-all; }
-        .tab-buttons { display: flex; gap: 6px; margin: 15px 0; }
-        .tab-btn { flex: 1; padding: 8px; background: #0b0f19; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .tab-buttons { display: flex; gap: 8px; margin: 15px 0; }
+        .tab-btn { flex: 1; padding: 10px; background: #0b0f19; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 8px; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: rgba(0, 82, 255, 0.2); border-color: var(--accent-blue); color: #38bdf8; }
 
         .form-group { margin-bottom: 12px; }
@@ -80,7 +78,7 @@
 <div class="app-container">
     <div class="header">
         <h1>🔵 ChainPump Pro</h1>
-        <p style="font-size: 12px; color: var(--text-muted);">منصة الإطلاق والتداول على Base Mainnet</p>
+        <p style="font-size: 12px; color: var(--text-muted);">منصة الإطلاق والتداول الذكي على Base Mainnet</p>
     </div>
 
     <button class="btn btn-wallet" id="walletBtn" onclick="connectWallet()">
@@ -89,13 +87,11 @@
     <div class="wallet-status" id="walletAddress">المحفظة غير متصلة</div>
 
     <div class="tab-buttons">
-        <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">إطلاق توكين</button>
-        <button class="tab-btn" id="tabTradeBtn" onclick="switchTab('trade')">التداول</button>
-        <!-- زر لوحة المالك يظهر فقط للمالك أو يمكن إخفاؤه وجعله يظهر برابط مخفي إذا أردتِ -->
-        <button class="tab-btn" id="tabAdminBtn" onclick="switchTab('admin')" style="color: var(--accent-yellow); display: none;">لوحة المالك</button>
+        <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">إطلاق توكين جديد</button>
+        <button class="tab-btn" id="tabTradeBtn" onclick="switchTab('trade')">التداول والتحكم</button>
     </div>
 
-    <!-- قسم إنشاء العملة (للكل) -->
+    <!-- قسم إنشاء العملة -->
     <div id="sectionCreate">
         <div class="form-group">
             <label>اسم العملة (Token Name)</label>
@@ -122,7 +118,7 @@
     <!-- قسم التداول المباشر -->
     <div id="sectionTrade" style="display: none;">
         <div class="form-group">
-            <label>عنوان عقد العملة على Base</label>
+            <label>عنوان عقد العملة (Token Address on Base)</label>
             <div style="display: flex; gap: 6px;">
                 <input type="text" id="tradeTokenAddr" placeholder="0x...">
                 <button class="btn btn-wallet" style="width: 80px;" onclick="loadTokenData()">جلب</button>
@@ -147,7 +143,7 @@
             </div>
 
             <div style="font-size: 11px; margin-top: 8px; color: var(--accent-green);">
-                رصيدك: <b id="dispUserBalance">0</b>
+                رصيدك من العملة: <b id="dispUserBalance">0</b>
             </div>
         </div>
 
@@ -178,31 +174,11 @@
         </div>
     </div>
 
-    <!-- لوحة تحكم المالك المخفية (تظهر تلقائياً فقط إذا كان المتصل هو مالك العقد) -->
-    <div id="sectionAdmin" style="display: none;">
-        <div class="card-box" style="border-color: var(--accent-yellow);">
-            <h3 style="font-size: 14px; color: var(--accent-yellow); margin-bottom: 10px;"><i class="fa-solid fa-shield-halved"></i> لوحة تحكم مالك الفاكتوري</h3>
-            
-            <div class="form-group">
-                <label>رسوم الإطلاق الحالية في العقد:</label>
-                <div id="currentFeeDisplay" style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 8px;">--- ETH</div>
-            </div>
-
-            <div class="form-group">
-                <label>تعيين رسوم إطلاق جديدة (بالـ ETH)</label>
-                <input type="number" id="newFeeInput" placeholder="مثال: 0.001" step="0.0001">
-            </div>
-
-            <button class="btn btn-yellow" onclick="updateCreationFee()">
-                <i class="fa-solid fa-pen-to-square"></i> تحديث رسوم الإطلاق في العقد
-            </button>
-        </div>
-    </div>
-
     <div class="status-box" id="statusBox">الحالة: جاهز للاتصال بالمحفظة</div>
 </div>
 
 <script>
+    // استبدلي هذا العنوان بعنوان عقد الفاكتوري الحقيقي الخاص بك على شبكة Base Mainnet
     const FACTORY_ADDRESS = "0x0000000000000000000000000000000000000000"; 
     const BASE_CHAIN_ID = "0x2105"; 
 
@@ -211,8 +187,6 @@
     const FACTORY_ABI = [
         "function createViralToken(string memory name, string memory symbol, uint256 graduationTargetEth) external payable returns (address)",
         "function creationFee() external view returns (uint256)",
-        "function setCreationFee(uint256 _newFee) external",
-        "function owner() external view returns (address)",
         "event TokenCreated(address indexed tokenAddress, string name, string symbol, address indexed creator, uint256 graduationTargetEth)"
     ];
 
@@ -237,7 +211,9 @@
         try {
             const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
             const data = await res.json();
-            if(data.ethereum && data.ethereum.usd) ethUsdRate = data.ethereum.usd;
+            if(data.ethereum && data.ethereum.usd) {
+                ethUsdRate = data.ethereum.usd;
+            }
         } catch (e) {}
         calculateUsdValue();
     }
@@ -248,18 +224,15 @@
         document.getElementById("buyUsdHint").innerText = `القيمة التقريبية: ~$${usdVal} USD`;
     }
 
-    window.onload = function() { fetchEthPrice(); }
+    window.onload = function() {
+        fetchEthPrice();
+    }
 
     function switchTab(tab) {
         document.getElementById("sectionCreate").style.display = tab === 'create' ? 'block' : 'none';
         document.getElementById("sectionTrade").style.display = tab === 'trade' ? 'block' : 'none';
-        document.getElementById("sectionAdmin").style.display = tab === 'admin' ? 'block' : 'none';
-        
         document.getElementById("tabCreateBtn").classList.toggle("active", tab === 'create');
         document.getElementById("tabTradeBtn").classList.toggle("active", tab === 'trade');
-        document.getElementById("tabAdminBtn").classList.toggle("active", tab === 'admin');
-
-        if(tab === 'admin') loadAdminData();
     }
 
     async function connectWallet() {
@@ -277,29 +250,12 @@
             signer = provider.getSigner();
             const address = await signer.getAddress();
             document.getElementById("walletAddress").innerText = "متصل: " + address.substring(0, 6) + "..." + address.substring(address.length - 4);
-            document.getElementById("walletBtn").innerText = "متصل ✓";
+            document.getElementById("walletBtn").innerText = "تم الاتصال بنجاح ✓";
 
             factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
-            
-            // التحقق الذكي تلقائياً: إذا كان المتصل هو المالك، تظهر له لوحة التحكم تلقائياً
-            checkIfOwner(address);
-
-            updateStatus("متصل بشبكة Base Mainnet بنجاح");
+            updateStatus("متصل بشبكة Base Mainnet الحقيقية");
         } catch (err) {
-            updateStatus("خطأ الاتصال: " + err.message);
-        }
-    }
-
-    async function checkIfOwner(userAddress) {
-        try {
-            const contractOwner = await factoryContract.owner();
-            if (contractOwner.toLowerCase() === userAddress.toLowerCase()) {
-                document.getElementById("tabAdminBtn").style.display = "block"; // إظهار زر لوحة المالك حصرياً لك
-            } else {
-                document.getElementById("tabAdminBtn").style.display = "none";
-            }
-        } catch (e) {
-            document.getElementById("tabAdminBtn").style.display = "none";
+            updateStatus("خطأ في الاتصال: " + err.message);
         }
     }
 
@@ -324,33 +280,6 @@
         }
     }
 
-    async function loadAdminData() {
-        if (!factoryContract) return;
-        try {
-            const feeWei = await factoryContract.creationFee();
-            document.getElementById("currentFeeDisplay").innerText = ethers.utils.formatEther(feeWei) + " ETH";
-        } catch (err) {
-            updateStatus("لست مالك العقد أو حدث خطأ في التحميل");
-        }
-    }
-
-    async function updateCreationFee() {
-        if (!factoryContract) return;
-        const newFeeVal = document.getElementById("newFeeInput").value;
-        if (!newFeeVal || parseFloat(newFeeVal) < 0) return alert("أدخل قيمة رسوم صحيحة");
-
-        try {
-            updateStatus("جاري تحديث رسوم الإطلاق في العقد...");
-            const newFeeWei = ethers.utils.parseEther(newFeeVal);
-            const tx = upgrade = await factoryContract.setCreationFee(newFeeWei);
-            await tx.wait();
-            updateStatus("✅ تم تحديث رسوم الإطلاق بنجاح!");
-            loadAdminData();
-        } catch (err) {
-            updateStatus("فشل التحديث: " + (err.reason || err.message));
-        }
-    }
-
     async function createToken() {
         if (!factoryContract) { await connectWallet(); if (!factoryContract) return; }
         const name = document.getElementById("tokenName").value.trim();
@@ -358,11 +287,11 @@
         const targetEth = document.getElementById("graduationTarget").value;
 
         try {
-            updateStatus("جاري جلب رسوم الإطلاق...");
+            updateStatus("جاري قراءة رسوم الإنشاء...");
             const fee = await factoryContract.creationFee();
             const targetEthWei = ethers.utils.parseEther(targetEth);
 
-            updateStatus("يرجى التأكيد في المحفظة...");
+            updateStatus("يرجى تأكيد معاملة الإطلاق في المحفظة...");
             const tx = await factoryContract.createViralToken(name, symbol, targetEthWei, { value: fee });
             
             updateStatus("جاري معالجة المعاملة على شبكة Base...");
@@ -438,7 +367,7 @@
             const tx = await activeTokenContract.buy(0, ethers.constants.AddressZero, { value: valWei });
             await tx.wait();
 
-            updateStatus("✅ تم شراء التوكينات بنجاح!");
+            updateStatus("✅ تم شراء التوكينات بنجاح وإضافتها لمحفظتك!");
             loadTokenData();
         } catch (err) {
             updateStatus("فشل الشراء: " + (err.reason || err.message));
@@ -456,7 +385,7 @@
 
             const currentAllowance = await activeTokenContract.allowance(userAddr, activeTokenContract.address);
             if (currentAllowance.lt(tokenWei)) {
-                updateStatus("1/2: يرجى الموافقة (Approve) أولاً...");
+                updateStatus("1/2: يرجى الموافقة (Approve) أولاً في المحفظة...");
                 const appTx = await activeTokenContract.approve(activeTokenContract.address, ethers.constants.MaxUint256);
                 await appTx.wait();
             }
@@ -465,7 +394,7 @@
             const sellTx = await activeTokenContract.sell(tokenWei, 0, ethers.constants.AddressZero);
             await sellTx.wait();
 
-            updateStatus("✅ تمت عملية البيع بنجاح!");
+            updateStatus("✅ تمت عملية البيع واسترجاع الـ ETH لمحفظتك بنجاح!");
             loadTokenData();
         } catch (err) {
             updateStatus("فشل البيع: " + (err.reason || err.message));
@@ -475,10 +404,10 @@
     async function graduateToken() {
         if (!activeTokenContract || !signer) return;
         try {
-            updateStatus("جاري نقل السيولة إلى Uniswap...");
+            updateStatus("جاري تنفيذ التخرج ونقل السيولة إلى Uniswap...");
             const tx = await activeTokenContract.graduate();
             await tx.wait();
-            updateStatus("🎉 تم تخرج العملة ونقل السيولة بنجاح!");
+            updateStatus("🎉 تم نقل السيولة وتخرج العملة بنجاح!");
             loadTokenData();
         } catch (err) {
             updateStatus("فشل التخرج: " + (err.reason || err.message));
@@ -491,7 +420,7 @@
             updateStatus("جاري سحب العمولات...");
             const tx = await activeTokenContract.claimFees();
             await tx.wait();
-            updateStatus("✅ تم سحب العمولات بنجاح!");
+            updateStatus("✅ تم سحب العمولات إلى محفظتك بنجاح!");
         } catch (err) {
             updateStatus("لا توجد عمولات قابلة للسحب أو فشلت المعاملة");
         }
