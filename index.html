@@ -147,9 +147,9 @@
         const graduationTargetBnb = ethers.utils.parseEther(targetBnbEth);
 
         try {
-            // جلب الرسم الحالي من المصنع وتحويله إلى Hex String صالح لـ value
+            // جلب الرسم الحالي وتحويله بالطريقة المدعومة في ethers v5
             const creationFeeWei = await factoryContract.creationFee();
-            const feeValue = `0x${BigInt(creationFeeWei.toString()).toString(16)}`;
+            const feeValue = creationFeeWei.toHexString();
 
             alert("جاري إرسال معاملة إطلاق التوكن على شبكة Base...");
 
