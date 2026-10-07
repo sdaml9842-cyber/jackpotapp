@@ -1,379 +1,576 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Degen Meme DEX - شراء الآن</title>
-    
-    <!-- استيراد خطوط عربية عصرية -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>ChainPump BNB 🚀 | Meme Launchpad</title>
+    <!-- Ethers.js v5 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-color: #050510;
-            --neon-green: #39ff14;
-            --neon-purple: #b026ff;
-            --glass-bg: rgba(20, 10, 40, 0.65);
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --accent-green: #10b981;
+            --accent-blue: #38bdf8;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-gold: #f59e0b;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: #1f2937;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
             background-color: var(--bg-color);
-            /* تأثير شبكة النيون في الخلفية */
-            background-image: 
-                linear-gradient(var(--glass-bg) 2px, transparent 2px),
-                linear-gradient(90deg, var(--glass-bg) 2px, transparent 2px),
-                linear-gradient(rgba(176, 38, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(176, 38, 255, 0.1) 1px, transparent 1px);
-            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-            background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden; /* لمنع التمرير بسبب حركة العملات */
+            color: var(--text-main);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 15px;
+            background-image: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15), transparent 50%);
         }
 
-        .container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            z-index: 10;
+        .app-container {
+            width: 100%; max-width: 480px; background: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 20px;
+            padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
 
-        .meme-character {
-            font-size: 120px;
-            filter: drop-shadow(0 0 20px var(--neon-purple));
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            animation: float 4s ease-in-out infinite;
-            user-select: none;
-        }
-
-        .meme-character:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .neon-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid var(--neon-purple);
-            border-radius: 20px;
-            padding: 40px;
-            width: 350px;
-            box-shadow: 
-                0 0 20px rgba(176, 38, 255, 0.5),
-                inset 0 0 20px rgba(176, 38, 255, 0.3);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* تأثير لمعان داخل البطاقة */
-        .neon-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(176, 38, 255, 0.1) 0%, transparent 60%);
-            animation: pulse 4s infinite alternate;
-            z-index: -1;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
+        .header { text-align: center; margin-bottom: 20px; }
         .header h1 {
-            margin: 0;
-            font-size: 32px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--neon-purple);
+            font-size: 26px; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        .btn-wallet {
+            width: 100%; background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: white; border: none; padding: 14px; border-radius: 12px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        .price-tag {
-            margin: 20px 0;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+        .wallet-status { font-size: 12px; color: var(--accent-blue); text-align: center; margin-top: 8px; font-weight: 600; word-break: break-all; }
+        .divider { height: 1px; background: var(--border-color); margin: 20px 0; }
+        .form-group { margin-bottom: 16px; }
+
+        label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        input[type="text"], input[type="number"] {
+            width: 100%; padding: 12px 14px; background: #0b0f19;
+            border: 1px solid var(--border-color); color: white;
+            border-radius: 10px; font-size: 14px; outline: none;
         }
 
-        .price-tag .up {
-            font-size: 16px;
-            background: rgba(57, 255, 20, 0.1);
-            padding: 2px 8px;
-            border-radius: 10px;
-            border: 1px solid var(--neon-green);
+        /* Flexible Graduation Selector */
+        .graduation-selector { display: flex; gap: 8px; margin-bottom: 8px; }
+        .grad-btn {
+            flex: 1; padding: 8px 4px; background: #0b0f19;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;
+            transition: all 0.2s ease;
+        }
+        .grad-btn.active {
+            background: rgba(16, 185, 129, 0.15); border-color: var(--accent-green); color: var(--accent-green);
         }
 
-        .input-group {
-            margin-bottom: 30px;
-            text-align: right;
+        .art-mode-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+        .mode-btn {
+            flex: 1; padding: 10px 4px; background: #0b0f19;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center;
+        }
+        .mode-btn.active { background: rgba(56, 189, 248, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        .sketch-box { background: #0b0f19; border: 1px dashed var(--border-color); border-radius: 12px; padding: 12px; text-align: center; }
+        canvas { background: #ffffff; border-radius: 8px; cursor: crosshair; touch-action: none; max-width: 100%; }
+
+        .tools { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-clear { background: #ef4444; color: white; }
+        .btn-action { background: linear-gradient(135deg, var(--accent-purple), #6d28d9); color: white; width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+
+        .booster-toggle {
+            background: #1f2937; color: var(--accent-blue); border: none;
+            width: 100%; padding: 10px; border-radius: 8px; font-size: 12px;
+            font-weight: bold; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center; margin-top: 15px;
         }
 
-        .input-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #aaa;
-            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+        .booster-box {
+            display: none; background: #0b0f19; border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 12px; margin-top: 8px;
         }
 
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
+        .switch-row {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
         }
+        .switch-row:last-child { margin-bottom: 0; }
+        .switch-title { font-size: 12px; font-weight: bold; color: var(--text-main); }
+        .switch-desc { font-size: 10px; color: var(--text-muted); }
 
-        .input-wrapper span {
-            position: absolute;
-            left: 15px;
-            color: var(--neon-purple);
-            font-weight: bold;
+        .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #374151; transition: .3s; border-radius: 20px;
         }
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-green); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 15px;
-            padding-left: 50px; /* مساحة لرمز العملة */
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(176, 38, 255, 0.5);
-            border-radius: 10px;
-            color: white;
-            font-size: 18px;
-            font-family: 'Cairo', sans-serif;
-            outline: none;
-            transition: all 0.3s;
-            box-sizing: border-box;
+        .btn-launch {
+            width: 100%; background: linear-gradient(135deg, #10b981, #059669);
+            color: white; border: none; padding: 16px; border-radius: 12px;
+            font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
+        .btn-launch:disabled { background: #374151; cursor: not-allowed; box-shadow: none; }
 
-        input[type="number"]:focus {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
-        }
+        .status-card { background: #0b0f19; border: 1px solid var(--border-color); padding: 12px; border-radius: 10px; font-size: 12px; color: var(--text-muted); margin-top: 15px; text-align: center; word-break: break-all; }
 
-        .buy-btn {
-            width: 100%;
-            padding: 15px;
-            font-size: 24px;
-            font-weight: 900;
-            font-family: 'Cairo', sans-serif;
-            color: var(--neon-green);
-            background: transparent;
-            border: 3px solid var(--neon-green);
-            border-radius: 15px;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 
-                0 0 15px rgba(57, 255, 20, 0.3),
-                inset 0 0 15px rgba(57, 255, 20, 0.3);
-            text-shadow: 0 0 10px var(--neon-green);
-            transition: all 0.2s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .buy-btn:hover {
-            background: var(--neon-green);
-            color: #000;
-            box-shadow: 
-                0 0 40px var(--neon-green),
-                inset 0 0 20px #fff;
-            text-shadow: none;
-            transform: scale(1.05);
-        }
-
-        /* تأثير التموج للزر */
-        .buy-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease-out, height 0.6s ease-out, opacity 0.6s;
-        }
-
-        .buy-btn:active::after {
-            width: 300px;
-            height: 300px;
-            opacity: 0;
-            transition: 0s;
-        }
-
-        /* تنسيق العملات الطائرة المتولدة عبر الجافاسكربت */
-        .flying-coin {
-            position: fixed;
-            font-size: 30px;
-            pointer-events: none;
-            z-index: 9999;
-            filter: drop-shadow(0 0 10px gold);
-        }
-
-        /* شاشات الموبايل */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .meme-character {
-                font-size: 90px;
-            }
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--accent-green); padding: 20px; border-radius: 20px; text-align: center; max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        
+        .btn-twitter { background: #1da1f2; color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 8px; font-size: 13px; width: 100%; }
+        .btn-copy { background: #374151; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; margin-top: 6px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <!-- شخصية الميم التفاعلية -->
-        <div class="meme-character" id="ape-meme" title="Degen Ape">
-            🦍
+<div class="app-container">
+    <div class="header">
+        <h1>⚡ ChainPump BNB 🔥</h1>
+        <p>Instant Memecoin Launchpad + Dynamic Bonding Curve</p>
+    </div>
+
+    <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">
+        <i class="fa-solid fa-wallet"></i> Connect Wallet
+    </button>
+    <div class="wallet-status" id="walletAddress">Wallet not connected</div>
+
+    <div class="divider"></div>
+
+    <div class="form-group">
+        <label><i class="fa-solid fa-tag"></i> Token Name</label>
+        <input type="text" id="tokenName" value="ChainPump Gem">
+    </div>
+
+    <div class="form-group">
+        <label><i class="fa-solid fa-coins"></i> Token Symbol</label>
+        <input type="text" id="tokenSymbol" value="CPUMP">
+    </div>
+
+    <!-- Flexible Graduation Section -->
+    <div class="form-group">
+        <label><i class="fa-solid fa-graduation-cap"></i> Dynamic Graduation Goal (BNB Target)</label>
+        <div class="graduation-selector">
+            <button class="grad-btn active" id="gradBtn10" type="button" onclick="selectGradGoal(10)">⚡ 10 BNB (Fast)</button>
+            <button class="grad-btn" id="gradBtn24" type="button" onclick="selectGradGoal(24)">🔥 24 BNB (Standard)</button>
+            <button class="grad-btn" id="gradBtn50" type="button" onclick="selectGradGoal(50)">💎 50 BNB (Mega)</button>
         </div>
+        <input type="number" id="graduationGoal" value="10" min="1" step="0.5" placeholder="Custom Graduation Goal in BNB">
+        <p style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+            <i class="fa-solid fa-circle-info"></i> Liquidity is automatically migrated & LP burned on PancakeSwap once this target is reached.
+        </p>
+    </div>
 
-        <!-- بطاقة الشراء -->
-        <div class="neon-card">
-            <div class="header">
-                <h1>$MEME</h1>
-            </div>
-            
-            <div class="price-tag">
-                $0.1542 
-                <span class="up">+8.9% 🚀</span>
-            </div>
+    <label><i class="fa-solid fa-image"></i> Token Logo Source</label>
+    <div class="art-mode-selector">
+        <button class="mode-btn active" id="btnModeDoodle" onclick="switchArtMode('doodle')">🎨 Doodle</button>
+        <button class="mode-btn" id="btnModeAI" onclick="switchArtMode('ai')">🪄 AI Art</button>
+        <button class="mode-btn" id="btnModeUpload" onclick="switchArtMode('upload')">📁 Upload</button>
+    </div>
 
-            <div class="input-group">
-                <label>الكمية المراد دفعها (سولانا):</label>
-                <div class="input-wrapper">
-                    <input type="number" placeholder="مثال: 5.5" step="0.1" min="0">
-                    <span>SOL</span>
-                </div>
-            </div>
-
-            <button class="buy-btn" id="buy-btn">
-                شراء الآن
-            </button>
+    <div class="sketch-box" id="doodleSection">
+        <canvas id="sketchpad" width="260" height="180"></canvas>
+        <div class="tools">
+            <input type="color" id="colorPicker" value="#000000" style="border:none; background:transparent; cursor:pointer;">
+            <button class="btn-sm btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-trash"></i> Clear</button>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const buyBtn = document.getElementById('buy-btn');
-            const apeMeme = document.getElementById('ape-meme');
+    <div class="sketch-box" id="aiSection" style="display: none;">
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Auto-creates a unique logo based on your token name!</p>
+        <div id="aiPreview" style="height: 140px; background: #1f2937; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #6b7280;">Click below to generate</span>
+        </div>
+        <button class="btn-action" onclick="generateAIArt()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Logo Now</button>
+    </div>
+
+    <div class="sketch-box" id="uploadSection" style="display: none;">
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Select a logo from your device</p>
+        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
+        <button class="btn-action" style="background: #0284c7;" onclick="document.getElementById('imageInput').click()">
+            <i class="fa-solid fa-upload"></i> Choose Image File
+        </button>
+        <div id="uploadPreview" style="margin-top: 10px; height: 130px; display: none; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; border: 1px solid var(--border-color);">
+            <img id="previewImg" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+    </div>
+
+    <div class="form-group" style="margin-top: 15px;">
+        <label><i class="fa-solid fa-fire"></i> Initial Buy Amount (BNB) [Min: 0.01]</label>
+        <input type="number" id="buyAmount" value="0.01" step="0.01" min="0.01">
+    </div>
+
+    <button class="booster-toggle" onclick="toggleBoosters()">
+        <span>⚡ Genius Launch Boosters (Optional)</span>
+        <i class="fa-solid fa-chevron-down" id="boosterIcon"></i>
+    </button>
+
+    <div class="booster-box" id="boosterBox">
+        <div class="switch-row">
+            <div>
+                <div class="switch-title">🛡️ Anti-Snipe Stealth Shield</div>
+                <div class="switch-desc">Hides token from bots for 60s to let real humans buy first</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="antiSnipeToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="switch-row" style="margin-top: 12px;">
+            <div>
+                <div class="switch-title">🌪️ Chaos Viral Mode</div>
+                <div class="switch-desc">Enables pulsing neon cards + instant multi-tweet raid pack</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="chaosToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <button class="btn-launch" id="launchBtn" onclick="createToken()">Launch Token Now 🪙</button>
+
+    <div class="status-card" id="outputStatus">Status: Ready to connect wallet</div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal" id="successModal">
+    <div class="modal-content">
+        <h2 style="color: var(--accent-green); font-size: 20px;">🎉 Token Live + Boosters Active!</h2>
+        
+        <div style="margin-top: 10px;">
+            <canvas id="cardCanvas" width="360" height="180" style="width:100%; border-radius: 10px; border: 1px solid var(--accent-green);"></canvas>
+            <button class="btn-copy" onclick="downloadMemeCard()"><i class="fa-solid fa-download"></i> Download Banner Card</button>
+        </div>
+
+        <div style="background: #0b0f19; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-top: 12px; text-align: left;">
+            <div style="font-size: 12px; color: var(--accent-blue); font-weight: bold; margin-bottom: 6px;">📖 AI Meme Lore:</div>
+            <div style="font-size: 11px; color: var(--text-muted); font-style: italic;" id="aiLoreText">Loading story...</div>
+        </div>
+
+        <a id="twitterShareBtn" href="#" target="_blank" class="btn-twitter">
+            <i class="fa-brands fa-x-twitter"></i> Launch Twitter Raid Now
+        </a>
+
+        <button class="btn-copy" onclick="copyTelegramMsg()"><i class="fa-solid fa-copy"></i> Copy Telegram Raid Template</button>
+        
+        <button onclick="closeModal()" style="background: transparent; border: none; color: var(--text-muted); margin-top: 12px; cursor: pointer; font-size: 12px;">Close Window</button>
+    </div>
+</div>
+
+<script>
+    const CONTRACT_ADDRESS = "0xb2C90c312201d312687D3063f60deB1216173DBc";
+    
+    // Audited ABI supporting both flexible graduation signature and standard signature
+    const CONTRACT_ABI = [
+        "function createToken(string memory name, string memory symbol, string memory tokenURI, uint256 graduationGoal) public payable returns (address)",
+        "function createToken(string memory name, string memory symbol, string memory tokenURI) public payable returns (address)",
+        "function getTokensCount() public view returns (uint256)"
+    ];
+    const BSC_CHAIN_ID = "0x38";
+
+    let provider, signer, factoryContract;
+    let currentArtMode = 'doodle';
+    let generatedAiImageUrl = '';
+    let uploadedImageUrl = '';
+    let currentTxHash = '';
+
+    const canvas = document.getElementById("sketchpad");
+    const ctx = canvas.getContext("2d");
+    let painting = false;
+
+    function initCanvas() { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+    initCanvas();
+
+    function startPosition(e) { painting = true; draw(e); }
+    function endPosition() { painting = false; ctx.beginPath(); }
+    
+    function draw(e) {
+        if (!painting) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.strokeStyle = document.getElementById("colorPicker").value;
+        ctx.lineTo(clientX - rect.left, clientY - rect.top);
+        ctx.stroke(); ctx.beginPath(); ctx.moveTo(clientX - rect.left, clientY - rect.top);
+    }
+
+    canvas.addEventListener("mousedown", startPosition);
+    canvas.addEventListener("mouseup", endPosition);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("touchstart", startPosition);
+    canvas.addEventListener("touchend", endPosition);
+    canvas.addEventListener("touchmove", draw);
+
+    function clearCanvas() { initCanvas(); }
+
+    function selectGradGoal(val) {
+        document.getElementById("graduationGoal").value = val;
+        document.getElementById("gradBtn10").classList.toggle("active", val === 10);
+        document.getElementById("gradBtn24").classList.toggle("active", val === 24);
+        document.getElementById("gradBtn50").classList.toggle("active", val === 50);
+    }
+
+    function switchArtMode(mode) {
+        currentArtMode = mode;
+        document.getElementById("btnModeDoodle").classList.toggle("active", mode === 'doodle');
+        document.getElementById("btnModeAI").classList.toggle("active", mode === 'ai');
+        document.getElementById("btnModeUpload").classList.toggle("active", mode === 'upload');
+
+        document.getElementById("doodleSection").style.display = mode === 'doodle' ? 'block' : 'none';
+        document.getElementById("aiSection").style.display = mode === 'ai' ? 'block' : 'none';
+        document.getElementById("uploadSection").style.display = mode === 'upload' ? 'block' : 'none';
+    }
+
+    function toggleBoosters() {
+        const box = document.getElementById("boosterBox");
+        const icon = document.getElementById("boosterIcon");
+        const isOpen = box.style.display === "block";
+        box.style.display = isOpen ? "none" : "block";
+        icon.className = isOpen ? "fa-solid fa-chevron-down" : "fa-solid fa-chevron-up";
+    }
+
+    async function generateAIArt() {
+        const name = document.getElementById("tokenName").value || "Crypto Gem";
+        const prompt = encodeURIComponent(`cute funny meme mascot logo for crypto coin named ${name}, 2d vector art, white background`);
+        const aiUrl = `https://image.pollinations.ai/prompt/${prompt}?width=250&height=250&nologo=true`;
+        
+        const previewBox = document.getElementById("aiPreview");
+        previewBox.innerHTML = `<span style="font-size: 12px; color: var(--accent-blue);"><i class="fa-solid fa-spinner fa-spin"></i> Generating AI Artwork...</span>`;
+
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = aiUrl;
+        img.onload = () => {
+            previewBox.innerHTML = `<img src="${aiUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            generatedAiImageUrl = aiUrl;
+        };
+        img.onerror = () => { previewBox.innerHTML = `<span style="font-size: 12px; color: #ef4444;">Failed to generate. Try again.</span>`; };
+    }
+
+    function handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                const tempCanvas = document.createElement("canvas");
+                tempCanvas.width = 128; tempCanvas.height = 128;
+                const tempCtx = tempCanvas.getContext("2d");
+                tempCtx.drawImage(img, 0, 0, 128, 128);
+                uploadedImageUrl = tempCanvas.toDataURL("image/png", 0.7);
+                document.getElementById("previewImg").src = uploadedImageUrl;
+                document.getElementById("uploadPreview").style.display = "flex";
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function connectWallet() {
+        if (!window.ethereum) { alert("Please install MetaMask or Web3 Browser!"); return; }
+        try {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const network = await provider.getNetwork();
+            if (network.chainId !== 56) { await switchNetwork(); return; }
+
+            signer = provider.getSigner();
+            const address = await signer.getAddress();
+            document.getElementById("walletAddress").innerText = "Connected: " + address.substring(0, 6) + "..." + address.substring(address.length - 4);
+            document.getElementById("walletBtn").innerHTML = `<i class="fa-solid fa-check-circle"></i> Wallet Connected`;
+            document.getElementById("walletBtn").style.background = "#059669";
+
+            factoryContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            document.getElementById("outputStatus").innerText = "Status: Connected & ready to launch!";
+        } catch (error) {
+            document.getElementById("outputStatus").innerText = "Error: " + (error.message || "Failed to connect");
+        }
+    }
+
+    async function switchNetwork() {
+        try {
+            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_ID }] });
+            connectWallet();
+        } catch (e) {
+            if (e.code === 4902) {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: BSC_CHAIN_ID,
+                            chainName: 'BNB Smart Chain Mainnet',
+                            nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                            rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                            blockExplorerUrls: ['https://bscscan.com/']
+                        }]
+                    });
+                    connectWallet();
+                } catch (addError) { alert("Failed to add BSC Network to wallet!"); }
+            } else {
+                alert("Please switch your wallet to BNB Smart Chain Mainnet!");
+            }
+        }
+    }
+
+    function getOptimizedCanvasData() {
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = 128; tempCanvas.height = 128;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(canvas, 0, 0, 128, 128);
+        return tempCanvas.toDataURL("image/png", 0.7);
+    }
+
+    async function createToken() {
+        if (!factoryContract) { await connectWallet(); if (!factoryContract) return; }
+
+        const name = document.getElementById("tokenName").value.trim();
+        const symbol = document.getElementById("tokenSymbol").value.trim();
+        const bnbAmount = document.getElementById("buyAmount").value;
+        const gradGoal = document.getElementById("graduationGoal").value;
+
+        if (!name || !symbol) { alert("Please enter Name & Symbol!"); return; }
+        if (parseFloat(bnbAmount) < 0.01) { alert("Min initial buy amount is 0.01 BNB!"); return; }
+        if (parseFloat(gradGoal) <= parseFloat(bnbAmount)) { alert("Graduation goal must be greater than initial buy amount!"); return; }
+
+        let finalTokenURI = currentArtMode === 'ai' ? generatedAiImageUrl : (currentArtMode === 'upload' ? uploadedImageUrl : getOptimizedCanvasData());
+        if (currentArtMode === 'upload' && !uploadedImageUrl) { alert("Please select an image file!"); return; }
+
+        const launchBtn = document.getElementById("launchBtn");
+        launchBtn.disabled = true; launchBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Launching...`;
+
+        try {
+            document.getElementById("outputStatus").innerText = "Status: Estimating gas & confirming in wallet...";
             
-            let isAnimating = false;
+            const gradGoalWei = ethers.utils.parseEther(gradGoal.toString());
+            const buyAmountWei = ethers.utils.parseEther(bnbAmount.toString());
 
-            // استدعاء دالة رمي العملات عند تمرير الماوس فوق الزر
-            buyBtn.addEventListener('mouseenter', () => {
-                if (isAnimating) return; // منع التكرار المفرط
-                isAnimating = true;
-                
-                throwCoins(10); // رمي 10 عملات
-                
-                // إعادة تفعيل التأثير بعد ثانية
-                setTimeout(() => {
-                    isAnimating = false;
-                }, 1000);
-            });
-
-            function throwCoins(amount) {
-                // الحصول على إحداثيات شخصية الميم والزر
-                const apeRect = apeMeme.getBoundingClientRect();
-                const btnRect = buyBtn.getBoundingClientRect();
-
-                // نقطة البداية (من فم/يد القرد تقريباً)
-                const startX = apeRect.left + (apeRect.width / 2);
-                const startY = apeRect.top + (apeRect.height / 2);
-
-                for (let i = 0; i < amount; i++) {
-                    setTimeout(() => {
-                        createAndAnimateCoin(startX, startY, btnRect);
-                    }, i * 60); // تأخير بين كل عملة والأخرى (Stagger effect)
-                }
-                
-                // تأثير اهتزاز بسيط لشخصية الميم عند الرمي
-                apeMeme.style.transform = 'scale(1.2) rotate(-15deg)';
-                setTimeout(() => {
-                    apeMeme.style.transform = ''; // العودة للحالة الطبيعية
-                }, 200);
-            }
-
-            function createAndAnimateCoin(startX, startY, targetRect) {
-                const coin = document.createElement('div');
-                coin.classList.add('flying-coin');
-                // التنويع بين عملة وشنطة أموال للمتعة
-                coin.innerText = Math.random() > 0.8 ? '💰' : '🪙'; 
-                
-                document.body.appendChild(coin);
-
-                // نقطة النهاية (مكان عشوائي على زر الشراء)
-                const endX = targetRect.left + (Math.random() * targetRect.width) - 15; // -15 لتعويض حجم العملة
-                const endY = targetRect.top + (Math.random() * targetRect.height) - 15;
-
-                // إعداد موضع البداية
-                coin.style.left = `${startX}px`;
-                coin.style.top = `${startY}px`;
-
-                // إنشاء مسار منحني (Arc) باستخدام حسابات رياضية بسيطة في الـ Keyframes
-                // نقطة وسطى لعمل انحناء للأعلى
-                const midX = startX + (endX - startX) / 2;
-                const midY = Math.min(startY, endY) - 100 - (Math.random() * 50);
-
-                // استخدام Web Animations API للحركة
-                const animation = coin.animate([
-                    { 
-                        transform: `translate(0, 0) scale(0.5) rotate(0deg)`, 
-                        opacity: 1,
-                        offset: 0
-                    },
-                    {
-                        // النقطة الوسطى (المنحنى)
-                        transform: `translate(${midX - startX}px, ${midY - startY}px) scale(1.5) rotate(180deg)`,
-                        offset: 0.5
-                    },
-                    { 
-                        transform: `translate(${endX - startX}px, ${endY - startY}px) scale(1) rotate(360deg)`, 
-                        opacity: 0,
-                        offset: 1
-                    }
-                ], {
-                    duration: 600 + Math.random() * 300, // مدة عشوائية لتبدو طبيعية أكثر
-                    easing: 'ease-in-out',
-                    fill: 'forwards'
+            let tx;
+            try {
+                // Try calling function with Flexible Graduation goal
+                const gasEst = await factoryContract.estimateGas["createToken(string,string,string,uint256)"](name, symbol, finalTokenURI, gradGoalWei, { value: buyAmountWei });
+                tx = await factoryContract["createToken(string,string,string,uint256)"](name, symbol, finalTokenURI, gradGoalWei, {
+                    value: buyAmountWei,
+                    gasLimit: gasEst.mul(120).div(100) // 20% safety margin
                 });
-
-                // إزالة العنصر من الـ DOM بعد انتهاء الحركة لتوفير الموارد
-                animation.onfinish = () => {
-                    coin.remove();
-                };
+            } catch (err) {
+                // Fallback to 3-parameter function if deployed contract uses standard signature
+                console.warn("Calling fallback 3-parameter createToken:", err);
+                const gasEst = await factoryContract.estimateGas["createToken(string,string,string)"](name, symbol, finalTokenURI, { value: buyAmountWei });
+                tx = await factoryContract["createToken(string,string,string)"](name, symbol, finalTokenURI, {
+                    value: buyAmountWei,
+                    gasLimit: gasEst.mul(120).div(100)
+                });
             }
-        });
-    </script>
+
+            document.getElementById("outputStatus").innerText = "Status: Transaction sent! Confirming on BSC...";
+            await tx.wait();
+
+            currentTxHash = tx.hash;
+            if (typeof confetti === "function") confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+
+            generateLaunchKit(name, symbol, finalTokenURI, gradGoal);
+
+            document.getElementById("outputStatus").innerText = "🎉 Token launched successfully!";
+        } catch (error) {
+            document.getElementById("outputStatus").innerText = "Error: " + (error.reason || error.message || "Transaction failed");
+        } finally {
+            launchBtn.disabled = false; launchBtn.innerHTML = "Launch Token Now 🪙";
+        }
+    }
+
+    function generateLaunchKit(name, symbol, logoUri, gradGoal) {
+        const isChaos = document.getElementById("chaosToggle").checked;
+        const isAntiSnipe = document.getElementById("antiSnipeToggle").checked;
+
+        const lores = [
+            `Legend says $${symbol} was created to bring massive gains to BNB holders! 🚀`,
+            `Born on BSC, $${symbol} is destined to pump beyond the moon! 🌙`,
+            `The ultimate meme token $${symbol} with ${gradGoal} BNB graduation goal is officially live! 🔥`
+        ];
+        const randomLore = lores[Math.floor(Math.random() * lores.length)];
+        document.getElementById("aiLoreText").innerText = randomLore;
+
+        const cCard = document.getElementById("cardCanvas");
+        const ctxC = cCard.getContext("2d");
+        ctxC.fillStyle = isChaos ? "#000000" : "#111827"; 
+        ctxC.fillRect(0, 0, 360, 180);
+        
+        if (isChaos) {
+            ctxC.strokeStyle = "#ec4899"; ctxC.lineWidth = 4;
+            ctxC.strokeRect(4, 4, 352, 172);
+        }
+
+        ctxC.fillStyle = "#38bdf8"; ctxC.font = "bold 18px 'Plus Jakarta Sans'";
+        ctxC.fillText(`🚀 $${symbol}`, 20, 35);
+        
+        ctxC.fillStyle = "#ffffff"; ctxC.font = "14px 'Plus Jakarta Sans'";
+        ctxC.fillText(name, 20, 60);
+
+        ctxC.fillStyle = "#f59e0b"; ctxC.font = "bold 12px 'Plus Jakarta Sans'";
+        ctxC.fillText(`🎓 GRADUATION GOAL: ${gradGoal} BNB`, 20, 90);
+
+        ctxC.fillStyle = "#10b981"; ctxC.font = "bold 12px 'Plus Jakarta Sans'";
+        ctxC.fillText(isAntiSnipe ? "🛡️ ANTI-BOT SHIELD PROTECTED" : "LIVE ON CHAINPUMP BNB 🔥", 20, 150);
+
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = () => { ctxC.drawImage(img, 220, 25, 120, 120); };
+        img.src = logoUri;
+
+        const tweetText = encodeURIComponent(`🚀 Launched $${symbol} (${name}) on ChainPump BNB!\n🎓 Graduation Target: ${gradGoal} BNB\n\n${randomLore}\n\nTx: https://bscscan.com/tx/${currentTxHash}`);
+        document.getElementById("twitterShareBtn").href = `https://twitter.com/intent/tweet?text=${tweetText}`;
+
+        document.getElementById("successModal").style.display = "flex";
+    }
+
+    function downloadMemeCard() {
+        const cCard = document.getElementById("cardCanvas");
+        const a = document.createElement("a");
+        a.href = cCard.toDataURL("image/png");
+        a.download = "ChainPump_Promo_Card.png";
+        a.click();
+    }
+
+    function copyTelegramMsg() {
+        const symbol = document.getElementById("tokenSymbol").value;
+        const gradGoal = document.getElementById("graduationGoal").value;
+        const msg = `🚀 NEW PUMP GEM ALERT! 🚀\n\nCoin: $${symbol}\nGraduation Target: ${gradGoal} BNB\nChain: BNB Smart Chain\nTx: https://bscscan.com/tx/${currentTxHash}\n\nJoin early on ChainPump BNB! 🔥`;
+        navigator.clipboard.writeText(msg);
+        alert("Telegram Raid message copied to clipboard!");
+    }
+
+    function closeModal() { document.getElementById("successModal").style.display = "none"; }
+</script>
+
 </body>
 </html>
