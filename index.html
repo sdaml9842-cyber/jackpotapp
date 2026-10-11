@@ -26,10 +26,6 @@
             box-shadow: 0 0 30px rgba(2, 132, 199, 0.5);
             transform: translateY(-1px);
         }
-        .official-glow {
-            box-shadow: 0 0 30px rgba(14, 165, 233, 0.4) !important;
-            border-color: #0ea5e9 !important;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
@@ -70,17 +66,10 @@
     <main class="max-w-xl mx-auto px-4 py-10 w-full flex-grow">
         <div id="mainCard" class="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden transition-all duration-500">
             
-            <div class="mb-6 text-center sm:text-right flex justify-between items-start">
-                <div>
-                    <span class="text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">وحدة الإصدار المؤسسي</span>
-                    <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight mt-3">إصدار أصل رقمي معتمد</h1>
-                    <p class="text-slate-400 text-sm mt-1">تكوين وتدشين العملات الرقمية وفق المعايير التقنية لشبكة Base.</p>
-                </div>
-                
-                <!-- استبدال الاشتعال الصاروخي بزر "الوضع المالي الرسمي / عرض بالريال" -->
-                <button type="button" onclick="toggleCurrencyDisplay()" id="currencyToggleBtn" class="bg-slate-900 border border-slate-700 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all hover:border-sky-500 flex items-center space-x-1 space-x-reverse">
-                    <span>💵 عرض بالريال (SAR)</span>
-                </button>
+            <div class="mb-6 text-center sm:text-right">
+                <span class="text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">وحدة الإصدار المؤسسي</span>
+                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight mt-3">إصدار أصل رقمي معتمد</h1>
+                <p class="text-slate-400 text-sm mt-1">تكوين وتدشين العملات الرقمية وفق المعايير التقنية لشبكة Base.</p>
             </div>
 
             <!-- نموذج الإصدار -->
@@ -196,25 +185,6 @@
 
         let provider, signer, contract;
         let aiImageUrl = "";
-        let isSARMode = false;
-
-        // ميزة تبديل العملة الرسمية (إظهار بالريال السعودي تقديرياً بناءً على سعر السوق)
-        function toggleCurrencyDisplay() {
-            isSARMode = !isSARMode;
-            const btn = document.getElementById("currencyToggleBtn");
-            const feeDisplay = document.getElementById("feeDisplay");
-            
-            if(isSARMode) {
-                // لنفترض تقديرياً سعر الإيثيريوم يعادل تقريباً قيمة معينة، أو نضع السعر بالريال السعودي بناءً على الرسوم الثابتة
-                feeDisplay.innerText = "≈ 3.50 ريال (SAR)";
-                btn.className = "bg-sky-500 text-slate-950 px-3.5 py-2 rounded-xl text-xs font-black transition-all shadow-md flex items-center space-x-1 space-x-reverse";
-                btn.innerHTML = "💵 العرض بالريال مفعل";
-            } else {
-                feeDisplay.innerText = "0.00025 ETH";
-                btn.className = "bg-slate-900 border border-slate-700 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all hover:border-sky-500 flex items-center space-x-1 space-x-reverse";
-                btn.innerHTML = "💵 عرض بالريال (SAR)";
-            }
-        }
 
         function updateLivePreview() {
             const nameVal = document.getElementById("tokenName").value.trim();
