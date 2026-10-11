@@ -101,7 +101,7 @@
 
                 <!-- بطاقة المعاينة الفورية للتوكن -->
                 <div class="bg-slate-950/80 border border-cyan-500/30 rounded-2xl p-4 flex items-center space-x-4 space-x-reverse shadow-inner">
-                    <div id="previewLogoContainer" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md overflow-hidden">
+                    <div id="previewLogoContainer" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md overflow-hidden flex-shrink-0">
                         <span id="previewLogoText">🚀</span>
                     </div>
                     <div class="flex-grow">
@@ -129,16 +129,15 @@
                         <button type="button" onclick="clearCanvas()" class="mt-2 text-[10px] text-rose-400 underline">مسح الرسم</button>
                     </div>
 
-                    <!-- لوحة الذكاء الاصطناعي الحقيقية -->
+                    <!-- لوحة الذكاء الاصطناعي المحسنة -->
                     <div id="panelAI" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden space-y-3 text-center">
                         <div class="flex justify-between items-center">
-                            <p class="text-xs text-slate-400">وصف فكرة الشعار:</p>
-                            <button type="button" onclick="suggestAIPrompt()" class="text-[10px] text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">💡 اقتراح ذكي</button>
+                            <p class="text-xs text-slate-400">وصف فكرة الشعار بدقة:</p>
+                            <button type="button" onclick="suggestAIPrompt()" class="text-[10px] text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20 font-bold">💡 اقتراح فكرة رهيبة</button>
                         </div>
-                        <input type="text" id="aiPromptInput" placeholder="مثال: قطة فضائية ترتدي نظارات شمسية" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                        <input type="text" id="aiPromptInput" placeholder="اكتب أو اختر اقتراحاً..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
                         <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md">توليد الشعار بالذكاء الاصطناعي الحقيقي ✨</button>
                         
-                        <!-- مكان عرض الصورة المولدة -->
                         <div id="aiResultContainer" class="hidden mt-3">
                             <img id="aiGeneratedImage" src="" alt="AI Logo" class="w-24 h-24 mx-auto rounded-xl border border-cyan-500/50 shadow-lg object-cover">
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">✨ تم توليد الشعار بنجاح وربطه بالعملة!</p>
@@ -249,14 +248,35 @@
             updateLivePreview();
         }
 
+        // اقتراحات ذكية متنوعة ومصممة بدقة لتوليد الشعارات
+        const aiSuggestionsList = [
+            "cute cyberpunk green pepe frog wearing futuristic sunglasses, crypto vector art, solid dark background",
+            "mighty Shiba Inu dog wearing a gold crown, minimalist vector crypto logo, solid background",
+            "golden rocket ship blasting off to the moon, vibrant neon colors, vector coin logo",
+            "crazy hacker cat wearing a hoodie with matrix code background, meme coin vector icon",
+            "bored ape with laser eyes, vibrant cyberpunk crypto art, clean background",
+            "king lion wearing diamond sunglasses, luxury crypto token emblem, vector style",
+            "cute baby panda holding a golden bitcoin, cartoon crypto meme logo, clean design",
+            "cyberpunk skull with glowing blue eyes and crypto symbols, vector badge style"
+        ];
+
         function suggestAIPrompt() {
-            const suggestions = [
-                "cute cyberpunk crypto cat, vector art, vibrant colors",
-                "epic crypto dog wearing sunglasses, neon background",
-                "golden rocket launching to the moon, minimalist crypto logo",
-                "futuristic AI robot holding a crypto coin, cyberpunk style"
+            const randomIndex = Math.floor(Math.random() * aiSuggestionsList.length);
+            // ترجمة أو إعطاء الوصف الإنجليزي الدقيق المباشر للذكاء الاصطناعي لضمان النتيجة الفورية
+            const descriptionsInArabic = [
+                "قطة بيبي خضراء بنظارات سايبربانك",
+                "كلب شيبا إينو يرتدي تاجاً ذهبياً",
+                "صاروخ ذهبي ينطلق نحو القمر بألوان نيون",
+                "قطة هكر مجنونة بهودي وخلفية ماتركس",
+                "قرد بملامح مضحكة وعيون ليزر متوهجة",
+                "أسد ملكي يرتدي نظارات ماسية فاخرة",
+                "باندا لطيف يحمل عملة رقمية ذهبية",
+                "جمجمة سايبربانك بعيون زرقاء متوهجة"
             ];
-            document.getElementById("aiPromptInput").value = suggestions[Math.floor(Math.random() * suggestions.length)];
+            
+            document.getElementById("aiPromptInput").value = descriptionsInArabic[randomIndex];
+            // حفظ الوصف الإنجليزي المقابل للاستخدام المباشر
+            window.currentEnglishPrompt = aiSuggestionsList[randomIndex];
         }
 
         function switchLogoTab(tab) {
@@ -280,22 +300,34 @@
             }
         }
 
-        // توليد شعار حقيقي بالذكاء الاصطناعي عبر API خارجي مباشر
+        // دالة توليد الشعار بالذكاء الاصطناعي مع تحسين مطابقة الوصف
         async function generateRealAILogo() {
-            const promptInput = document.getElementById('aiPromptInput').value.trim();
-            const prompt = promptInput || "crypto meme coin logo, futuristic vector icon";
+            let userPrompt = document.getElementById('aiPromptInput').value.trim();
+            
+            // إذا استخدم المستخدم الاقتراح الذكي، نأخذ الوصف الإنجليزي الجاهز الدقيق
+            let finalPrompt = window.currentEnglishPrompt || userPrompt || "cute crypto meme coin logo, vector icon";
+            
+            // إذا كتب المستخدم باللغة العربية نصاً يدوياً، نقوم بتحويله عبر قاموس مصغر لضمان عدم حدوث تشويش في الذكاء الاصطناعي
+            if(userPrompt && !window.currentEnglishPrompt) {
+                const lower = userPrompt.toLowerCase();
+                if(lower.includes("قطة") || lower.includes("قط")) finalPrompt = "cute crypto cat meme logo, vector style, vibrant colors";
+                else if(lower.includes("كلب") || lower.includes("شيبا")) finalPrompt = "funny Shiba Inu crypto dog wearing sunglasses, vector icon";
+                else if(lower.includes("صاروخ") || lower.includes("قمر")) finalPrompt = "golden rocket launching to the moon, crypto meme icon";
+                else if(lower.includes("قرد")) finalPrompt = "cool bored ape crypto art, vibrant vector design";
+                else if(lower.includes("أسد")) finalPrompt = "majestic golden lion crypto logo emblem";
+                else finalPrompt = userPrompt + ", crypto meme coin logo icon, minimalist vector art, solid background";
+            }
+
             const btn = document.getElementById('aiGenBtn');
             const container = document.getElementById('aiResultContainer');
             const imgElement = document.getElementById('aiGeneratedImage');
 
             btn.disabled = true;
-            btn.innerText = "جاري رسم الشعار بالذكاء الاصطناعي... ⏳";
+            btn.innerText = "جاري تصميم الشعار بدقة متناهية... ⏳";
 
-            // رابط توليد الصور اللحظي بالذكاء الاصطناعي
-            const encodedPrompt = encodeURIComponent(prompt + ", high quality crypto logo icon, flat design");
+            const encodedPrompt = encodeURIComponent(finalPrompt + ", high quality crypto logo icon, isolated, flat vector art");
             const generatedUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=256&height=256&nologo=true`;
 
-            // تحميل الصورة للتأكد من جاهزيتها
             const tempImg = new Image();
             tempImg.src = generatedUrl;
             tempImg.onload = function() {
@@ -303,15 +335,15 @@
                 imgElement.src = generatedUrl;
                 container.classList.remove('hidden');
                 
-                // تحديث معاينة التوكن مباشرة بالصورة المولدة
                 const containerLogo = document.getElementById('previewLogoContainer');
                 containerLogo.innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
 
                 btn.disabled = false;
                 btn.innerText = "توليد شعار جديد بالذكاء الاصطناعي ✨";
+                window.currentEnglishPrompt = ""; // إعادة تعيين
             };
             tempImg.onerror = function() {
-                alert("حدث خطأ أثناء الاتصال بخدمة الذكاء الاصطناعي. يجدر المحاولة مجدداً.");
+                alert("تعذر الاتصال بخدمة توليد الصور حالياً، يجدر المحاولة مجدداً.");
                 btn.disabled = false;
                 btn.innerText = "توليد الشعار بالذكاء الاصطناعي الحقيقي ✨";
             };
