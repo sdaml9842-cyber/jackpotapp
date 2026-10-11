@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ دد<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Pro - Next-Gen Launchpad</title>
+    <title>ChainPump Pro - Enterprise Protocol</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 -->
@@ -18,49 +18,49 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
         .glow-btn {
-            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.3);
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            box-shadow: 0 0 20px rgba(2, 132, 199, 0.3);
             transition: all 0.3s ease;
         }
         .glow-btn:hover {
-            box-shadow: 0 0 35px rgba(6, 182, 212, 0.6);
+            box-shadow: 0 0 30px rgba(2, 132, 199, 0.5);
             transform: translateY(-1px);
         }
-        .rocket-glow {
-            box-shadow: 0 0 40px rgba(6, 182, 212, 0.8) !important;
-            border-color: #06b6d4 !important;
+        .official-glow {
+            box-shadow: 0 0 30px rgba(14, 165, 233, 0.4) !important;
+            border-color: #0ea5e9 !important;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
 
-    <!-- مؤشر النبض الفيروسي الحي -->
-    <div id="viralPulseBar" class="bg-cyan-950/60 border-b border-cyan-500/30 text-cyan-300 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500">
+    <!-- الشريط العلوي المالي الرسمي -->
+    <div id="viralPulseBar" class="bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500">
         <div class="flex items-center space-x-2 space-x-reverse">
-            <span id="pulseDot" class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-            <span id="viralStatusText">الجاذبية الفيروسية: جاهز للإطلاق الآمن 🚀</span>
+            <span id="pulseDot" class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+            <span id="viralStatusText">النظام المالي المعتمد: جاهز للربط الفوري والتسوية الآمنة 🔒</span>
         </div>
         <div class="hidden sm:flex items-center space-x-2 space-x-reverse text-slate-400">
-            <span>⚡ إطلاقات اليوم على Base:</span>
-            <span class="font-bold text-cyan-400" id="genesisCounter">24</span>
+            <span>⚡ حالة العقد:</span>
+            <span class="font-bold text-sky-400">نشط ومؤمن</span>
         </div>
     </div>
 
-    <!-- الهيدر الاحترافي -->
-    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+    <!-- الهيدر الرسمي والمؤسسي -->
+    <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-black text-lg">
-                    ⚡
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-blue-700 flex items-center justify-center shadow-md text-white font-black text-lg">
+                    🏛️
                 </div>
                 <div>
-                    <span class="font-extrabold text-xl tracking-tight text-white">Chain<span class="text-cyan-400">Pump</span></span>
-                    <span class="block text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Base Protocol</span>
+                    <span class="font-extrabold text-xl tracking-tight text-white">ChainPump <span class="text-sky-400 font-medium text-sm">Enterprise</span></span>
+                    <span class="block text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Base Protocol Infrastructure</span>
                 </div>
             </div>
             
-            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-cyan-400 font-semibold px-5 py-2.5 rounded-xl transition-all text-sm shadow-sm flex items-center space-x-2 space-x-reverse">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sky-400 font-semibold px-5 py-2.5 rounded-xl transition-all text-sm shadow-sm flex items-center space-x-2 space-x-reverse">
+                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
                 <span>ربط المحفظة</span>
             </button>
         </div>
@@ -72,402 +72,18 @@
             
             <div class="mb-6 text-center sm:text-right flex justify-between items-start">
                 <div>
-                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">منصة إطلاق متقدمة</span>
-                    <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight mt-3">إطلاق عملة ميم فورية</h1>
-                    <p class="text-slate-400 text-sm mt-1">أنشئ رمزك المميز على شبكة Base مع أدوات تفاعلية متطورة.</p>
+                    <span class="text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">وحدة الإصدار المؤسسي</span>
+                    <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight mt-3">إصدار أصل رقمي معتمد</h1>
+                    <p class="text-slate-400 text-sm mt-1">تكوين وتدشين العملات الرقمية وفق المعايير التقنية لشبكة Base.</p>
                 </div>
                 
-                <button type="button" onclick="toggleViralBoost()" id="boostBtn" class="bg-slate-900 border border-slate-700 text-slate-400 px-3 py-2 rounded-xl text-xs font-bold transition-all hover:border-cyan-500 flex items-center space-x-1 space-x-reverse">
-                    <span>🔥 اشتعال صاروخي</span>
+                <!-- استبدال الاشتعال الصاروخي بزر "الوضع المالي الرسمي / عرض بالريال" -->
+                <button type="button" onclick="toggleCurrencyDisplay()" id="currencyToggleBtn" class="bg-slate-900 border border-slate-700 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all hover:border-sky-500 flex items-center space-x-1 space-x-reverse">
+                    <span>💵 عرض بالريال (SAR)</span>
                 </button>
             </div>
 
-            <!-- نموذج الإطلاق -->
+            <!-- نموذج الإصدار -->
             <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-5">
                 <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-300">اسم العملة (Token Name)</label>
-                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20 transition-all flex items-center space-x-1 space-x-reverse">
-                            <span>🎰 عجلة حظ الأسماء</span>
-                        </button>
-                    </div>
-                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: ChainPump Gem" class="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3.5 focus:outline-none focus:border-cyan-500 transition-all text-slate-100 text-sm placeholder:text-slate-600">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-300">رمز العملة (Token Symbol)</label>
-                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: CPUMP" class="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3.5 focus:outline-none focus:border-cyan-500 transition-all text-slate-100 text-sm placeholder:text-slate-600 uppercase">
-                </div>
-
-                <!-- بطاقة المعاينة الفورية للتوكن -->
-                <div class="bg-slate-950/80 border border-cyan-500/30 rounded-2xl p-4 flex items-center space-x-4 space-x-reverse shadow-inner">
-                    <div id="previewLogoContainer" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md overflow-hidden flex-shrink-0">
-                        <span id="previewLogoText">🚀</span>
-                    </div>
-                    <div class="flex-grow">
-                        <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">معاينة التوكن الحية</span>
-                        <h3 id="previewName" class="font-bold text-white text-sm">اسم العملة المقترح</h3>
-                        <p id="previewSymbol" class="text-xs text-slate-400 uppercase">SYMBOL</p>
-                    </div>
-                    <div class="text-left">
-                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20 font-bold">جاهز للإطلاق</span>
-                    </div>
-                </div>
-
-                <!-- لوحة اختيار مصدر شعار العملة -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-300">مصدر شعار العملة (Token Logo Source)</label>
-                    <div class="grid grid-cols-3 gap-2 mb-3">
-                        <button type="button" onclick="switchLogoTab('doodle')" id="tabDoodle" class="py-2.5 px-3 rounded-xl border border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold text-xs transition-all">🎨 خربشة</button>
-                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all">✨ ذكاء اصطناعي</button>
-                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all">📁 تحميل</button>
-                    </div>
-
-                    <div id="panelDoodle" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl text-center">
-                        <p class="text-xs text-slate-400 mb-2">ارسم شعارك مباشرة بإصبعك أو الماوس أدناه:</p>
-                        <canvas id="doodleCanvas" width="280" height="120" class="bg-white rounded-xl mx-auto cursor-crosshair border border-slate-700 touch-none"></canvas>
-                        <button type="button" onclick="clearCanvas()" class="mt-2 text-[10px] text-rose-400 underline">مسح الرسم</button>
-                    </div>
-
-                    <!-- لوحة الذكاء الاصطناعي الخارقة والمخصصة بالكامل -->
-                    <div id="panelAI" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden space-y-3 text-center">
-                        <div class="flex justify-between items-center">
-                            <p class="text-xs text-slate-400">وصف فكرة الشعار (اكتب ما تريد بدقة):</p>
-                            <button type="button" onclick="suggestAIPrompt()" class="text-[10px] text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20 font-bold">💡 اقتراح عشوائي رهيب</button>
-                        </div>
-                        <input type="text" id="aiPromptInput" placeholder="مثال: بطريق يرتدي بذلة رائد فضاء ويحمل مثلاً..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
-                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md">توليد الشعار المخصص بالذكاء الاصطناعي ✨</button>
-                        
-                        <div id="aiResultContainer" class="hidden mt-3">
-                            <img id="aiGeneratedImage" src="" alt="AI Logo" class="w-24 h-24 mx-auto rounded-xl border border-cyan-500/50 shadow-lg object-cover">
-                            <p class="text-[11px] text-emerald-400 font-bold mt-1">✨ تم توليد شعارك المطلوب بدقة وربطه بالعملة!</p>
-                        </div>
-                    </div>
-
-                    <div id="panelUpload" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden text-center">
-                        <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-500/10 file:text-cyan-400 hover:file:bg-cyan-500/20">
-                    </div>
-                </div>
-
-                <!-- صندوق الملخص المالي -->
-                <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-xs space-y-2.5 text-slate-400">
-                    <div class="flex justify-between">
-                        <span>إجمالي التوكنات المصدرة:</span>
-                        <span class="font-bold text-slate-200">1,000,000,000</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>رسوم الإطلاق الثابتة:</span>
-                        <span class="font-bold text-cyan-400">0.00025 ETH</span>
-                    </div>
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full glow-btn text-white font-black py-4 rounded-xl text-sm tracking-wide">
-                    إطلاق الرمز المميز على شبكة Base 🚀
-                </button>
-            </form>
-
-            <!-- صندوق الحالة والرسائل -->
-            <div id="statusBox" class="mt-6 hidden p-4 rounded-2xl text-xs border"></div>
-        </div>
-    </main>
-
-    <!-- الفوتر -->
-    <footer class="border-t border-slate-900 bg-slate-950/40 text-center py-6 text-xs text-slate-500">
-        <p>جميع الحقوق محفوظة © 2026 - ChainPump Protocol على شبكة Base</p>
-    </footer>
-
-    <!-- منطق التشغيل التقني والواجهة التفاعلية -->
-    <script>
-        const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
-        const BASE_CHAIN_ID = "0x2105";
-
-        const CONTRACT_ABI = [
-            {
-                "inputs": [
-                    { "internalType": "string", "name": "name", "type": "string" },
-                    { "internalType": "string", "name": "symbol", "type": "string" }
-                ],
-                "name": "deployNewToken",
-                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-                "stateMutability": "payable",
-                "type": "function"
-            }
-        ];
-
-        let provider, signer, contract;
-        let aiImageUrl = "";
-
-        function updateLivePreview() {
-            const nameVal = document.getElementById("tokenName").value.trim();
-            const symbolVal = document.getElementById("tokenSymbol").value.trim();
-
-            document.getElementById("previewName").innerText = nameVal || "اسم العملة المقترح";
-            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
-
-            const pulseBar = document.getElementById("viralPulseBar");
-            const viralStatus = document.getElementById("viralStatusText");
-
-            if (nameVal.length > 3 && symbolVal.length > 1) {
-                pulseBar.className = "bg-emerald-950/80 border-b border-emerald-500/40 text-emerald-300 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
-                viralStatus.innerText = "الجاذبية الفيروسية: عالية جداً وممتازة 🚀";
-                if(!aiImageUrl) {
-                    document.getElementById("previewLogoText").innerText = symbolVal.substring(0, 2).toUpperCase();
-                }
-            } else {
-                pulseBar.className = "bg-cyan-950/60 border-b border-cyan-500/30 text-cyan-300 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
-                viralStatus.innerText = "الجاذبية الفيروسية: جاهز للإطلاق الآمن 🚀";
-            }
-        }
-
-        let isBoosted = false;
-        function toggleViralBoost() {
-            isBoosted = !isBoosted;
-            const card = document.getElementById("mainCard");
-            const btn = document.getElementById("boostBtn");
-            if(isBoosted) {
-                card.classList.add("rocket-glow");
-                btn.className = "bg-cyan-500 text-slate-950 px-3 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-1 space-x-reverse shadow-lg shadow-cyan-500/50";
-                btn.innerHTML = "🔥 الاشتعال مفعل";
-            } else {
-                card.classList.remove("rocket-glow");
-                btn.className = "bg-slate-900 border border-slate-700 text-slate-400 px-3 py-2 rounded-xl text-xs font-bold transition-all hover:border-cyan-500 flex items-center space-x-1 space-x-reverse";
-                btn.innerHTML = "🔥 اشتعال صاروخي";
-            }
-        }
-
-        function spinDestinyWheel() {
-            const list = [
-                { name: "Base Pepe King", symbol: "BPEPE" },
-                { name: "Cyber Doge X", symbol: "CDOGEX" },
-                { name: "MoonShot AI", symbol: "MSAI" },
-                { name: "Turbo Chad Base", symbol: "CHAD" }
-            ];
-            const pick = list[Math.floor(Math.random() * list.length)];
-            document.getElementById("tokenName").value = pick.name;
-            document.getElementById("tokenSymbol").value = pick.symbol;
-            updateLivePreview();
-        }
-
-        // قائمة اقتراحات متنوعة وغريبة لعالم الميمز
-        const awesomeSuggestions = [
-            "بطريق مجنون يرتدي خوذة رائد فضاء يمسك بيتزا",
-            "قرش أزرق يلبس نظارة شمسية ويسوق سكيتبورد",
-            "ديناصور صغير يرتدي بدلة رسمية وربطة عنق",
-            "هامستر غاضب بعيون ليزر متوهجة",
-            "كوب قهوة سايبربانك يخرج منه دخان نيون",
-            "قمر ضاحك يلبس طاقية حفلات لامعة",
-            "بطة صفراء شريرة تحمل عصا سحرية"
-        ];
-
-        function suggestAIPrompt() {
-            const rand = awesomeSuggestions[Math.floor(Math.random() * awesomeSuggestions.length)];
-            document.getElementById("aiPromptInput").value = rand;
-        }
-
-        function switchLogoTab(tab) {
-            document.getElementById('panelDoodle').classList.add('hidden');
-            document.getElementById('panelAI').classList.add('hidden');
-            document.getElementById('panelUpload').classList.add('hidden');
-            
-            document.getElementById('tabDoodle').className = "py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
-            document.getElementById('tabAI').className = "py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
-            document.getElementById('tabUpload').className = "py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
-
-            if(tab === 'doodle') {
-                document.getElementById('panelDoodle').classList.remove('hidden');
-                document.getElementById('tabDoodle').className = "py-2.5 px-3 rounded-xl border border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold text-xs transition-all";
-            } else if(tab === 'ai') {
-                document.getElementById('panelAI').classList.remove('hidden');
-                document.getElementById('tabAI').className = "py-2.5 px-3 rounded-xl border border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold text-xs transition-all";
-            } else if(tab === 'upload') {
-                document.getElementById('panelUpload').classList.remove('hidden');
-                document.getElementById('tabUpload').className = "py-2.5 px-3 rounded-xl border border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold text-xs transition-all";
-            }
-        }
-
-        // دالة توليد ذكاء اصطناعي تفصيلية تمنع التكرار وترسم بدقة ما يكتبه المستخدم
-        async function generateRealAILogo() {
-            let userPrompt = document.getElementById('aiPromptInput').value.trim();
-            if(!userPrompt) {
-                userPrompt = "cute crypto meme character, vector icon";
-            }
-
-            const btn = document.getElementById('aiGenBtn');
-            const container = document.getElementById('aiResultContainer');
-            const imgElement = document.getElementById('aiGeneratedImage');
-
-            btn.disabled = true;
-            btn.innerText = "جاري رسم فكرتك بدقة متناهية... ⏳";
-
-            // تحويل الوصف العربي مباشرة إلى إنجليزي دقيق وتوجيه النموذج لعدم التكرار المالي
-            let translatedPrompt = userPrompt;
-            const lower = userPrompt.toLowerCase();
-            
-            if(lower.includes("بطريق")) translatedPrompt = "cute funny penguin wearing astronaut helmet holding pizza, vector art, vibrant colors, solid background";
-            else if(lower.includes("قرش")) translatedPrompt = "cool blue shark wearing sunglasses riding a skateboard, vector meme art";
-            else if(lower.includes("ديناصور")) translatedPrompt = "cute baby dinosaur wearing a business suit and tie, funny vector icon";
-            else if(lower.includes("هامستر")) translatedPrompt = "angry cute hamster with glowing laser eyes, vector meme logo";
-            else if(lower.includes("قهوة")) translatedPrompt = "cyberpunk coffee cup with neon steam, minimalist vector icon";
-            else if(lower.includes("قمر")) translatedPrompt = "smiling cute moon wearing party hat, vibrant vector illustration";
-            else if(lower.includes("بطة")) translatedPrompt = "evil yellow duck holding magical wand, funny vector character";
-            else {
-                // إذا كتب وصفاً خاصاً به، نأخذ نصه ونضيف عليه معلمات التصميم النقي بدون رموز مالية مكررة
-                translatedPrompt = userPrompt + ", high quality vector character icon, minimalist design, solid background, no text, no dollar signs";
-            }
-
-            const encodedPrompt = encodeURIComponent(translatedPrompt);
-            const generatedUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=256&height=256&nologo=true`;
-
-            const tempImg = new Image();
-            tempImg.src = generatedUrl;
-            tempImg.onload = function() {
-                aiImageUrl = generatedUrl;
-                imgElement.src = generatedUrl;
-                container.classList.remove('hidden');
-                
-                const containerLogo = document.getElementById('previewLogoContainer');
-                containerLogo.innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
-
-                btn.disabled = false;
-                btn.innerText = "توليد الشعار المخصص بالذكاء الاصطناعي ✨";
-            };
-            tempImg.onerror = function() {
-                alert("تعذر الاتصال بخدمة توليد الصور حالياً، يرجى المحاولة مجدداً.");
-                btn.disabled = false;
-                btn.innerText = "توليد الشعار المخصص بالذكاء الاصطناعي ✨";
-            };
-        }
-
-        // إعداد الرسم الماوس واللمس
-        const canvas = document.getElementById('doodleCanvas');
-        const ctx = canvas.getContext('2d');
-        let painting = false;
-
-        function startPosition(e) { painting = true; draw(e); }
-        function endPosition() { painting = false; ctx.beginPath(); }
-        function draw(e) {
-            if (!painting) return;
-            e.preventDefault();
-            ctx.lineWidth = 4;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#0f172a';
-            const rect = canvas.getBoundingClientRect();
-            let clientX, clientY;
-            if (e.touches && e.touches[0]) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-            ctx.lineTo(clientX - rect.left, clientY - rect.top);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(clientX - rect.left, clientY - rect.top);
-        }
-
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', endPosition);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('touchstart', startPosition);
-        canvas.addEventListener('touchend', endPosition);
-        canvas.addEventListener('touchmove', draw);
-
-        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-
-        async function connectWallet() {
-            if (typeof window.ethereum === "undefined") {
-                showStatus("يرجى فتح الموقع من متصفح محفظة ويب 3 مدعومة.", "error");
-                return;
-            }
-            try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-                const chainId = await window.ethereum.request({ method: "eth_chainId" });
-                if (chainId !== BASE_CHAIN_ID) {
-                    await window.ethereum.request({
-                        method: "wallet_switchEthereumChain",
-                        params: [{ chainId: BASE_CHAIN_ID }]
-                    });
-                }
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-                const address = await signer.getAddress();
-                const shortAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
-                
-                const btn = document.getElementById("connectWalletBtn");
-                btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
-                showStatus("تم اتصال المحفظة بنجاح.", "success");
-            } catch (error) {
-                showStatus("فشل الاتصال بالمحفظة.", "error");
-            }
-        }
-
-        async function handleLaunch(event) {
-            event.preventDefault();
-            if (!contract) {
-                showStatus("يرجى ربط المحفظة أولاً.", "error");
-                await connectWallet();
-                return;
-            }
-
-            const name = document.getElementById("tokenName").value.trim();
-            const symbol = document.getElementById("tokenSymbol").value.trim();
-            const submitBtn = document.getElementById("submitBtn");
-
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "جاري إعداد المعاملة...";
-
-                const requiredFee = 250000000000000n; // 0.00025 ETH[span_0](start_span)[span_0](end_span)
-                const txOptions = { value: requiredFee, gasLimit: 600000n };
-
-                showStatus("يرجى تأكيد المعاملة من محفظتك...", "info");
-
-                const tx = await contract.deployNewToken(name, symbol, txOptions);[span_1](start_span)[span_1](end_span)
-                
-                submitBtn.innerText = "جاري التأكيد على البلوكتشين...";
-                showStatus(`تم إرسال المعاملة بنجاح! <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline font-bold text-cyan-400">متابعة على BaseScan</a>`, "info");
-
-                const receipt = await tx.wait();[span_2](start_span)[span_2](end_span)
-
-                submitBtn.disabled = false;
-                submitBtn.innerText = "إطلاق الرمز المميز على شبكة Base 🚀";
-                showStatus(`🎉 تم إطلاق العملة الرقمية بنجاح!<br><a href="https://basescan.org/tx/${receipt.hash}" target="_blank" class="underline font-bold text-cyan-400">عرض تفاصيل المعاملة النهائية</a>`, "success");
-                
-                document.getElementById("launchForm").reset();
-                clearCanvas();
-                updateLivePreview();
-
-            } catch (error) {
-                console.error(error);
-                submitBtn.disabled = false;
-                submitBtn.innerText = "إطلاق الرمز المميز على شبكة Base 🚀";
-                
-                let errorMsg = "حدث خطأ أثناء تنفيذ المعاملة.";
-                if (error.message.includes("user rejected") || error.message.includes("ACTION_REJECTED")) {
-                    errorMsg = "تم إلغاء المعاملة من قِبل المستخدم.";
-                } else if (error.message.includes("insufficient funds")) {
-                    errorMsg = "رصيد الإيثيريوم على شبكة Base غير كافي لدفع الرسوم والغاز.";
-                }
-                showStatus(errorMsg, "error");
-            }
-        }
-
-        function showStatus(message, type) {
-            const box = document.getElementById("statusBox");
-            box.classList.remove("hidden", "bg-emerald-950/40", "border-emerald-800", "text-emerald-300", "bg-rose-950/40", "border-rose-800", "text-rose-300", "bg-cyan-950/40", "border-cyan-800", "text-cyan-300");
-            
-            if (type === "success") {
-                box.classList.add("bg-emerald-950/40", "border-emerald-800", "text-emerald-300");
-            } else if (type === "error") {
-                box.classList.add("bg-rose-950/40", "border-rose-800", "text-rose-300");
-            } else {
-                box.classList.add("bg-cyan-950/40", "border-cyan-800", "text-cyan-300");
-            }
-            box.innerHTML = message;
-        }
-    </script>
-</body>
-</html>
+                    <div class="
