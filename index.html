@@ -3,121 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Base - Launchpad</title>
-    <!-- مكتبة ethers.js للتعامل مع البلوكشين -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <title>منصة إطلاق العملات - Base Launchpad</title>
+    <!-- Tailwind CSS للتصميم الاحترافي -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ethers.js v6 للتفاعل مع البلوكتشين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; margin: 0; }
-        .container { max-width: 500px; margin: 40px auto; background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        h2 { text-align: center; color: #38bdf8; margin-bottom: 20px; }
-        .btn { width: 100%; padding: 14px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 15px; font-weight: bold; transition: background 0.3s; }
-        .btn:hover { background: #0369a1; }
-        input { width: 100%; padding: 12px; margin: 8px 0 16px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        label { font-size: 14px; color: #94a3b8; display: block; margin-top: 10px; }
-        .status { text-align: center; margin-bottom: 20px; font-size: 14px; color: #22c55e; background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #334155; }
+        body { font-family: 'Cairo', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>⚡ ChainPump Base</h2>
-        <div id="walletStatus" class="status">غير متصل بالمحفظة</div>
-        <button id="connectBtn" class="btn" onclick="connectWallet()">ربط المحفظة</button>
-        
-        <hr style="border-color: #334155; margin: 25px 0;">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
 
-        <label>اسم التوكن (Token Name)</label>
-        <input type="text" id="tokenName" placeholder="مثال: My Meme Token">
+    <!-- الهيدر -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-xl shadow-lg shadow-cyan-500/20">🚀</div>
+                <span class="font-bold text-xl bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">MemeFactory Pro</span>
+            </div>
+            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-200 text-sm">
+                ربط المحفظة
+            </button>
+        </div>
+    </header>
 
-        <label>رمز التوكن (Token Symbol)</label>
-        <input type="text" id="tokenSymbol" placeholder="مثال: MEME">
+    <!-- المحتوى الرئيسي -->
+    <main class="max-w-xl mx-auto px-4 py-12 w-full flex-grow">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="text-center mb-8">
+                <h1 class="text-2xl sm:text-3xl font-black mb-2">أنشئ عملتك الرقمية فوراً</h1>
+                <p class="text-slate-400 text-sm">أطلق عملة الميم الخاصة بك على شبكة Base بضغطة زر وبأمان تام.</p>
+            </div>
 
-        <button id="launchBtn" class="btn" onclick="launchToken()" style="background: #10b981;">إطلاق التوكن الآن ⚡</button>
-    </div>
+            <!-- نموذج الإطلاق -->
+            <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-slate-300">اسم العملة (Token Name)</label>
+                    <input type="text" id="tokenName" required placeholder="مثال: Super Doge" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors text-slate-100 placeholder:text-slate-600">
+                </div>
 
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-slate-300">رمز العملة (Token Symbol)</label>
+                    <input type="text" id="tokenSymbol" required placeholder="مثال: DOGE" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors text-slate-100 placeholder:text-slate-600 uppercase">
+                </div>
+
+                <div class="bg-slate-950/50 border border-slate-800/80 rounded-xl p-4 text-xs space-y-2 text-slate-400">
+                    <div class="flex justify-between">
+                        <span>إجمالي التوكنات المصدرة:</span>
+                        <span class="font-bold text-slate-200">1,000,000,000</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>رسوم الإطلاق للمنصة:</span>
+                        <span class="font-bold text-cyan-400">0.00025 ETH</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    إطلاق العملة الآن 🚀
+                </button>
+            </form>
+
+            <!-- صندوق الحالة والرسائل -->
+            <div id="statusBox" class="mt-6 hidden p-4 rounded-xl text-sm border"></div>
+        </div>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="border-t border-slate-900 text-center py-6 text-xs text-slate-500">
+        جميع الحقوق محفوطة © 2026 - يعمل على شبكة Base الآمنة
+    </footer>
+
+    <!-- سكربت التشغيل ومنطق الاتصال -->
     <script>
-        const FACTORY_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a";
-        const FACTORY_ABI = [
-            "function creationFee() view returns (uint256)",
-            "function createToken(string memory name, string memory symbol) payable returns (address)"
+        const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+        const BASE_CHAIN_ID = "0x2105"; // 8453 بالعشري
+
+        const CONTRACT_ABI = [
+            {
+                "inputs": [{"internalType": "string", "name": "name", "type": "string"},{"internalType": "string", "name": "symbol", "type": "string"}],
+                "name": "deployNewToken",
+                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "creationFee",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            }
         ];
 
-        let provider, signer, factoryContract;
+        let provider, signer, contract;
 
         async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    
-                    // التحقق من الشبكة (Base Mainnet ID: 8453 / 0x2105)
-                    const network = await provider.getNetwork();
-                    if (network.chainId !== 8453) {
-                        try {
-                            await window.ethereum.request({
-                                method: 'wallet_switchEthereumChain',
-                                params: [{ chainId: '0x2105' }],
-                            });
-                        } catch (switchError) {
-                            alert("يرجى التبديل يدوياً إلى شبكة Base Mainnet في محفظتك.");
-                            return;
-                        }
-                    }
+            if (typeof window.ethereum === "undefined") {
+                showStatus("يرجى تثبيت محفظة MetaMask أو استخدام متصفح يدعم Web3.", "error");
+                return;
+            }
 
-                    signer = provider.getSigner();
-                    const address = await signer.getAddress();
-                    document.getElementById("walletStatus").innerText = "متصل: " + address.substring(0,6) + "..." + address.substring(38);
-                    document.getElementById("connectBtn").innerText = "متصل بنجاح";
-                    
-                    factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
-                } catch (err) {
-                    console.error(err);
-                    alert("فشل الاتصال بالمحفظة: " + (err.message || err));
+            try {
+                // طلب الاتصال بالمحفظة
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                
+                // التحقق من الشبكة (Base Mainnet)
+                const chainId = await window.ethereum.request({ method: "eth_chainId" });
+                if (chainId !== BASE_CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: "wallet_switchEthereumChain",
+                            params: [{ chainId: BASE_CHAIN_ID }]
+                        });
+                    } catch (switchError) {
+                        showStatus("يرجى التحويل إلى شبكة Base الرئيسية في محفظتك.", "error");
+                        return;
+                    }
                 }
-            } else {
-                alert("يرجى فتح الموقع من متصفح يدعم Web3 مثل MetaMask أو Binance Web3 Wallet.");
+
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                const address = await signer.getAddress();
+                const shortAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
+                
+                const btn = document.getElementById("connectWalletBtn");
+                btn.innerText = shortAddr;
+                btn.className = "bg-slate-800 border border-slate-700 text-slate-200 font-semibold px-4 py-2 rounded-xl text-sm";
+                
+                showStatus("تم اتصال المحفظة بنجاح!", "success");
+            } catch (error) {
+                console.error(error);
+                showStatus("فشل الاتصال بالمحفظة: " + (error.reason || error.message), "error");
             }
         }
 
-        async function launchToken() {
+        async function handleLaunch(event) {
+            event.preventDefault();
+            
+            if (!contract) {
+                showStatus("يرجى ربط المحفظة أولاً!", "error");
+                await connectWallet();
+                return;
+            }
+
+            const name = document.getElementById("tokenName").value.trim();
+            const symbol = document.getElementById("tokenSymbol").value.trim();
+            const submitBtn = document.getElementById("submitBtn");
+
             try {
-                if (!signer || !factoryContract) {
-                    alert("يرجى ربط المحفظة أولاً!");
-                    return;
+                submitBtn.disabled = true;
+                submitBtn.innerText = "جاري جلب الرسوم وإرسال المعاملة...";
+
+                // جلب قيمة الرسوم الفعلية مباشرة من العقد لضمان الدقة المطلقة
+                let fee = ethers.parseEther("0.00025");
+                try {
+                    fee = await contract.creationFee();
+                } catch (e) {
+                    console.log("استخدام القيمة الافتراضية للرسوم");
                 }
 
-                const name = document.getElementById("tokenName").value.trim();
-                const symbol = document.getElementById("tokenSymbol").value.trim();
+                showStatus("يرجى تأكيد المعاملة في محفظتك...", "info");
 
-                if (!name || !symbol) {
-                    alert("يرجى إدخال اسم ورمز التوكن بشكل صحيح!");
-                    return;
-                }
+                // تنفيذ استدعاء دالة الإطلاق مع إرسال قيمة الرسوم المطلوبة
+                const tx = await contract.deployNewToken(name, symbol, { value: fee });
+                
+                submitBtn.innerText = "جاري تأكيد المعاملة على البلوكتشين...";
+                showStatus(`تم إرسال المعاملة! جارٍ التأكيد... <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline font-bold text-cyan-400">عرض على البس سكان</a>`, "info");
 
-                // جلب رسوم الإطلاق ديناميكياً من العقد
-                const fee = await factoryContract.creationFee();
+                // الانتظار حتى يتم تأكيد المعاملة
+                const receipt = await tx.wait();
 
-                // تنفيذ المعاملة مع تمرير القيمة بصيغة Hex لتجنب أخطاء BigNumber
-                const tx = await factoryContract.createToken(name, symbol, {
-                    value: fee.toHexString()
-                });
-
-                alert("تم إرسال المعاملة بنجاح! بانتظار التأكيد على الشبكة...");
-                await tx.wait();
-                alert("🎉 مبروك! تم إنشاء وإطلاق التوكن بنجاح تام على شبكة Base.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "إطلاق العملة الآن 🚀";
+                
+                showStatus(`🎉 تم إطلاق العملة بنجاح وتوزيع الحصص تلقائياً!<br><a href="https://basescan.org/tx/${receipt.hash}" target="_blank" class="underline font-bold text-cyan-400">رابط المعاملة النهائية</a>`, "success");
+                
+                // تفريغ الحقول
+                document.getElementById("launchForm").reset();
 
             } catch (error) {
-                console.error("Launch Error:", error);
-                let errorMessage = error.message || error;
-
-                // التعرّف على خطأ نقص الرصيد وعرض رسالة واضحة للمستخدم
-                if (errorMessage.includes("OutOfFunds") || errorMessage.includes("insufficient funds") || errorMessage.includes("sender doesn't have enough funds")) {
-                    alert("❌ عذراً، رصيد محفظتك غير كافٍ (OutOfFunds) لتغطية رسوم الإطلاق والغاز على شبكة Base. يرجى شحن رصيدك بالمحفظة.");
-                } else if (errorMessage.includes("user rejected")) {
-                    alert("تم إلغاء المعاملة من قبل المستخدم.");
-                } else {
-                    alert("حدث خطأ أثناء الإطلاق: " + errorMessage);
+                console.error(error);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "إطلاق العملة الآن 🚀";
+                
+                let errorMsg = error.reason || error.message || "حدث خطأ غير معروف";
+                if (errorMsg.includes("user rejected")) {
+                    errorMsg = "تم إلغاء المعاملة من قِبل المستخدم.";
                 }
+                showStatus("خطأ: " + errorMsg, "error");
             }
+        }
+
+        function showStatus(message, type) {
+            const box = document.getElementById("statusBox");
+            box.classList.remove("hidden", "bg-emerald-950/40", "border-emerald-800", "text-emerald-300", "bg-rose-950/40", "border-rose-800", "text-rose-300", "bg-cyan-950/40", "border-cyan-800", "text-cyan-300");
+            
+            if (type === "success") {
+                box.classList.add("bg-emerald-950/40", "border-emerald-800", "text-emerald-300");
+            } else if (type === "error") {
+                box.classList.add("bg-rose-950/40", "border-rose-800", "text-rose-300");
+            } else {
+                box.classList.add("bg-cyan-950/40", "border-cyan-800", "text-cyan-300");
+            }
+            box.innerHTML = message;
         }
     </script>
 </body>
