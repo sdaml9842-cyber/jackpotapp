@@ -101,8 +101,8 @@
 
                 <!-- بطاقة المعاينة الفورية للتوكن -->
                 <div class="bg-slate-950/80 border border-cyan-500/30 rounded-2xl p-4 flex items-center space-x-4 space-x-reverse shadow-inner">
-                    <div id="previewLogoCircle" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md">
-                        🚀
+                    <div id="previewLogoContainer" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-lg shadow-md overflow-hidden">
+                        <span id="previewLogoText">🚀</span>
                     </div>
                     <div class="flex-grow">
                         <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">معاينة التوكن الحية</span>
@@ -129,14 +129,20 @@
                         <button type="button" onclick="clearCanvas()" class="mt-2 text-[10px] text-rose-400 underline">مسح الرسم</button>
                     </div>
 
-                    <div id="panelAI" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden space-y-3">
+                    <!-- لوحة الذكاء الاصطناعي الحقيقية -->
+                    <div id="panelAI" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden space-y-3 text-center">
                         <div class="flex justify-between items-center">
                             <p class="text-xs text-slate-400">وصف فكرة الشعار:</p>
                             <button type="button" onclick="suggestAIPrompt()" class="text-[10px] text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">💡 اقتراح ذكي</button>
                         </div>
                         <input type="text" id="aiPromptInput" placeholder="مثال: قطة فضائية ترتدي نظارات شمسية" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
-                        <button type="button" onclick="generateAILogo()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-xl text-xs transition-all">توليد الشعار بالذكاء الاصطناعي ✨</button>
-                        <div id="aiResultBox" class="hidden text-center text-xs text-emerald-400 font-bold">تم توليد الشعار بنجاح وجاهز للإطلاق!</div>
+                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md">توليد الشعار بالذكاء الاصطناعي الحقيقي ✨</button>
+                        
+                        <!-- مكان عرض الصورة المولدة -->
+                        <div id="aiResultContainer" class="hidden mt-3">
+                            <img id="aiGeneratedImage" src="" alt="AI Logo" class="w-24 h-24 mx-auto rounded-xl border border-cyan-500/50 shadow-lg object-cover">
+                            <p class="text-[11px] text-emerald-400 font-bold mt-1">✨ تم توليد الشعار بنجاح وربطه بالعملة!</p>
+                        </div>
                     </div>
 
                     <div id="panelUpload" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden text-center">
@@ -190,6 +196,7 @@
         ];
 
         let provider, signer, contract;
+        let aiImageUrl = "";
 
         function updateLivePreview() {
             const nameVal = document.getElementById("tokenName").value.trim();
@@ -204,7 +211,9 @@
             if (nameVal.length > 3 && symbolVal.length > 1) {
                 pulseBar.className = "bg-emerald-950/80 border-b border-emerald-500/40 text-emerald-300 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
                 viralStatus.innerText = "الجاذبية الفيروسية: عالية جداً وممتازة 🚀";
-                document.getElementById("previewLogoCircle").innerText = symbolVal.substring(0, 2).toUpperCase();
+                if(!aiImageUrl) {
+                    document.getElementById("previewLogoText").innerText = symbolVal.substring(0, 2).toUpperCase();
+                }
             } else {
                 pulseBar.className = "bg-cyan-950/60 border-b border-cyan-500/30 text-cyan-300 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
                 viralStatus.innerText = "الجاذبية الفيروسية: جاهز للإطلاق الآمن 🚀";
@@ -242,10 +251,10 @@
 
         function suggestAIPrompt() {
             const suggestions = [
-                "قطة فضائية ترتدي نظارات شمسية براقة",
-                "كلب سايبر بانك خارق على شبكة Base",
-                "صاروخ ذهبي يخترق الغلاف الجوي للتوكنات",
-                "روبوت ذكي يحمل عملة رقمية متوهجة"
+                "cute cyberpunk crypto cat, vector art, vibrant colors",
+                "epic crypto dog wearing sunglasses, neon background",
+                "golden rocket launching to the moon, minimalist crypto logo",
+                "futuristic AI robot holding a crypto coin, cyberpunk style"
             ];
             document.getElementById("aiPromptInput").value = suggestions[Math.floor(Math.random() * suggestions.length)];
         }
@@ -271,30 +280,58 @@
             }
         }
 
-        // إعداد الرسم ليعمل مع الماوس والهواتف المحمولة (Touch + Mouse)
+        // توليد شعار حقيقي بالذكاء الاصطناعي عبر API خارجي مباشر
+        async function generateRealAILogo() {
+            const promptInput = document.getElementById('aiPromptInput').value.trim();
+            const prompt = promptInput || "crypto meme coin logo, futuristic vector icon";
+            const btn = document.getElementById('aiGenBtn');
+            const container = document.getElementById('aiResultContainer');
+            const imgElement = document.getElementById('aiGeneratedImage');
+
+            btn.disabled = true;
+            btn.innerText = "جاري رسم الشعار بالذكاء الاصطناعي... ⏳";
+
+            // رابط توليد الصور اللحظي بالذكاء الاصطناعي
+            const encodedPrompt = encodeURIComponent(prompt + ", high quality crypto logo icon, flat design");
+            const generatedUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=256&height=256&nologo=true`;
+
+            // تحميل الصورة للتأكد من جاهزيتها
+            const tempImg = new Image();
+            tempImg.src = generatedUrl;
+            tempImg.onload = function() {
+                aiImageUrl = generatedUrl;
+                imgElement.src = generatedUrl;
+                container.classList.remove('hidden');
+                
+                // تحديث معاينة التوكن مباشرة بالصورة المولدة
+                const containerLogo = document.getElementById('previewLogoContainer');
+                containerLogo.innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
+
+                btn.disabled = false;
+                btn.innerText = "توليد شعار جديد بالذكاء الاصطناعي ✨";
+            };
+            tempImg.onerror = function() {
+                alert("حدث خطأ أثناء الاتصال بخدمة الذكاء الاصطناعي. يجدر المحاولة مجدداً.");
+                btn.disabled = false;
+                btn.innerText = "توليد الشعار بالذكاء الاصطناعي الحقيقي ✨";
+            };
+        }
+
+        // إعداد الرسم الماوس واللمس
         const canvas = document.getElementById('doodleCanvas');
         const ctx = canvas.getContext('2d');
         let painting = false;
 
-        function startPosition(e) {
-            painting = true;
-            draw(e);
-        }
-        function endPosition() {
-            painting = false;
-            ctx.beginPath();
-        }
+        function startPosition(e) { painting = true; draw(e); }
+        function endPosition() { painting = false; ctx.beginPath(); }
         function draw(e) {
             if (!painting) return;
-            e.preventDefault(); // يمنع تحريك الشاشة أثناء الرسم على الهاتف
-            
+            e.preventDefault();
             ctx.lineWidth = 4;
             ctx.lineCap = 'round';
             ctx.strokeStyle = '#0f172a';
-
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
-
             if (e.touches && e.touches[0]) {
                 clientX = e.touches[0].clientX;
                 clientY = e.touches[0].clientY;
@@ -302,32 +339,20 @@
                 clientX = e.clientX;
                 clientY = e.clientY;
             }
-
             ctx.lineTo(clientX - rect.left, clientY - rect.top);
             ctx.stroke();
             ctx.beginPath();
             ctx.moveTo(clientX - rect.left, clientY - rect.top);
         }
 
-        // ربط أحداث الماوس
         canvas.addEventListener('mousedown', startPosition);
         canvas.addEventListener('mouseup', endPosition);
         canvas.addEventListener('mousemove', draw);
-
-        // ربط أحداث اللمس للهواتف المحمولة (Touch Events)
         canvas.addEventListener('touchstart', startPosition);
         canvas.addEventListener('touchend', endPosition);
         canvas.addEventListener('touchmove', draw);
 
         function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-
-        function generateAILogo() {
-            const prompt = document.getElementById('aiPromptInput').value.trim();
-            if(!prompt) { alert('يرجى كتابة وصف لفكرة الشعار أولاً'); return; }
-            const box = document.getElementById('aiResultBox');
-            box.classList.remove('hidden');
-            box.innerText = "✨ تم توليد الشعار الذكي بنجاح وجاهز للإدماج!";
-        }
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
