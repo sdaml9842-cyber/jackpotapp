@@ -212,7 +212,7 @@
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                showStatus("يرجى استخدام محفظة ويب 3 مدعومة مثل Binance Web3 Wallet.", "error");
+                showStatus("يرجى استخدام محفظة ويب 3 مدعومة مثل Binance أو MetaMask.", "error");
                 return;
             }
 
@@ -267,12 +267,18 @@
                 submitBtn.disabled = true;
                 submitBtn.innerText = "جاري إعداد المعاملة...";
 
-                // استخدام القيمة بالـ Wei مباشرة لمنع أي خطأ تحليل في المتصفحات الداخلية
-                const fee = 250000000000000n;
+                // القيمة الدقيقة للرسوم بالـ Wei (0.00025 ETH)
+                const requiredFee = 250000000000000n; 
+
+                // خيارات المعاملة مع تحديد حد الغاز يدوياً لتجاوز مشاكل المحاكاة في الهواتف
+                const txOptions = {
+                    value: requiredFee,
+                    gasLimit: 600000n 
+                };
 
                 showStatus("يرجى تأكيد المعاملة في محفظتك...", "info");
 
-                const tx = await contract.deployNewToken(name, symbol, { value: fee });
+                const tx = await contract.deployNewToken(name, symbol, txOptions);
                 
                 submitBtn.innerText = "جاري تأكيد المعاملة على البلوكتشين...";
                 showStatus(`تم إرسال المعاملة! جارٍ التأكيد... <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline font-bold text-cyan-400">عرض على البس سكان</a>`, "info");
@@ -294,8 +300,8 @@
                 let errorMsg = error.reason || error.message || "حدث خطأ غير معروف";
                 if (errorMsg.includes("user rejected") || errorMsg.includes("ACTION_REJECTED")) {
                     errorMsg = "تم إلغاء المعاملة من قِبل المستخدم.";
-                } else if (errorMsg.includes("insufficient funds")) {
-                    errorMsg = "عذراً، رصيدك من الإيثيريوم (ETH) غير كافي لدفع رسوم الإطلاق والغاز.";
+                } else if (errorMsg.includes("insufficient funds") || errorMsg.includes("exceeds balance")) {
+                    errorMsg = "عذراً، رصيدك من الإيثيريوم على شبكة Base غير كافي لدفع رسوم الإطلاق والغاز.";
                 }
                 showStatus("خطأ: " + errorMsg, "error");
             }
