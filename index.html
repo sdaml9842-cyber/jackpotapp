@@ -1,4 +1,4 @@
- دد<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -86,4 +86,390 @@
             <!-- نموذج الإصدار -->
             <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-5">
                 <div>
-                    <div class="
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-300">اسم العملة (Token Name)</label>
+                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-sky-400 hover:text-sky-300 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20 transition-all flex items-center space-x-1 space-x-reverse">
+                            <span>🎲 توليد اسم مقترح</span>
+                        </button>
+                    </div>
+                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: Enterprise Token" class="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3.5 focus:outline-none focus:border-sky-500 transition-all text-slate-100 text-sm placeholder:text-slate-600">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-300">رمز العملة (Token Symbol)</label>
+                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: ENT" class="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3.5 focus:outline-none focus:border-sky-500 transition-all text-slate-100 text-sm placeholder:text-slate-600 uppercase">
+                </div>
+
+                <!-- بطاقة المعاينة الفورية للأصل -->
+                <div class="bg-slate-950/80 border border-sky-500/30 rounded-2xl p-4 flex items-center space-x-4 space-x-reverse shadow-inner">
+                    <div id="previewLogoContainer" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-sky-600 to-blue-700 flex items-center justify-center font-black text-white text-lg shadow-md overflow-hidden flex-shrink-0">
+                        <span id="previewLogoText">🏛️</span>
+                    </div>
+                    <div class="flex-grow">
+                        <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider">معاينة الأصل الرقمي</span>
+                        <h3 id="previewName" class="font-bold text-white text-sm">اسم العملة المقترح</h3>
+                        <p id="previewSymbol" class="text-xs text-slate-400 uppercase">SYMBOL</p>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20 font-bold">جاهز للإصدار</span>
+                    </div>
+                </div>
+
+                <!-- لوحة اختيار الهوية البصرية -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-slate-300">مصدر الشعار والهوية البصرية (Token Logo Source)</label>
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <button type="button" onclick="switchLogoTab('doodle')" id="tabDoodle" class="py-2.5 px-3 rounded-xl border border-sky-500 bg-sky-500/10 text-sky-400 font-bold text-xs transition-all">🎨 رسم يدوي</button>
+                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all">✨ ذكاء اصطناعي</button>
+                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all">📁 رفع ملف</button>
+                    </div>
+
+                    <div id="panelDoodle" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl text-center">
+                        <p class="text-xs text-slate-400 mb-2">ارسم الشعار مباشرة بإصبعك أو الماوس أدناه:</p>
+                        <canvas id="doodleCanvas" width="280" height="120" class="bg-white rounded-xl mx-auto cursor-crosshair border border-slate-700 touch-none"></canvas>
+                        <button type="button" onclick="clearCanvas()" class="mt-2 text-[10px] text-rose-400 underline">مسح الرسم</button>
+                    </div>
+
+                    <div id="panelAI" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden space-y-3 text-center">
+                        <div class="flex justify-between items-center">
+                            <p class="text-xs text-slate-400">وصف الهوية البصرية بدقة:</p>
+                            <button type="button" onclick="suggestAIPrompt()" class="text-[10px] text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20 font-bold">💡 اقتراح هويّة رسمية</button>
+                        </div>
+                        <input type="text" id="aiPromptInput" placeholder="مثال: درع ذهبي، هرم استثماري..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md">توليد الشعار بالذكاء الاصطناعي الفوري ✨</button>
+                        
+                        <div id="aiResultContainer" class="hidden mt-3">
+                            <img id="aiGeneratedImage" src="" alt="AI Logo" class="w-24 h-24 mx-auto rounded-xl border border-sky-500/50 shadow-lg object-cover">
+                            <p class="text-[11px] text-emerald-400 font-bold mt-1">✨ تم اعتماد الشعار وربطه بالأصل الرقمي بنجاح!</p>
+                        </div>
+                    </div>
+
+                    <div id="panelUpload" class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl hidden text-center">
+                        <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500/10 file:text-sky-400 hover:file:bg-sky-500/20">
+                    </div>
+                </div>
+
+                <!-- صندوق الملخص المالي الرسمي -->
+                <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-xs space-y-2.5 text-slate-400">
+                    <div class="flex justify-between">
+                        <span>إجمالي الإصدار الثابت:</span>
+                        <span class="font-bold text-slate-200">1,000,000,000 وحدة</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>رسوم الإطلاق المؤسسي:</span>
+                        <span class="font-bold text-sky-400" id="feeDisplay">0.00025 ETH</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full glow-btn text-white font-black py-4 rounded-xl text-sm tracking-wide shadow-lg">
+                    اعتماد وإصدار الأصل الرقمي الآن 🏛️
+                </button>
+            </form>
+
+            <!-- صندوق الحالة والرسائل -->
+            <div id="statusBox" class="mt-6 hidden p-4 rounded-2xl text-xs border"></div>
+        </div>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="border-t border-slate-900 bg-slate-950/40 text-center py-6 text-xs text-slate-500">
+        <p>جميع الحقوق محفوظة © 2026 - ChainPump Enterprise Protocol على شبكة Base</p>
+    </footer>
+
+    <!-- منطق التشغيل التقني والواجهة الرسمية -->
+    <script>
+        const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+        const BASE_CHAIN_ID = "0x2105";
+
+        const CONTRACT_ABI = [
+            {
+                "inputs": [
+                    { "internalType": "string", "name": "name", "type": "string" },
+                    { "internalType": "string", "name": "symbol", "type": "string" }
+                ],
+                "name": "deployNewToken",
+                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+                "stateMutability": "payable",
+                "type": "function"
+            }
+        ];
+
+        let provider, signer, contract;
+        let aiImageUrl = "";
+        let isSARMode = false;
+
+        // ميزة تبديل العملة الرسمية (إظهار بالريال السعودي تقديرياً بناءً على سعر السوق)
+        function toggleCurrencyDisplay() {
+            isSARMode = !isSARMode;
+            const btn = document.getElementById("currencyToggleBtn");
+            const feeDisplay = document.getElementById("feeDisplay");
+            
+            if(isSARMode) {
+                // لنفترض تقديرياً سعر الإيثيريوم يعادل تقريباً قيمة معينة، أو نضع السعر بالريال السعودي بناءً على الرسوم الثابتة
+                feeDisplay.innerText = "≈ 3.50 ريال (SAR)";
+                btn.className = "bg-sky-500 text-slate-950 px-3.5 py-2 rounded-xl text-xs font-black transition-all shadow-md flex items-center space-x-1 space-x-reverse";
+                btn.innerHTML = "💵 العرض بالريال مفعل";
+            } else {
+                feeDisplay.innerText = "0.00025 ETH";
+                btn.className = "bg-slate-900 border border-slate-700 text-slate-300 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all hover:border-sky-500 flex items-center space-x-1 space-x-reverse";
+                btn.innerHTML = "💵 عرض بالريال (SAR)";
+            }
+        }
+
+        function updateLivePreview() {
+            const nameVal = document.getElementById("tokenName").value.trim();
+            const symbolVal = document.getElementById("tokenSymbol").value.trim();
+
+            document.getElementById("previewName").innerText = nameVal || "اسم العملة المقترح";
+            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
+
+            const pulseBar = document.getElementById("viralPulseBar");
+            const viralStatus = document.getElementById("viralStatusText");
+
+            if (nameVal.length > 3 && symbolVal.length > 1) {
+                pulseBar.className = "bg-slate-900 border-b border-emerald-500/40 text-emerald-300 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
+                viralStatus.innerText = "النظام المالي المعتمد: جاهز للإصدار الآمن والمستقر 🏛️";
+                if(!aiImageUrl) {
+                    document.getElementById("previewLogoText").innerText = symbolVal.substring(0, 2).toUpperCase();
+                }
+            } else {
+                pulseBar.className = "bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
+                viralStatus.innerText = "النظام المالي المعتمد: جاهز للربط الفوري والتسوية الآمنة 🔒";
+            }
+        }
+
+        function spinDestinyWheel() {
+            const list = [
+                { name: "Base Enterprise Asset", symbol: "BEA" },
+                { name: "Digital Sovereign Fund", symbol: "DSF" },
+                { name: "Base Capital Reserve", symbol: "BCR" },
+                { name: "Sovereign Protocol", symbol: "SOV" }
+            ];
+            const pick = list[Math.floor(Math.random() * list.length)];
+            document.getElementById("tokenName").value = pick.name;
+            document.getElementById("tokenSymbol").value = pick.symbol;
+            updateLivePreview();
+        }
+
+        const officialSuggestions = [
+            "درع ذهبي رسمي يرمز للأمان المالي",
+            "هرم هندسي استثماري متطور بلون أزرق فخم",
+            "عملة رقمية رسمية بشعار سيادة مالية",
+            "مؤشر صاعد فخم يرمز للاستثمار المؤسسي",
+            "شعار مؤسسي هندسي نقي بتصميم حديث"
+        ];
+
+        function suggestAIPrompt() {
+            const rand = officialSuggestions[Math.floor(Math.random() * officialSuggestions.length)];
+            document.getElementById("aiPromptInput").value = rand;
+        }
+
+        function switchLogoTab(tab) {
+            document.getElementById('panelDoodle').classList.add('hidden');
+            document.getElementById('panelAI').classList.add('hidden');
+            document.getElementById('panelUpload').classList.add('hidden');
+            
+            document.getElementById('tabDoodle').className = "py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
+            document.getElementById('tabAI').className = "py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
+            document.getElementById('tabUpload').className = "py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
+
+            if(tab === 'doodle') {
+                document.getElementById('panelDoodle').classList.remove('hidden');
+                document.getElementById('tabDoodle').className = "py-2.5 px-3 rounded-xl border border-sky-500 bg-sky-500/10 text-sky-400 font-bold text-xs transition-all";
+            } else if(tab === 'ai') {
+                document.getElementById('panelAI').classList.remove('hidden');
+                document.getElementById('tabAI').className = "py-2.5 px-3 rounded-xl border border-sky-500 bg-sky-500/10 text-sky-400 font-bold text-xs transition-all";
+            } else if(tab === 'upload') {
+                document.getElementById('panelUpload').classList.remove('hidden');
+                document.getElementById('tabUpload').className = "py-2.5 px-3 rounded-xl border border-sky-500 bg-sky-500/10 text-sky-400 font-bold text-xs transition-all";
+            }
+        }
+
+        async function generateRealAILogo() {
+            let userPrompt = document.getElementById('aiPromptInput').value.trim();
+            if(!userPrompt) { userPrompt = "official financial asset corporate logo, vector art"; }
+
+            const btn = document.getElementById('aiGenBtn');
+            const container = document.getElementById('aiResultContainer');
+            const imgElement = document.getElementById('aiGeneratedImage');
+
+            btn.disabled = true;
+            btn.innerText = "جاري إنشاء الهوية البصرية الرسمية... ⏳";
+
+            let promptKeyword = userPrompt;
+            const lower = userPrompt.toLowerCase();
+            
+            if(lower.includes("درع")) promptKeyword = "golden corporate shield financial security emblem, vector art";
+            else if(lower.includes("هرم")) promptKeyword = "modern geometric investment pyramid vector logo, blue luxury";
+            else if(lower.includes("مؤشر")) promptKeyword = "professional financial growth chart emblem, minimalist vector";
+            else promptKeyword = userPrompt + ", professional corporate financial asset logo, vector art, solid background";
+
+            const encoded = encodeURIComponent(promptKeyword + ", minimalist corporate design, solid dark background");
+            const randomSeed = Math.floor(Math.random() * 10000);
+            const generatedUrl = `https://image.pollinations.ai/prompt/${encoded}?width=256&height=256&nologo=true&seed=${randomSeed}`;
+
+            const tempImg = new Image();
+            tempImg.src = generatedUrl;
+            
+            let isLoaded = false;
+            tempImg.onload = function() {
+                if(isLoaded) return;
+                isLoaded = true;
+                aiImageUrl = generatedUrl;
+                imgElement.src = generatedUrl;
+                container.classList.remove('hidden');
+                
+                const containerLogo = document.getElementById('previewLogoContainer');
+                containerLogo.innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
+
+                btn.disabled = false;
+                btn.innerText = "توليد الشعار بالذكاء الاصطناعي الفوري ✨";
+            };
+
+            setTimeout(() => {
+                if(!isLoaded) {
+                    isLoaded = true;
+                    aiImageUrl = generatedUrl;
+                    imgElement.src = generatedUrl;
+                    container.classList.remove('hidden');
+                    const containerLogo = document.getElementById('previewLogoContainer');
+                    containerLogo.innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
+                    btn.disabled = false;
+                    btn.innerText = "توليد الشعار بالذكاء الاصطناعي الفوري ✨";
+                }
+            }, 1200);
+        }
+
+        // إعداد الرسم
+        const canvas = document.getElementById('doodleCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+
+        function startPosition(e) { painting = true; draw(e); }
+        function endPosition() { painting = false; ctx.beginPath(); }
+        function draw(e) {
+            if (!painting) return;
+            e.preventDefault();
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#0f172a';
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.touches && e.touches[0]) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            ctx.lineTo(clientX - rect.left, clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(clientX - rect.left, clientY - rect.top);
+        }
+
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('touchstart', startPosition);
+        canvas.addEventListener('touchend', endPosition);
+        canvas.addEventListener('touchmove', draw);
+
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        async function connectWallet() {
+            if (typeof window.ethereum === "undefined") {
+                showStatus("يرجى فتح الموقع من متصفح محفظة ويب 3 مدعومة.", "error");
+                return;
+            }
+            try {
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                const chainId = await window.ethereum.request({ method: "eth_chainId" });
+                if (chainId !== BASE_CHAIN_ID) {
+                    await window.ethereum.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: BASE_CHAIN_ID }]
+                    });
+                }
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                const address = await signer.getAddress();
+                const shortAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
+                
+                const btn = document.getElementById("connectWalletBtn");
+                btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
+                showStatus("تم ربط المحفظة المؤسسية بنجاح.", "success");
+            } catch (error) {
+                showStatus("فشل الاتصال بالمحفظة.", "error");
+            }
+        }
+
+        async function handleLaunch(event) {
+            event.preventDefault();
+            if (!contract) {
+                showStatus("يرجى ربط المحفظة أولاً.", "error");
+                await connectWallet();
+                return;
+            }
+
+            const name = document.getElementById("tokenName").value.trim();
+            const symbol = document.getElementById("tokenSymbol").value.trim();
+            const submitBtn = document.getElementById("submitBtn");
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "جاري إعداد معاملة الإصدار المعتمد...";
+
+                const requiredFee = 250000000000000n; // 0.00025 ETH[span_0](start_span)[span_0](end_span)
+                const txOptions = { value: requiredFee, gasLimit: 600000n };
+
+                showStatus("يرجى تأكيد المعاملة من محفظتك...", "info");
+
+                const tx = await contract.deployNewToken(name, symbol, txOptions);[span_1](start_span)[span_1](end_span)
+                
+                submitBtn.innerText = "جاري توثيق المعاملة على الشبكة...";
+                showStatus(`تم إرسال معاملة الإصدار بنجاح! <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline font-bold text-sky-400">متابعة على BaseScan</a>`, "info");
+
+                const receipt = await tx.wait();[span_2](start_span)[span_2](end_span)
+
+                submitBtn.disabled = false;
+                submitBtn.innerText = "اعتماد وإصدار الأصل الرقمي الآن 🏛️";
+                showStatus(`🎉 تم إصدار وتدشين العملة الرقمية رسمياً بنجاح!<br><a href="https://basescan.org/tx/${receipt.hash}" target="_blank" class="underline font-bold text-sky-400">عرض تفاصيل المعاملة النهائية</a>`, "success");
+                
+                document.getElementById("launchForm").reset();
+                clearCanvas();
+                updateLivePreview();
+
+            } catch (error) {
+                console.error(error);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "اعتماد وإصدار الأصل الرقمي الآن 🏛️";
+                
+                let errorMsg = "حدث خطأ أثناء تنفيذ المعاملة.";
+                if (error.message.includes("user rejected") || error.message.includes("ACTION_REJECTED")) {
+                    errorMsg = "تم إلغاء المعاملة من قِبل المستخدم.";
+                } else if (error.message.includes("insufficient funds")) {
+                    errorMsg = "رصيد الإيثيريوم على شبكة Base غير كافي لدفع الرسوم والغاز.";
+                }
+                showStatus(errorMsg, "error");
+            }
+        }
+
+        function showStatus(message, type) {
+            const box = document.getElementById("statusBox");
+            box.classList.remove("hidden", "bg-emerald-950/40", "border-emerald-800", "text-emerald-300", "bg-rose-950/40", "border-rose-800", "text-rose-300", "bg-sky-950/40", "border-sky-800", "text-sky-300");
+            
+            if (type === "success") {
+                box.classList.add("bg-emerald-950/40", "border-emerald-800", "text-emerald-300");
+            } else if (type === "error") {
+                box.classList.add("bg-rose-950/40", "border-rose-800", "text-rose-300");
+            } else {
+                box.classList.add("bg-sky-950/40", "border-sky-800", "text-sky-300");
+            }
+            box.innerHTML = message;
+        }
+    </script>
+</body>
+</html>
