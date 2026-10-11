@@ -83,16 +83,126 @@
 
         const CONTRACT_ABI = [
             {
-                "inputs": [{"internalType": "string", "name": "name", "type": "string"},{"internalType": "string", "name": "symbol", "type": "string"}],
+                "inputs": [
+                    { "internalType": "string", "name": "name", "type": "string" },
+                    { "internalType": "string", "name": "symbol", "type": "string" }
+                ],
                 "name": "deployNewToken",
-                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
                 "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [{ "internalType": "address", "name": "_feeRecipient", "type": "address" }],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+                "name": "OwnableInvalidOwner",
+                "type": "error"
+            },
+            {
+                "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+                "name": "OwnableUnauthorizedAccount",
+                "type": "error"
+            },
+            {
+                "inputs": [],
+                "name": "ReentrancyGuardReentrantCall",
+                "type": "error"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
+                    { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+                ],
+                "name": "OwnershipTransferred",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "renounceOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{ "internalType": "uint256", "name": "_newFee", "type": "uint256" }],
+                "name": "setCreationFee",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{ "internalType": "address", "name": "_newRecipient", "type": "address" }],
+                "name": "setFeeRecipient",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    { "indexed": true, "internalType": "address", "name": "tokenAddress", "type": "address" },
+                    { "indexed": false, "internalType": "string", "name": "name", "type": "string" },
+                    { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" },
+                    { "indexed": true, "internalType": "address", "name": "creator", "type": "address" }
+                ],
+                "name": "TokenLaunched",
+                "type": "event"
+            },
+            {
+                "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+                "name": "transferOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdrawStuckEther",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "stateMutability": "payable",
+                "type": "receive"
+            },
+            {
+                "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+                "name": "allTokens",
+                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+                "stateMutability": "view",
                 "type": "function"
             },
             {
                 "inputs": [],
                 "name": "creationFee",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "feeRecipient",
+                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getAllTokensCount",
+                "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
                 "stateMutability": "view",
                 "type": "function"
             }
@@ -102,15 +212,13 @@
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                showStatus("يرجى تثبيت محفظة MetaMask أو استخدام متصفح يدعم Web3.", "error");
+                showStatus("يرجى استخدام محفظة ويب 3 مدعومة مثل Binance Web3 Wallet.", "error");
                 return;
             }
 
             try {
-                // طلب الاتصال بالمحفظة
                 await window.ethereum.request({ method: "eth_requestAccounts" });
                 
-                // التحقق من الشبكة (Base Mainnet)
                 const chainId = await window.ethereum.request({ method: "eth_chainId" });
                 if (chainId !== BASE_CHAIN_ID) {
                     try {
@@ -157,25 +265,18 @@
 
             try {
                 submitBtn.disabled = true;
-                submitBtn.innerText = "جاري جلب الرسوم وإرسال المعاملة...";
+                submitBtn.innerText = "جاري إعداد المعاملة...";
 
-                // جلب قيمة الرسوم الفعلية مباشرة من العقد لضمان الدقة المطلقة
-                let fee = ethers.parseEther("0.00025");
-                try {
-                    fee = await contract.creationFee();
-                } catch (e) {
-                    console.log("استخدام القيمة الافتراضية للرسوم");
-                }
+                // استخدام القيمة الثابتة مباشرة لمنع أي خطأ استعلام في محفظة بينانس
+                const fee = ethers.parseEther("0.00025");
 
                 showStatus("يرجى تأكيد المعاملة في محفظتك...", "info");
 
-                // تنفيذ استدعاء دالة الإطلاق مع إرسال قيمة الرسوم المطلوبة
                 const tx = await contract.deployNewToken(name, symbol, { value: fee });
                 
                 submitBtn.innerText = "جاري تأكيد المعاملة على البلوكتشين...";
                 showStatus(`تم إرسال المعاملة! جارٍ التأكيد... <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline font-bold text-cyan-400">عرض على البس سكان</a>`, "info");
 
-                // الانتظار حتى يتم تأكيد المعاملة
                 const receipt = await tx.wait();
 
                 submitBtn.disabled = false;
@@ -183,7 +284,6 @@
                 
                 showStatus(`🎉 تم إطلاق العملة بنجاح وتوزيع الحصص تلقائياً!<br><a href="https://basescan.org/tx/${receipt.hash}" target="_blank" class="underline font-bold text-cyan-400">رابط المعاملة النهائية</a>`, "success");
                 
-                // تفريغ الحقول
                 document.getElementById("launchForm").reset();
 
             } catch (error) {
@@ -192,8 +292,10 @@
                 submitBtn.innerText = "إطلاق العملة الآن 🚀";
                 
                 let errorMsg = error.reason || error.message || "حدث خطأ غير معروف";
-                if (errorMsg.includes("user rejected")) {
+                if (errorMsg.includes("user rejected") || errorMsg.includes("ACTION_REJECTED")) {
                     errorMsg = "تم إلغاء المعاملة من قِبل المستخدم.";
+                } else if (errorMsg.includes("insufficient funds")) {
+                    errorMsg = "عذراً، رصيدك من الإيثيريوم (ETH) غير كافي لدفع رسوم الإطلاق والغاز.";
                 }
                 showStatus("خطأ: " + errorMsg, "error");
             }
