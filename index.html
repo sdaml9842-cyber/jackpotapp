@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Protocol - Masterpiece Enterprise Engine</title>
+    <title>ChainPump Protocol - Global Multi-Chain Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; background-color: #080c14; color: #f1f5f9; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif; background-color: #080c14; color: #f1f5f9; -webkit-font-smoothing: antialiased; }
+        [dir="rtl"] body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; }
         .institutional-card {
             background: rgba(13, 20, 36, 0.92);
             backdrop-filter: blur(16px);
@@ -36,39 +37,44 @@
     <!-- شريط توثيق الأمان المؤسسي -->
     <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-2 space-x-reverse">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
                 <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                <span>الشبكة النشطة: <strong id="activeNetworkLabel" class="text-slate-200">Solana Phantom (SPL)</strong></span>
+                <span id="netLabelText">Network: <strong class="text-slate-200">Solana Phantom (SPL)</strong></span>
             </div>
-            <span class="text-purple-400 font-semibold">🛡️ لوحة رسم متغيرة الألوان</span>
+            <span class="text-purple-400 font-semibold" id="topSecText">🛡️ Global Institutional Engine</span>
         </div>
     </div>
 
-    <!-- الهيدر المؤسسي المطور -->
+    <!-- الهيدر المؤسسي مع محدد اللغات والشبكات -->
     <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <div class="flex items-center space-x-3 space-x-reverse">
+            <div class="flex items-center space-x-3 rtl:space-x-reverse">
                 <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-base shadow-sm">
                     👻
                 </div>
                 <div>
-                    <div class="flex items-center space-x-2 space-x-reverse">
+                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
                         <span class="font-extrabold text-base text-white tracking-tight">ChainPump</span>
-                        <span class="text-[10px] bg-purple-950 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-800">MASTER</span>
+                        <span class="text-[10px] bg-purple-950 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-800">GLOBAL</span>
                     </div>
-                    <span class="block text-[10px] text-slate-500 font-semibold">محرك إطلاق الأصول الرقمية</span>
+                    <span class="block text-[10px] text-slate-500 font-semibold" id="headerSubText">Enterprise Token Engine</span>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2 space-x-reverse">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <!-- مبدل اللغة -->
+                <button type="button" onclick="toggleLanguage()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold px-2.5 py-2 rounded-xl text-xs" id="langBtn">
+                    🌐 AR
+                </button>
+
                 <select id="networkSelector" onchange="switchProtocolNetwork()" class="bg-slate-900 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl px-2.5 py-2 focus:outline-none focus:border-purple-500">
-                    <option value="solana">🟣 Solana Phantom</option>
-                    <option value="base">🔵 Base Mainnet</option>
+                    <option value="solana">Solana Phantom</option>
+                    <option value="base">Base Mainnet</option>
                 </select>
 
-                <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3.5 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 space-x-reverse shadow-sm">
+                <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 rtl:space-x-reverse shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                    <span>ربط Phantom</span>
+                    <span id="connectWalletText">Connect Phantom</span>
                 </button>
             </div>
         </div>
@@ -80,127 +86,124 @@
         <!-- لوحة عوائد البروتوكول (Revenue Share) -->
         <div class="institutional-card rounded-2xl p-4 shadow-xl border border-slate-800">
             <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center space-x-2 space-x-reverse">
+                <div class="flex items-center space-x-2 rtl:space-x-reverse">
                     <span class="text-base">💼</span>
-                    <h2 class="font-bold text-white text-xs">برنامج مشاركة عوائد البروتوكول (Revenue Share)</h2>
+                    <h2 class="font-bold text-white text-xs" id="revShareTitle">Protocol Revenue Share Program</h2>
                 </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 font-bold px-2 py-0.5 rounded border border-purple-500/20">عائد فوري 20%</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 font-bold px-2 py-0.5 rounded border border-purple-500/20" id="revShareBadge">20% Instant Yield</span>
             </div>
             
             <div class="grid grid-cols-2 gap-2 mb-3">
                 <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
-                    <span class="block text-[10px] text-slate-500 mb-0.5">الإحالات الناجحة</span>
-                    <span id="refCountText" class="text-xs font-bold text-white font-mono">0 إحالة</span>
+                    <span class="block text-[10px] text-slate-500 mb-0.5" id="refCountLabel">Successful Launches</span>
+                    <span id="refCountText" class="text-xs font-bold text-white font-mono">0 Referral</span>
                 </div>
                 <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
-                    <span class="block text-[10px] text-slate-500 mb-0.5">العوائد المستحقة</span>
+                    <span class="block text-[10px] text-slate-500 mb-0.5" id="refEarnedLabel">Earned Rewards</span>
                     <span id="refEarnedText" class="text-xs font-bold text-purple-400 font-mono">0.0000 SOL</span>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2 space-x-reverse">
-                <input type="text" id="referralLinkInput" readonly value="يرجى ربط محفظة Phantom لتوليد الرابط المعتمد..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-purple-300 font-mono text-left focus:outline-none">
-                <button type="button" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold px-3.5 py-2 rounded-lg text-xs flex-shrink-0">
-                    نسخ
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <input type="text" id="referralLinkInput" readonly value="Connect Phantom wallet to generate referral link..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-purple-300 font-mono text-left ltr:text-left rtl:text-right focus:outline-none">
+                <button type="button" id="copyBtn" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold px-3.5 py-2 rounded-lg text-xs flex-shrink-0">
+                    Copy
                 </button>
             </div>
         </div>
 
-        <!-- بطاقة الإطلاق الرئيسية الفائقة السلاسة -->
+        <!-- بطاقة الإطلاق الرئيسية -->
         <div class="institutional-card rounded-2xl p-5 shadow-2xl">
             <div class="mb-4 border-b border-slate-800/80 pb-3">
-                <h1 id="engineTitle" class="text-base font-bold text-white">إصدار أصل رقمي فوري (Solana Phantom)</h1>
-                <p class="text-slate-400 text-xs mt-0.5">توليد عقود السيولة الفورية والشراء بانسيابية مطلقة وبدون أخطاء.</p>
+                <h1 id="engineTitle" class="text-base font-bold text-white">Instant Token Deployment (Solana Phantom)</h1>
+                <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Generate algorithmic liquidity pools and deploy seamlessly without errors.</p>
             </div>
 
             <!-- شريط الخطوات -->
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
-                <div class="py-1.5 rounded-lg border step-active">1. البيانات</div>
-                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">2. التجهيز</div>
-                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">3. السيولة</div>
-                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">4. الأمان</div>
+                <div class="py-1.5 rounded-lg border step-active" id="step1">1. Data</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step2">2. Setup</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step3">3. Liquidity</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step4">4. Security</div>
             </div>
 
             <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-3.5">
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-bold text-slate-300">اسم العملة / الأصل (Token Name)</label>
-                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-purple-400 hover:underline">🎲 توليد اسم موثق</button>
+                        <label class="text-xs font-bold text-slate-300" id="nameLabel">Token Name</label>
+                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-purple-400 hover:underline" id="genNameBtn">🎲 Generate Name</button>
                     </div>
-                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: Phantom Sovereign AI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
+                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="e.g. Phantom Sovereign AI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-slate-300">الرمز المالي المقتضب (Ticker Symbol)</label>
-                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: SOV" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 uppercase focus:outline-none focus:border-purple-500">
+                    <label class="block text-xs font-bold mb-1 text-slate-300" id="symbolLabel">Ticker Symbol</label>
+                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="e.g. SOV" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 uppercase focus:outline-none focus:border-purple-500">
                 </div>
 
-                <!-- معاينة حية للأصل -->
-                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex items-center space-x-3 space-x-reverse">
+                <!-- معاينة حية -->
+                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex items-center space-x-3 rtl:space-x-reverse">
                     <div id="previewLogoContainer" class="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400 text-sm overflow-hidden flex-shrink-0">
                         <span id="previewLogoText">👻</span>
                     </div>
                     <div class="flex-grow">
-                        <h3 id="previewName" class="font-bold text-white text-xs">اسم الأصل الرقمي</h3>
+                        <h3 id="previewName" class="font-bold text-white text-xs">Digital Asset Name</h3>
                         <p id="previewSymbol" class="text-[10px] text-slate-500 uppercase font-mono">SYMBOL</p>
                     </div>
-                    <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold">جاهز</span>
+                    <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold" id="readyBadge">Ready</span>
                 </div>
 
-                <!-- خيارات الهوية البصرية (AI + رفع ملف + رسم حر ملون) -->
+                <!-- الهوية البصرية -->
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-slate-300">الهوية البصرية والشعار</label>
+                    <label class="block text-xs font-bold mb-1 text-slate-300" id="logoSourceLabel">Visual Identity & Logo</label>
                     <div class="grid grid-cols-3 gap-1.5 mb-2">
-                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs">✨ ذكاء اصطناعي</button>
-                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">📁 رفع ملف</button>
-                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">🎨 رسم حر ملون</button>
+                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs">✨ AI Studio</button>
+                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs" id="tabUploadText">📁 Upload File</button>
+                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs" id="tabCanvasText">🎨 Color Canvas</button>
                     </div>
 
                     <div id="panelAI" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
-                        <input type="text" id="aiPromptInput" placeholder="وصف شعار العملة..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
-                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-2 rounded-lg text-xs">توليد الشعار فوراً ✨</button>
+                        <input type="text" id="aiPromptInput" placeholder="Enter logo prompt..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
+                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-2 rounded-lg text-xs">Generate Logo ✨</button>
                     </div>
 
                     <div id="panelUpload" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden text-center">
                         <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400">
                     </div>
 
-                    <!-- لوحة الرسم الحر مع ألوان متغيرة -->
                     <div id="panelCanvas" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-2.5 text-center">
-                        <!-- شريط اختيار الألوان -->
-                        <div class="flex justify-center items-center space-x-3 space-x-reverse py-1">
-                            <span class="text-[11px] text-slate-400 font-bold">اختر اللون:</span>
-                            <div onclick="setBrushColor('#a855f7', this)" class="color-dot active" style="background-color: #a855f7;" title="أرجواني Phantom"></div>
-                            <div onclick="setBrushColor('#10b981', this)" class="color-dot" style="background-color: #10b981;" title="أخضر زمردي"></div>
-                            <div onclick="setBrushColor('#3b82f6', this)" class="color-dot" style="background-color: #3b82f6;" title="أزرق سيادي"></div>
-                            <div onclick="setBrushColor('#f59e0b', this)" class="color-dot" style="background-color: #f59e0b;" title="ذهبي ناصع"></div>
-                            <div onclick="setBrushColor('#ef4444', this)" class="color-dot" style="background-color: #ef4444;" title="أحمر ناري"></div>
-                            <div onclick="setBrushColor('#ffffff', this)" class="color-dot" style="background-color: #ffffff;" title="أبيض نقي"></div>
+                        <div class="flex justify-center items-center space-x-3 rtl:space-x-reverse py-1">
+                            <span class="text-[11px] text-slate-400 font-bold" id="brushColorText">Color:</span>
+                            <div onclick="setBrushColor('#a855f7', this)" class="color-dot active" style="background-color: #a855f7;" title="Phantom Purple"></div>
+                            <div onclick="setBrushColor('#10b981', this)" class="color-dot" style="background-color: #10b981;" title="Emerald Green"></div>
+                            <div onclick="setBrushColor('#3b82f6', this)" class="color-dot" style="background-color: #3b82f6;" title="Blue"></div>
+                            <div onclick="setBrushColor('#f59e0b', this)" class="color-dot" style="background-color: #f59e0b;" title="Gold"></div>
+                            <div onclick="setBrushColor('#ffffff', this)" class="color-dot" style="background-color: #ffffff;" title="White"></div>
                         </div>
 
                         <div class="flex justify-center">
                             <canvas id="logoCanvas" width="160" height="160" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none shadow-inner"></canvas>
                         </div>
-                        <div class="flex space-x-2 space-x-reverse">
-                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs">مسح 🗑️</button>
-                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-1.5 rounded-lg text-xs">اعتماد ✨</button>
+                        <div class="flex space-x-2 rtl:space-x-reverse">
+                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs" id="clearBtn">Clear 🗑️</button>
+                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-1.5 rounded-lg text-xs" id="applyBtn">Apply ✨</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1.5 text-slate-400">
                     <div class="flex justify-between">
-                        <span>إجمالي المعروض الثابت:</span>
+                        <span id="supplyLabel">Total Fixed Supply:</span>
                         <span class="font-bold text-slate-200 font-mono">1,000,000,000</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span>رسوم الإصدار (صافي ~ $0.70):</span>
+                        <span id="feeProtocolLabel">Protocol Fee (Net ~$0.70):</span>
                         <span id="feeLabel" class="font-bold text-purple-400 font-mono">0.0065 SOL</span>
                     </div>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-3.5 rounded-xl text-xs tracking-wide shadow-lg shadow-purple-900/30">
-                    ربط Phantom وإطلاق الأصل فوراً 🚀
+                    Connect Phantom & Launch Instantly 🚀
                 </button>
             </form>
 
@@ -209,7 +212,7 @@
     </main>
 
     <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-4 text-[11px] text-slate-600">
-        <p>© 2026 ChainPump Master Enterprise Protocol</p>
+        <p>© 2026 ChainPump Global Master Protocol</p>
     </footer>
 
     <!-- إخفاء شعار Netlify نهائياً -->
@@ -220,13 +223,129 @@
     </style>
 
     <script>
-        const CONTRACT_ADDRESS_BASE = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
-        const BASE_CHAIN_ID = "0x2105";
-
+        let currentLang = 'en';
         let userAddress = "";
         let currentNetwork = "solana";
         let canvas, ctx, painting = false;
-        let brushColor = "#a855f7"; // اللون الافتراضي أرجواني Phantom
+        let brushColor = "#a855f7";
+
+        const translations = {
+            en: {
+                topSec: "🛡️ Global Institutional Engine",
+                netLabel: "Network:",
+                headerSub: "Enterprise Token Engine",
+                connectWallet: "Connect Phantom",
+                revShare: "Protocol Revenue Share Program",
+                revBadge: "20% Instant Yield",
+                refCount: "Successful Launches",
+                refEarned: "Earned Rewards",
+                refInputDefault: "Connect Phantom wallet to generate referral link...",
+                copy: "Copy",
+                engineTitle: "Instant Token Deployment (Solana Phantom)",
+                engineDesc: "Generate algorithmic liquidity pools and deploy seamlessly without errors.",
+                step1: "1. Data", step2: "2. Setup", step3: "3. Liquidity", step4: "4. Security",
+                nameLabel: "Token Name",
+                genName: "🎲 Generate Name",
+                symbolLabel: "Ticker Symbol",
+                ready: "Ready",
+                logoSource: "Visual Identity & Logo",
+                tabAI: "✨ AI Studio",
+                tabUpload: "📁 Upload File",
+                tabCanvas: "🎨 Color Canvas",
+                aiPromptPlaceholder: "Enter logo prompt...",
+                aiGenBtn: "Generate Logo ✨",
+                brushColorText: "Color:",
+                clearBtn: "Clear 🗑️",
+                applyBtn: "Apply ✨",
+                supply: "Total Fixed Supply:",
+                feeProtocol: "Protocol Fee (Net ~$0.70):",
+                submitBtn: "Connect Phantom & Launch Instantly 🚀",
+                connected: "Connected",
+                switchNetMsg: "Network switched successfully.",
+                walletConnectedMsg: "Wallet connected securely & successfully!",
+                copiedMsg: "Referral link copied successfully!",
+                launchSuccessMsg: "🎉 Token launched successfully via Solana Phantom!"
+            },
+            ar: {
+                topSec: "🛡️ محرك مؤسسي عالمي",
+                netLabel: "الشبكة:",
+                headerSub: "منصة إطلاق الأصول الرقمية",
+                connectWallet: "ربط Phantom",
+                revShare: "برنامج مشاركة عوائد البروتوكول",
+                revBadge: "عائد فوري 20%",
+                refCount: "الإحالات الناجحة",
+                refEarned: "العوائد المستحقة",
+                refInputDefault: "يرجى ربط محفظة Phantom لتوليد الرابط المعتمد...",
+                copy: "نسخ",
+                engineTitle: "إصدار أصل رقمي فوري (Solana Phantom)",
+                engineDesc: "توليد عقود السيولة الفورية والشراء بانسيابية مطلقة وبدون أخطاء.",
+                step1: "1. البيانات", step2: "2. التجهيز", step3: "3. السيولة", step4: "4. الأمان",
+                nameLabel: "اسم العملة / الأصل",
+                genName: "🎲 توليد اسم موثق",
+                symbolLabel: "الرمز المالي المقتضب",
+                ready: "جاهز",
+                logoSource: "الهوية البصرية والشعار",
+                tabAI: "✨ ذكاء اصطناعي",
+                tabUpload: "📁 رفع ملف",
+                tabCanvas: "🎨 رسم حر ملون",
+                aiPromptPlaceholder: "وصف شعار العملة...",
+                aiGenBtn: "توليد الشعار فوراً ✨",
+                brushColorText: "اللون:",
+                clearBtn: "مسح 🗑️",
+                applyBtn: "اعتماد ✨",
+                supply: "إجمالي المعروض الثابت:",
+                feeProtocol: "رسوم الإصدار (صافي ~ $0.70):",
+                submitBtn: "ربط Phantom وإطلاق الأصل فوراً 🚀",
+                connected: "متصل",
+                switchNetMsg: "تم تبديل الشبكة بنجاح.",
+                walletConnectedMsg: "تم ربط المحفظة وتفعيل لوحة الشريك بنجاح ت تام وأمان!",
+                copiedMsg: "تم نسخ رابط الشريك بنجاح!",
+                launchSuccessMsg: "🎉 تم تنفيذ الشراء وإطلاق الأصل بنجاح تام عبر شبكة Solana!"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const root = document.getElementById('htmlRoot');
+            root.setAttribute('lang', currentLang);
+            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('langBtn').innerText = currentLang === 'en' ? '🌐 AR' : '🌐 EN';
+            
+            const t = translations[currentLang];
+            document.getElementById('topSecText').innerText = t.topSec;
+            document.getElementById('headerSubText').innerText = t.headerSub;
+            if(!userAddress) {
+                document.getElementById('connectWalletText').innerText = t.connectWallet;
+                document.getElementById('referralLinkInput').value = t.refInputDefault;
+            }
+            document.getElementById('revShareTitle').innerText = t.revShare;
+            document.getElementById('revShareBadge').innerText = t.revBadge;
+            document.getElementById('refCountLabel').innerText = t.refCount;
+            document.getElementById('refEarnedLabel').innerText = t.refEarned;
+            document.getElementById('copyBtn').innerText = t.copy;
+            document.getElementById('engineTitle').innerText = t.engineTitle;
+            document.getElementById('engineDesc').innerText = t.engineDesc;
+            document.getElementById('step1').innerText = t.step1;
+            document.getElementById('step2').innerText = t.step2;
+            document.getElementById('step3').innerText = t.step3;
+            document.getElementById('step4').innerText = t.step4;
+            document.getElementById('nameLabel').innerText = t.nameLabel;
+            document.getElementById('genNameBtn').innerText = t.genName;
+            document.getElementById('symbolLabel').innerText = t.symbolLabel;
+            document.getElementById('readyBadge').innerText = t.ready;
+            document.getElementById('logoSourceLabel').innerText = t.logoSource;
+            document.getElementById('tabAI').innerText = t.tabAI;
+            document.getElementById('tabUploadText').innerText = t.tabUpload;
+            document.getElementById('tabCanvasText').innerText = t.tabCanvas;
+            document.getElementById('aiPromptInput').placeholder = t.aiPromptPlaceholder;
+            document.getElementById('aiGenBtn').innerText = t.aiGenBtn;
+            document.getElementById('brushColorText').innerText = t.brushColorText;
+            document.getElementById('clearBtn').innerText = t.clearBtn;
+            document.getElementById('applyBtn').innerText = t.applyBtn;
+            document.getElementById('supplyLabel').innerText = t.supply;
+            document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
+            document.getElementById('submitBtn').innerText = t.submitBtn;
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -244,14 +363,13 @@
         function switchProtocolNetwork() {
             currentNetwork = document.getElementById('networkSelector').value;
             const isSol = currentNetwork === 'solana';
-            document.getElementById('activeNetworkLabel').innerText = isSol ? "Solana Phantom (SPL)" : "Base Mainnet (ERC-20)";
-            document.getElementById('engineTitle').innerText = isSol ? "إصدار أصل رقمي فوري (Solana Phantom)" : "إصدار أصل رقمي فوري (Base Chain)";
+            const t = translations[currentLang];
             document.getElementById('feeLabel').innerText = isSol ? "0.0065 SOL" : "0.00025 ETH";
-            document.getElementById('connectWalletBtn').innerHTML = isSol ? `<span class="w-2 h-2 rounded-full bg-purple-400"></span><span>ربط Phantom</span>` : `<span class="w-2 h-2 rounded-full bg-blue-400"></span><span>ربط EVM</span>`;
-            showStatus("تم تبديل الشبكة بنجاح وانسيابية.", "info");
+            showStatus(t.switchNetMsg, "info");
         }
 
         async function connectWallet() {
+            const t = translations[currentLang];
             if (currentNetwork === 'solana') {
                 try {
                     const provider = window.phantom?.solana || window.solana;
@@ -264,12 +382,12 @@
                         return;
                     }
                 } catch (err) {
-                    showStatus("تم إلغاء الاتصال من محفظة Phantom.", "error");
+                    showStatus("Connection canceled by user.", "error");
                     return;
                 }
             } else {
                 if (typeof window.ethereum === "undefined") {
-                    showStatus("يرجى فتح متصفح يدعم Web3.", "error");
+                    showStatus("Web3 wallet not found.", "error");
                     return;
                 }
                 const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -279,21 +397,22 @@
             const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
             document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
             document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
-            showStatus("تم ربط المحفظة وتفعيل لوحة الشريك بنجاح ت تام وأمان!", "success");
+            showStatus(t.walletConnectedMsg, "success");
         }
 
         function copyReferralLink() {
             const input = document.getElementById('referralLinkInput');
-            if(!userAddress) { showStatus("يرجى ربط المحفظة أولاً!", "error"); return; }
+            const t = translations[currentLang];
+            if(!userAddress) { showStatus("Please connect wallet first!", "error"); return; }
             navigator.clipboard.writeText(input.value).then(() => {
-                showStatus("تم نسخ رابط الشريك بنجاح!", "success");
+                showStatus(t.copiedMsg, "success");
             });
         }
 
         function updateLivePreview() {
             const nameVal = document.getElementById("tokenName").value.trim();
             const symbolVal = document.getElementById("tokenSymbol").value.trim();
-            document.getElementById("previewName").innerText = nameVal || "اسم الأصل الرقمي";
+            document.getElementById("previewName").innerText = nameVal || (currentLang === 'ar' ? "اسم الأصل الرقمي" : "Digital Asset Name");
             document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
         }
 
@@ -378,26 +497,27 @@
             if(!canvas) return;
             const dataUrl = canvas.toDataURL('image/png');
             document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
-            showStatus("تم اعتماد الرسم الحر الملون بنجاح للشعار!", "success");
+            showStatus(currentLang === 'ar' ? "تم اعتماد الرسم الحر بنجاح!" : "Custom drawing applied successfully!", "success");
         }
 
         async function generateRealAILogo() {
             let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana phantom token logo vector";
             const btn = document.getElementById('aiGenBtn');
-            btn.innerText = "جاري التوليد... ⏳";
+            btn.innerText = currentLang === 'ar' ? "جاري التوليد... ⏳" : "Generating... ⏳";
             const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
             const img = new Image();
             img.src = generatedUrl;
             img.onload = () => {
                 document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
-                btn.innerText = "توليد الشعار فوراً ✨";
+                btn.innerText = translations[currentLang].aiGenBtn;
             };
         }
 
         async function handleLaunch(event) {
             event.preventDefault();
-            if (!userAddress) { showStatus("يرجى ربط محفظة Phantom أولاً.", "error"); connectWallet(); return; }
-            showStatus("🎉 تم تنفيذ الشراء وإطلاق الأصل بنجاح تام عبر شبكة Solana!", "success");
+            const t = translations[currentLang];
+            if (!userAddress) { showStatus("Please connect Phantom wallet first.", "error"); connectWallet(); return; }
+            showStatus(t.launchSuccessMsg, "success");
         }
 
         function showStatus(message, type) {
