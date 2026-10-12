@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Pro - Enterprise Protocol</title>
+    <title>ChainPump Pro - Enterprise & Viral Launchpad</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 -->
@@ -26,19 +26,23 @@
             box-shadow: 0 0 30px rgba(2, 132, 199, 0.5);
             transform: translateY(-1px);
         }
+        .telegram-gold-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(14, 165, 233, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
 
-    <!-- الشريط العلوي المالي الرسمي -->
-    <div id="viralPulseBar" class="bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500">
+    <!-- الشريط العلوي المالي والتنافسي -->
+    <div id="viralPulseBar" class="bg-slate-900 border-b border-slate-800 text-emerald-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500">
         <div class="flex items-center space-x-2 space-x-reverse">
-            <span id="pulseDot" class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-            <span id="viralStatusText">النظام المالي المعتمد: جاهز للربط الفوري والتسوية الآمنة 🔒</span>
+            <span id="pulseDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="viralStatusText">🔥 تحدي السفير الفيروسي: احصل على $3.00 USDT لكل 20 إحالة إطلاق ناجحة! 🚀</span>
         </div>
         <div class="hidden sm:flex items-center space-x-2 space-x-reverse text-slate-400">
-            <span>⚡ حالة العقد:</span>
-            <span class="font-bold text-sky-400">نشط ومؤمن</span>
+            <span>🎁 مكافأة التجميع:</span>
+            <span class="font-bold text-emerald-400">$3.00 / 20 إحالة (20%)</span>
         </div>
     </div>
 
@@ -46,24 +50,76 @@
     <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-blue-700 flex items-center justify-center shadow-md text-white font-black text-lg">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-600 flex items-center justify-center shadow-md text-white font-black text-lg">
                     🏛️
                 </div>
                 <div>
-                    <span class="font-extrabold text-xl tracking-tight text-white">ChainPump <span class="text-sky-400 font-medium text-sm">Enterprise</span></span>
+                    <span class="font-extrabold text-xl tracking-tight text-white">ChainPump <span class="text-emerald-400 font-medium text-sm">Enterprise</span></span>
                     <span class="block text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Base Protocol Infrastructure</span>
                 </div>
             </div>
             
-            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sky-400 font-semibold px-5 py-2.5 rounded-xl transition-all text-sm shadow-sm flex items-center space-x-2 space-x-reverse">
-                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-400 font-semibold px-5 py-2.5 rounded-xl transition-all text-sm shadow-sm flex items-center space-x-2 space-x-reverse">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span>ربط المحفظة</span>
             </button>
         </div>
     </header>
 
     <!-- المحتوى الرئيسي -->
-    <main class="max-w-xl mx-auto px-4 py-10 w-full flex-grow">
+    <main class="max-w-xl mx-auto px-4 py-8 w-full flex-grow space-y-6">
+
+        <!-- بطاقة أصحاب قنوات التلجرام ونظام الحوافز بالتجميع (3$ / 20 إحالة) -->
+        <div class="telegram-gold-card rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <span class="text-2xl">⚡</span>
+                    <h2 class="font-black text-white text-base">برنامج أصحاب القنوات والمروجين (20% أرباح)</h2>
+                </div>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">3$ / 20 إحالة</span>
+            </div>
+            
+            <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+                انشر رابط قناتك الخاص وجمع الإحالات: **احصل على 3.00$ USDT كاش فوراً** عند الوصول إلى **20 إحالة إطلاق ناجحة** عبر رابطك!
+            </p>
+
+            <!-- شريط تقدم الإحالات -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 mb-4 text-xs space-y-2.5">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400">تقدم إحالات قناتك:</span>
+                    <span class="font-bold text-emerald-400" id="referralProgressText">0 / 20 إحالة (المكافأة: $3.00)</span>
+                </div>
+                <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                    <div id="referralProgressBar" class="bg-gradient-to-r from-emerald-500 to-sky-500 h-full w-[0%] transition-all duration-500"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-500 font-bold">
+                    <span>0 إحالة</span>
+                    <span>10 إحالات</span>
+                    <span>20 إحالة ($3.00)</span>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد رابط القناة الخاص..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-emerald-300 font-mono text-left focus:outline-none">
+                    <button type="button" onclick="copyReferralLink()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex-shrink-0 shadow-md">
+                        📋 نسخ
+                    </button>
+                </div>
+
+                <!-- أزرار المشاركة السريعة -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button type="button" onclick="shareOnTelegram()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs py-2.5 rounded-xl font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all shadow-md">
+                        <span>✈️ نشر مباشر للقناة</span>
+                    </button>
+                    <button type="button" onclick="shareOnX()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs py-2.5 rounded-xl font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all">
+                        <span>𝕏 مشاركة على X</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- بطاقة نموذج الإصدار الرئيسي -->
         <div id="mainCard" class="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden transition-all duration-500">
             
             <div class="mb-6 text-center sm:text-right">
@@ -146,7 +202,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span>رسوم الإطلاق المؤسسي:</span>
-                        <span class="font-bold text-sky-400" id="feeDisplay">0.00025 ETH</span>
+                        <span class="font-bold text-sky-400">0.00025 ETH</span>
                     </div>
                 </div>
 
@@ -165,10 +221,10 @@
         <p>جميع الحقوق محفوظة © 2026 - ChainPump Enterprise Protocol على شبكة Base</p>
     </footer>
 
-    <!-- منطق التشغيل التقني والواجهة الرسمية -->
+    <!-- منطق التشغيل التقني -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
-        const BASE_CHAIN_ID = "0x2105";
+        const BASE_CHAIN_ID = "0x2105"; // Base Mainnet
 
         const CONTRACT_ABI = [
             {
@@ -183,8 +239,81 @@
             }
         ];
 
-        let provider, signer, contract;
+        let provider, signer, contract, userAddress;
         let aiImageUrl = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref');
+            if (refParam && refParam.startsWith('0x')) {
+                localStorage.setItem('chainpump_referrer', refParam);
+            }
+        });
+
+        async function connectWallet() {
+            if (typeof window.ethereum === "undefined") {
+                showStatus("يرجى فتح الموقع من متصفح محفظة ويب 3 مدعومة.", "error");
+                return;
+            }
+            try {
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                
+                const chainId = await window.ethereum.request({ method: "eth_chainId" });
+                if (chainId !== BASE_CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: "wallet_switchEthereumChain",
+                            params: [{ chainId: BASE_CHAIN_ID }]
+                        });
+                    } catch (switchError) {
+                        showStatus("يرجى التحويل إلى شبكة Base الرئيسية في محفظتك.", "error");
+                        return;
+                    }
+                }
+
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                userAddress = await signer.getAddress();
+                const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+                
+                const btn = document.getElementById("connectWalletBtn");
+                btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
+                
+                const baseUrl = window.location.origin + window.location.pathname;
+                const refLink = `${baseUrl}?ref=${userAddress}`;
+                document.getElementById('referralLinkInput').value = refLink;
+
+                showStatus("تم ربط المحفظة وتفعيل رابط تحدي الـ 3$ USDT الخاص بك!", "success");
+            } catch (error) {
+                console.error(error);
+                showStatus("فشل الاتصال بالمحفظة.", "error");
+            }
+        }
+
+        function copyReferralLink() {
+            const input = document.getElementById('referralLinkInput');
+            if(!userAddress) {
+                alert("يرجى ربط المحفظة أولاً للحصول على رابط التلجرام الخاص بك!");
+                return;
+            }
+            input.select();
+            document.execCommand('copy');
+            alert("🎉 تم نسخ رابط القناة الخاص بك بنجاح! انشره الآن لتحقيق هدف الـ 20 إحالة وحصد 3.00$ USDT.");
+        }
+
+        function shareOnTelegram() {
+            const refLink = document.getElementById('referralLinkInput').value;
+            const text = encodeURIComponent("🚨 **فرصة استثمارية لأعضاء القناة!** 🚀\n\nأطلق عملتك الرقمية المعتمدة فوراً على شبكة **Base** بأسهل وأسرع طريقة عبر منصة **ChainPump Enterprise**!\n\n👇 **ابدأ الإطلاق الآن عبر الرابط التالي:**\n");
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${text}`, '_blank');
+        }
+
+        function shareOnX() {
+            const refLink = document.getElementById('referralLinkInput').value;
+            const text = encodeURIComponent("🚀 Launch your custom enterprise token on Base Chain via ChainPump Enterprise Platform!\n\nDeploy here:");
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(refLink)}`, '_blank');
+        }
 
         function updateLivePreview() {
             const nameVal = document.getElementById("tokenName").value.trim();
@@ -203,8 +332,8 @@
                     document.getElementById("previewLogoText").innerText = symbolVal.substring(0, 2).toUpperCase();
                 }
             } else {
-                pulseBar.className = "bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
-                viralStatus.innerText = "النظام المالي المعتمد: جاهز للربط الفوري والتسوية الآمنة 🔒";
+                pulseBar.className = "bg-slate-900 border-b border-slate-800 text-emerald-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
+                viralStatus.innerText = "🔥 تحدي السفير الفيروسي: احصل على $3.00 USDT لكل 20 إحالة إطلاق ناجحة! 🚀";
             }
         }
 
@@ -347,35 +476,6 @@
 
         function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-        async function connectWallet() {
-            if (typeof window.ethereum === "undefined") {
-                showStatus("يرجى فتح الموقع من متصفح محفظة ويب 3 مدعومة.", "error");
-                return;
-            }
-            try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-                const chainId = await window.ethereum.request({ method: "eth_chainId" });
-                if (chainId !== BASE_CHAIN_ID) {
-                    await window.ethereum.request({
-                        method: "wallet_switchEthereumChain",
-                        params: [{ chainId: BASE_CHAIN_ID }]
-                    });
-                }
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-                const address = await signer.getAddress();
-                const shortAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
-                
-                const btn = document.getElementById("connectWalletBtn");
-                btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
-                showStatus("تم ربط المحفظة المؤسسية بنجاح.", "success");
-            } catch (error) {
-                showStatus("فشل الاتصال بالمحفظة.", "error");
-            }
-        }
-
         async function handleLaunch(event) {
             event.preventDefault();
             if (!contract) {
@@ -392,17 +492,19 @@
                 submitBtn.disabled = true;
                 submitBtn.innerText = "جاري إعداد معاملة الإصدار المعتمد...";
 
-                const requiredFee = 250000000000000n; // 0.00025 ETH[span_0](start_span)[span_0](end_span)
-                const txOptions = { value: requiredFee, gasLimit: 600000n };
+                const txOptions = { 
+                    value: ethers.parseEther("0.00025"), 
+                    gasLimit: 600000n 
+                };
 
                 showStatus("يرجى تأكيد المعاملة من محفظتك...", "info");
 
-                const tx = await contract.deployNewToken(name, symbol, txOptions);[span_1](start_span)[span_1](end_span)
+                const tx = await contract.deployNewToken(name, symbol, txOptions);
                 
                 submitBtn.innerText = "جاري توثيق المعاملة على الشبكة...";
                 showStatus(`تم إرسال معاملة الإصدار بنجاح! <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline font-bold text-sky-400">متابعة على BaseScan</a>`, "info");
 
-                const receipt = await tx.wait();[span_2](start_span)[span_2](end_span)
+                const receipt = await tx.wait();
 
                 submitBtn.disabled = false;
                 submitBtn.innerText = "اعتماد وإصدار الأصل الرقمي الآن 🏛️";
