@@ -37,28 +37,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-emerald-600 selection:text-white">
 
-    <!-- نافذة الحجب الذكي لمتصفحات فيسبوك والتطبيقات الداخلية (تمنع الخطأ وتوجه المستخدم للمتصفح الخارجي) -->
-    <div id="inAppBlockerModal" class="fixed inset-0 z-50 bg-[#080c14]/95 backdrop-blur-xl hidden flex items-center justify-center p-6 text-center">
-        <div class="institutional-card max-w-md w-full p-6 rounded-2xl border border-emerald-500/30 space-y-4 shadow-2xl">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl mx-auto">
-                🛡️
-            </div>
-            <h3 class="text-white font-extrabold text-base">حماية متصفح البروتوكول</h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
-                أنت تفتح المنصة الآن من داخل تطبيق تواصل اجتماعي (مثل فيسبوك أو تيليجرام). هذه المتصفحات مقيدة ولا تدعم ربط محفظة الويب 3 (`Web3 Wallet`).
-            </p>
-            <div class="space-y-2.5 pt-2">
-                <button onclick="openInExternalBrowser()" class="w-full btn-green-action text-white font-bold py-3.5 rounded-xl text-xs">
-                    🌐 افتح المنصة الآن في متصفحك الأساسي (Chrome)
-                </button>
-                <button onclick="copyCurrentLinkForBrowser()" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold py-3 rounded-xl text-xs">
-                    📋 نسخ الرابط لفتحه يدوياً
-                </button>
-            </div>
-            <p class="text-[10px] text-slate-500">ChainPump Protocol Security Layer v3.0</p>
-        </div>
-    </div>
-
     <!-- شريط توثيق أمان البروتوكول -->
     <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
@@ -120,11 +98,6 @@
                 <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
                     <div id="affiliateProgressBar" class="bg-emerald-500 h-full w-[0%] transition-all duration-500"></div>
                 </div>
-                <div class="flex justify-between text-[10px] text-slate-500 font-bold">
-                    <span>0 إحالة</span>
-                    <span>10 إحالات</span>
-                    <span>20 إحالة ($3.00 USDT)</span>
-                </div>
             </div>
 
             <div class="space-y-2">
@@ -134,27 +107,17 @@
                         نسخ الرابط
                     </button>
                 </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button type="button" onclick="shareOnTelegram()" class="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 text-xs py-2 rounded-lg font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all">
-                        <span>✈️ مشاركة عبر Telegram</span>
-                    </button>
-                    <button type="button" onclick="shareOnX()" class="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 text-xs py-2 rounded-lg font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all">
-                        <span>𝕏 مشاركة عبر X</span>
-                    </button>
-                </div>
             </div>
         </div>
 
         <!-- بطاقة الإطلاق الرئيسية -->
         <div class="institutional-card rounded-2xl p-6 shadow-2xl relative">
-            
             <div class="mb-5 border-b border-slate-800/80 pb-4">
                 <h1 class="text-lg font-bold text-white">إصدار وتأطير أصل رقمي جديد</h1>
                 <p class="text-slate-400 text-xs mt-1">توليد العقود الذكية المؤثقة وجدولة معايير التداول اللامركزي.</p>
             </div>
 
-            <!-- شريط الخطوات (4 Steps) -->
+            <!-- شريط الخطوات -->
             <div class="grid grid-cols-4 gap-1.5 mb-6 text-center text-[10px] font-bold">
                 <div class="py-2 px-1 rounded-lg border step-active">1. البيانات</div>
                 <div class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">2. التجهيز</div>
@@ -169,12 +132,12 @@
                         <label class="text-xs font-bold text-slate-300">اسم العملة / الأصل (Token Name)</label>
                         <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-blue-400 hover:underline">🎲 توليد تسمية موثقة</button>
                     </div>
-                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: Aura Reserve Protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 transition-all placeholder:text-slate-600">
+                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: Aura Reserve Protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold mb-1.5 text-slate-300">الرمز المالي المقتضب (Ticker Symbol)</label>
-                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: AURA" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 transition-all placeholder:text-slate-600 uppercase">
+                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: AURA" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 uppercase focus:outline-none focus:border-emerald-500">
                 </div>
 
                 <!-- بطاقة المعاينة -->
@@ -192,28 +155,21 @@
                 <!-- خيارات الشعار -->
                 <div>
                     <label class="block text-xs font-bold mb-1.5 text-slate-300">مصدر الهوية البصرية (Token Logo)</label>
-                    <div class="grid grid-cols-3 gap-2 mb-2.5">
-                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs transition-all">✨ ذكاء اصطناعي</button>
-                        <button type="button" onclick="switchLogoTab('doodle')" id="tabDoodle" class="py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs transition-all">🎨 رسم يدوي</button>
-                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs transition-all">📁 رفع ملف</button>
+                    <div class="grid grid-cols-2 gap-2 mb-2.5">
+                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs">✨ ذكاء اصطناعي</button>
+                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">📁 رفع ملف</button>
                     </div>
 
                     <div id="panelAI" class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
-                        <input type="text" id="aiPromptInput" placeholder="وصف الشعار المؤسسي (مثال: درع ذهبي، هرم استثماري...)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
-                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded-lg text-xs transition-all">توليد الشعار الموثق تلقائياً ✨</button>
-                    </div>
-
-                    <div id="panelDoodle" class="p-3 bg-slate-950 border border-slate-800 rounded-xl hidden text-center">
-                        <canvas id="doodleCanvas" width="240" height="90" class="bg-white rounded-lg mx-auto cursor-crosshair border border-slate-700 touch-none"></canvas>
-                        <button type="button" onclick="clearCanvas()" class="mt-1 text-[10px] text-rose-400 underline">مسح الرسم</button>
+                        <input type="text" id="aiPromptInput" placeholder="وصف الشعار المؤسسي..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
+                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded-lg text-xs">توليد الشعار تلقائياً ✨</button>
                     </div>
 
                     <div id="panelUpload" class="p-3 bg-slate-950 border border-slate-800 rounded-xl hidden text-center">
-                        <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-emerald-600/20 file:text-emerald-400">
+                        <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400">
                     </div>
                 </div>
 
-                <!-- الملخص الفني للرسوم -->
                 <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3.5 text-xs space-y-2 text-slate-400">
                     <div class="flex justify-between">
                         <span>إجمالي المعروض الثابت:</span>
@@ -225,7 +181,6 @@
                     </div>
                 </div>
 
-                <!-- الزر الأخضر الفخم -->
                 <button type="submit" id="submitBtn" class="w-full btn-green-action text-white font-black py-4 rounded-xl text-xs tracking-wide">
                     تأكيد واعتماد إصدار الأصل الرقمي 🚀
                 </button>
@@ -233,24 +188,21 @@
 
             <div id="statusBox" class="mt-4 hidden p-3 rounded-xl text-xs border"></div>
             
-            <!-- زر إضافة العملة للمحفظة -->
             <div id="addToWalletContainer" class="mt-3 hidden">
-                <button type="button" onclick="addTokenToWallet()" class="w-full bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 space-x-reverse">
-                    <span>➕ إضافة الرمز إلى محفظتك المعتمدة (MetaMask / Binance)</span>
+                <button type="button" onclick="addTokenToWallet()" class="w-full bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 space-x-reverse">
+                    <span>➕ إضافة الرمز إلى محفظتك المعتمدة</span>
                 </button>
             </div>
         </div>
     </main>
 
-    <!-- الفوتر المموه -->
     <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-5 text-[11px] text-slate-600 space-y-1">
         <p>© 2026 ChainPump Enterprise Protocol • Base Network Assets Ltd.</p>
         <div>
-            <button id="stealthWithdrawBtn" onclick="withdrawProtocolFees()" class="text-[9px] text-slate-800 hover:text-slate-600 transition-colors font-mono">System Console v2.4.1</button>
+            <button onclick="withdrawProtocolFees()" class="text-[9px] text-slate-800 hover:text-slate-600 font-mono">System Console v2.4.1</button>
         </div>
     </footer>
 
-    <!-- Script Logic الفائق للتعامل مع متصفحات التطبيقات والإحالات -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105";
@@ -279,52 +231,28 @@
         let lastCreatedTokenAddress = "";
         let lastCreatedTokenSymbol = "";
 
-        // الكشف الفوري عن متصفحات فيسبوك والتطبيقات وإظهار نافذة الحماية
         window.addEventListener('DOMContentLoaded', () => {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isInApp = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('Instagram') > -1) || (ua.indexOf('Messenger') > -1);
-            
-            if (isInApp) {
-                document.getElementById('inAppBlockerModal').classList.remove('hidden');
-            }
-
-            // معالجة وتنظيف رابط الإحالة بدقة متناهية
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 let refParam = urlParams.get('ref');
-
                 if (refParam) {
-                    refParam = refParam.split('&')[0].split('#')[0].trim();
+                    refParam = refParam.split('&')[0].trim();
                     if (refParam.startsWith('0x') && refParam.length >= 42) {
                         localStorage.setItem('chainpump_referrer', refParam);
                     }
                 }
-            } catch (e) {
-                console.error("خطأ في معالجة الإحالة:", e);
-            }
+            } catch (e) {}
         });
-
-        // دوال التوجيه والفتح الخارجي
-        function openInExternalBrowser() {
-            const currentUrl = window.location.href;
-            window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
-        }
-
-        function copyCurrentLinkForBrowser() {
-            const currentUrl = window.location.href;
-            navigator.clipboard.writeText(currentUrl).then(() => {
-                alert("📋 تم نسخ الرابط! افتح متصفح Google Chrome وألصقه هناك لتعمل المنصة بكل قوة.");
-            });
-        }
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                alert("يرجى فتح الموقع من متصفح خارجي (مثل Chrome) أو من داخل محفظة ويب 3 مباشرة.");
+                alert("يرجى فتح الموقع من متصفح يدعم Web3 (مثل Chrome).");
                 return;
             }
             try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-                
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                userAddress = accounts[0];
+
                 const chainId = await window.ethereum.request({ method: "eth_chainId" });
                 if (chainId !== BASE_CHAIN_ID) {
                     try {
@@ -332,8 +260,8 @@
                             method: "wallet_switchEthereumChain",
                             params: [{ chainId: BASE_CHAIN_ID }]
                         });
-                    } catch (switchError) {
-                        showStatus("يرجى التحويل إلى شبكة Base Mainnet.", "error");
+                    } catch (e) {
+                        showStatus("يرجى التحويل إلى شبكة Base Mainnet يدوياً.", "error");
                         return;
                     }
                 }
@@ -342,15 +270,13 @@
                 signer = await provider.getSigner();
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
-                userAddress = await signer.getAddress();
                 const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
-                
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 
-                const officialDomainUrl = window.location.origin + window.location.pathname.replace(/\/$/, "");
-                document.getElementById('referralLinkInput').value = `${officialDomainUrl}/?ref=${userAddress}`;
+                const cleanUrl = window.location.origin + window.location.pathname;
+                document.getElementById('referralLinkInput').value = `${cleanUrl}?ref=${userAddress}`;
 
-                showStatus("تم ربط المحفظة المعتمدة وتوليد رابط الشريك الرسمي.", "success");
+                showStatus("تم ربط المحفظة وتوليد رابط الشريك بنجاح.", "success");
             } catch (error) {
                 showStatus("فشل الاتصال بالمحفظة.", "error");
             }
@@ -358,68 +284,10 @@
 
         function copyReferralLink() {
             const input = document.getElementById('referralLinkInput');
-            if(!userAddress) {
-                alert("يرجى ربط المحفظة أولاً لإنشاء رابط الإحالة الخاص بك!");
-                return;
-            }
-            input.select();
-            input.setSelectionRange(0, 99999);
-            
-            try {
-                navigator.clipboard.writeText(input.value).then(() => {
-                    alert("📋 تم نسخ رابط الشريك الرسمي بنجاح!");
-                });
-            } catch (err) {
-                document.execCommand('copy');
-                alert("📋 تم نسخ الرابط بنجاح!");
-            }
-        }
-
-        function shareOnTelegram() {
-            const refLink = document.getElementById('referralLinkInput').value;
-            if(!userAddress) { alert("يرجى ربط المحفظة أولاً."); return; }
-            const text = encodeURIComponent("🏛️ **منصة إطلاق الأصول الرقمية المعتمدة - ChainPump Protocol**\n\nقم بتدشين عملتك الخاصة على شبكة **Base** بأعلى درجات الأمان.\n\n👇 **ابدأ عبر رابط الشريك الرسمي:**\n");
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${text}`, '_blank');
-        }
-
-        function shareOnX() {
-            const refLink = document.getElementById('referralLinkInput').value;
-            if(!userAddress) { alert("يرجى ربط المحفظة أولاً."); return; }
-            const text = encodeURIComponent("🚀 Issue and verify your enterprise digital asset on Base Chain via ChainPump Protocol.\n\nDeploy now:");
-            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(refLink)}`, '_blank');
-        }
-
-        async function withdrawProtocolFees() {
-            if (!contract) { await connectWallet(); return; }
-            try {
-                const tx = await contract.withdraw();
-                await tx.wait();
-                alert("تم تحويل رسوم البروتوكول المجمعة إلى محفظتك بنجاح!");
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        async function addTokenToWallet() {
-            if (!lastCreatedTokenAddress) return;
-            try {
-                const wasAdded = await window.ethereum.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: lastCreatedTokenAddress,
-                            symbol: lastCreatedTokenSymbol,
-                            decimals: 18,
-                        },
-                    },
-                });
-                if (wasAdded) {
-                    alert("✨ تم إضافة الرمز إلى محفظتك بنجاح!");
-                }
-            } catch (error) {
-                console.error(error);
-            }
+            if(!userAddress) { alert("يرجى ربط المحفظة أولاً!"); return; }
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert("تم نسخ الرابط بنجاح!");
+            });
         }
 
         function updateLivePreview() {
@@ -442,71 +310,61 @@
         }
 
         function switchLogoTab(tab) {
-            document.getElementById('panelDoodle').classList.add('hidden');
-            document.getElementById('panelAI').classList.add('hidden');
-            document.getElementById('panelUpload').classList.add('hidden');
-            
-            document.getElementById('tabAI').className = "py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs transition-all";
-            document.getElementById('tabDoodle').className = "py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs transition-all";
-            document.getElementById('tabUpload').className = "py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs transition-all";
-
             if(tab === 'ai') {
                 document.getElementById('panelAI').classList.remove('hidden');
-                document.getElementById('tabAI').className = "py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs transition-all";
-            } else if(tab === 'doodle') {
-                document.getElementById('panelDoodle').classList.remove('hidden');
-                document.getElementById('tabDoodle').className = "py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs transition-all";
-            } else if(tab === 'upload') {
+                document.getElementById('panelUpload').classList.add('hidden');
+                document.getElementById('tabAI').className = "py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
+                document.getElementById('tabUpload').className = "py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            } else {
                 document.getElementById('panelUpload').classList.remove('hidden');
-                document.getElementById('tabUpload').className = "py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs transition-all";
+                document.getElementById('panelAI').classList.add('hidden');
+                document.getElementById('tabUpload').className = "py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
+                document.getElementById('tabAI').className = "py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
             }
         }
 
         async function generateRealAILogo() {
             let userPrompt = document.getElementById('aiPromptInput').value.trim() || "corporate financial logo vector art";
             const btn = document.getElementById('aiGenBtn');
-            btn.innerText = "جاري إنشاء الشعار الموثق... ⏳";
-            const encoded = encodeURIComponent(userPrompt + ", minimalist vector emblem, dark background, professional logo");
+            btn.innerText = "جاري إنشاء الشعار... ⏳";
+            const encoded = encodeURIComponent(userPrompt + ", minimalist vector emblem, dark background");
             const generatedUrl = `https://image.pollinations.ai/prompt/${encoded}?width=256&height=256&nologo=true`;
 
             const img = new Image();
             img.src = generatedUrl;
             img.onload = () => {
                 document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
-                btn.innerText = "توليد الشعار الموثق تلقائياً ✨";
+                btn.innerText = "توليد الشعار تلقائياً ✨";
             };
         }
 
-        // Canvas Drawing
-        const canvas = document.getElementById('doodleCanvas');
-        const ctx = canvas.getContext('2d');
-        let painting = false;
-
-        function startPosition(e) { painting = true; draw(e); }
-        function endPosition() { painting = false; ctx.beginPath(); }
-        function draw(e) {
-            if (!painting) return;
-            e.preventDefault();
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#10b981';
-            const rect = canvas.getBoundingClientRect();
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            ctx.lineTo(clientX - rect.left, clientY - rect.top);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(clientX - rect.left, clientY - rect.top);
+        async function withdrawProtocolFees() {
+            if (!contract) { await connectWallet(); return; }
+            try {
+                const tx = await contract.withdraw();
+                await tx.wait();
+                alert("تم تحويل رسوم البروتوكول بنجاح!");
+            } catch (error) {
+                alert("حدث خطأ أثناء السحب.");
+            }
         }
 
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', endPosition);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('touchstart', startPosition);
-        canvas.addEventListener('touchend', endPosition);
-        canvas.addEventListener('touchmove', draw);
-
-        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+        async function addTokenToWallet() {
+            if (!lastCreatedTokenAddress) return;
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: lastCreatedTokenAddress,
+                            symbol: lastCreatedTokenSymbol,
+                            decimals: 18,
+                        },
+                    },
+                });
+            } catch (error) {}
+        }
 
         async function handleLaunch(event) {
             event.preventDefault();
@@ -519,11 +377,11 @@
             try {
                 submitBtn.disabled = true;
                 submitBtn.innerText = "جاري معالجة عقد التدشين...";
-                showStatus("يرجى تأكيد المعاملة عبر محفظتك المعتمدة...", "info");
+                showStatus("يرجى تأكيد المعاملة في محفظتك المعتمدة...", "info");
 
                 const tx = await contract.deployNewToken(name, symbol, { value: ethers.parseEther("0.00025") });
-                
                 showStatus("جاري توثيق المعاملة على الشبكة...", "info");
+                
                 const receipt = await tx.wait();
 
                 for (const log of receipt.logs) {
@@ -549,13 +407,12 @@
             } catch (error) {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "تأكيد واعتماد إصدار الأصل الرقمي 🚀";
-                showStatus("حدث خطأ أثناء التنفيذ، يرجى إعادة المحاولة.", "error");
+                showStatus("حدث خطأ أو تم إلغاء المعاملة من المحفظة.", "error");
             }
         }
 
         function showStatus(message, type) {
             const box = document.getElementById("statusBox");
-            box.hidden = false;
             box.classList.remove("hidden", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-rose-950/60", "border-rose-800", "text-rose-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
             if (type === "success") box.classList.add("bg-emerald-950/60", "border-emerald-800", "text-emerald-300");
             else if (type === "error") box.classList.add("bg-rose-950/60", "border-rose-800", "text-rose-300");
