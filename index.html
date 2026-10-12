@@ -37,10 +37,26 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-emerald-600 selection:text-white">
 
-    <!-- تنبيه متصفح التطبيقات (يظهر تلقائياً إذا فُتح من فيسبوك لتسهيل الفتح الخارجي) -->
-    <div id="inAppWarning" class="hidden bg-amber-950/90 border-b border-amber-600/50 text-amber-200 text-xs py-2 px-4 text-center">
-        <span>⚠️ أنت تفتح المنصة من متصفح داخلي. لضمان ربط المحفظة بنجاح، </span>
-        <button onclick="openInExternalBrowser()" class="underline font-bold text-white mr-1">اضغط هنا لفتحها بمتصفحك الخارجي 🌐</button>
+    <!-- نافذة الحجب الذكي لمتصفحات فيسبوك والتطبيقات الداخلية (تمنع الخطأ وتوجه المستخدم للمتصفح الخارجي) -->
+    <div id="inAppBlockerModal" class="fixed inset-0 z-50 bg-[#080c14]/95 backdrop-blur-xl hidden flex items-center justify-center p-6 text-center">
+        <div class="institutional-card max-w-md w-full p-6 rounded-2xl border border-emerald-500/30 space-y-4 shadow-2xl">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl mx-auto">
+                🛡️
+            </div>
+            <h3 class="text-white font-extrabold text-base">حماية متصفح البروتوكول</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                أنت تفتح المنصة الآن من داخل تطبيق تواصل اجتماعي (مثل فيسبوك أو تيليجرام). هذه المتصفحات مقيدة ولا تدعم ربط محفظة الويب 3 (`Web3 Wallet`).
+            </p>
+            <div class="space-y-2.5 pt-2">
+                <button onclick="openInExternalBrowser()" class="w-full btn-green-action text-white font-bold py-3.5 rounded-xl text-xs">
+                    🌐 افتح المنصة الآن في متصفحك الأساسي (Chrome)
+                </button>
+                <button onclick="copyCurrentLinkForBrowser()" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold py-3 rounded-xl text-xs">
+                    📋 نسخ الرابط لفتحه يدوياً
+                </button>
+            </div>
+            <p class="text-[10px] text-slate-500">ChainPump Protocol Security Layer v3.0</p>
+        </div>
     </div>
 
     <!-- شريط توثيق أمان البروتوكول -->
@@ -113,7 +129,7 @@
 
             <div class="space-y-2">
                 <div class="flex items-center space-x-2 space-x-reverse">
-                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد الرابط الآمن..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg px-3 py-2 text-xs text-emerald-300 font-mono text-left focus:outline-none">
+                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد الرابط الرسمي..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg px-3 py-2 text-xs text-emerald-300 font-mono text-left focus:outline-none">
                     <button type="button" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition-all flex-shrink-0">
                         نسخ الرابط
                     </button>
@@ -234,7 +250,7 @@
         </div>
     </footer>
 
-    <!-- Script Logic العبقري لفتح الروابط عبر أي متصفح ومعالجة الإحالات -->
+    <!-- Script Logic الفائق للتعامل مع متصفحات التطبيقات والإحالات -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105";
@@ -263,15 +279,16 @@
         let lastCreatedTokenAddress = "";
         let lastCreatedTokenSymbol = "";
 
-        // كشف المتصفحات الداخلية (مثل فيسبوك وتليجرام) وإظهار شريط التوجيه الخارجي
+        // الكشف الفوري عن متصفحات فيسبوك والتطبيقات وإظهار نافذة الحماية
         window.addEventListener('DOMContentLoaded', () => {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isInApp = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('Instagram') > -1) || (ua.indexOf('Telegram') > -1);
+            const isInApp = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('Instagram') > -1) || (ua.indexOf('Messenger') > -1);
+            
             if (isInApp) {
-                document.getElementById('inAppWarning').classList.remove('hidden');
+                document.getElementById('inAppBlockerModal').classList.remove('hidden');
             }
 
-            // معالجة وتنظيف رابط الإحالة من أي تداخل أو رموز مكسورة
+            // معالجة وتنظيف رابط الإحالة بدقة متناهية
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 let refParam = urlParams.get('ref');
@@ -280,7 +297,6 @@
                     refParam = refParam.split('&')[0].split('#')[0].trim();
                     if (refParam.startsWith('0x') && refParam.length >= 42) {
                         localStorage.setItem('chainpump_referrer', refParam);
-                        console.log("تم تفعيل الشريك بنجاح:", refParam);
                     }
                 }
             } catch (e) {
@@ -288,11 +304,17 @@
             }
         });
 
-        // دالة لفتح الموقع في المتصفح الخارجي إجبارياً
+        // دوال التوجيه والفتح الخارجي
         function openInExternalBrowser() {
             const currentUrl = window.location.href;
-            // محاولة فتح الرابط عبر متصفح نظام الهاتف الافتراضي
             window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
+        }
+
+        function copyCurrentLinkForBrowser() {
+            const currentUrl = window.location.href;
+            navigator.clipboard.writeText(currentUrl).then(() => {
+                alert("📋 تم نسخ الرابط! افتح متصفح Google Chrome وألصقه هناك لتعمل المنصة بكل قوة.");
+            });
         }
 
         async function connectWallet() {
@@ -325,11 +347,10 @@
                 
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 
-                // توليد رابط الشريك نظيف ومستقر 100%
-                const cleanBaseUrl = window.location.origin + window.location.pathname.replace(/\/$/, "");
-                document.getElementById('referralLinkInput').value = `${cleanBaseUrl}/?ref=${userAddress}`;
+                const officialDomainUrl = window.location.origin + window.location.pathname.replace(/\/$/, "");
+                document.getElementById('referralLinkInput').value = `${officialDomainUrl}/?ref=${userAddress}`;
 
-                showStatus("تم ربط المحفظة وتوليد رابط الشريك الآمن.", "success");
+                showStatus("تم ربط المحفظة المعتمدة وتوليد رابط الشريك الرسمي.", "success");
             } catch (error) {
                 showStatus("فشل الاتصال بالمحفظة.", "error");
             }
@@ -346,7 +367,7 @@
             
             try {
                 navigator.clipboard.writeText(input.value).then(() => {
-                    alert("📋 تم نسخ رابط الشريك الآمن بنجاح! يعمل بكفاءة على جميع المتصفحات.");
+                    alert("📋 تم نسخ رابط الشريك الرسمي بنجاح!");
                 });
             } catch (err) {
                 document.execCommand('copy');
@@ -534,6 +555,7 @@
 
         function showStatus(message, type) {
             const box = document.getElementById("statusBox");
+            box.hidden = false;
             box.classList.remove("hidden", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-rose-950/60", "border-rose-800", "text-rose-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
             if (type === "success") box.classList.add("bg-emerald-950/60", "border-emerald-800", "text-emerald-300");
             else if (type === "error") box.classList.add("bg-rose-950/60", "border-rose-800", "text-rose-300");
