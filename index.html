@@ -26,6 +26,9 @@
         .btn-green-action:active { transform: scale(0.98); }
         .step-active { border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.1); }
         input, select, button { transition: all 0.2s ease; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: transform 0.2s; }
+        .color-dot:hover { transform: scale(1.15); }
+        .color-dot.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
@@ -37,7 +40,7 @@
                 <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
                 <span>الشبكة النشطة: <strong id="activeNetworkLabel" class="text-slate-200">Solana Phantom (SPL)</strong></span>
             </div>
-            <span class="text-purple-400 font-semibold">🛡️ هندسة أمان فائقة الانسيابية</span>
+            <span class="text-purple-400 font-semibold">🛡️ لوحة رسم متغيرة الألوان</span>
         </div>
     </div>
 
@@ -144,13 +147,13 @@
                     <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold">جاهز</span>
                 </div>
 
-                <!-- خيارات الهوية البصرية (AI + رفع ملف + رسم حر) -->
+                <!-- خيارات الهوية البصرية (AI + رفع ملف + رسم حر ملون) -->
                 <div>
                     <label class="block text-xs font-bold mb-1 text-slate-300">الهوية البصرية والشعار</label>
                     <div class="grid grid-cols-3 gap-1.5 mb-2">
                         <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs">✨ ذكاء اصطناعي</button>
                         <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">📁 رفع ملف</button>
-                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">🎨 رسم حر</button>
+                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">🎨 رسم حر ملون</button>
                     </div>
 
                     <div id="panelAI" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
@@ -162,9 +165,21 @@
                         <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400">
                     </div>
 
-                    <div id="panelCanvas" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-2 text-center">
+                    <!-- لوحة الرسم الحر مع ألوان متغيرة -->
+                    <div id="panelCanvas" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-2.5 text-center">
+                        <!-- شريط اختيار الألوان -->
+                        <div class="flex justify-center items-center space-x-3 space-x-reverse py-1">
+                            <span class="text-[11px] text-slate-400 font-bold">اختر اللون:</span>
+                            <div onclick="setBrushColor('#a855f7', this)" class="color-dot active" style="background-color: #a855f7;" title="أرجواني Phantom"></div>
+                            <div onclick="setBrushColor('#10b981', this)" class="color-dot" style="background-color: #10b981;" title="أخضر زمردي"></div>
+                            <div onclick="setBrushColor('#3b82f6', this)" class="color-dot" style="background-color: #3b82f6;" title="أزرق سيادي"></div>
+                            <div onclick="setBrushColor('#f59e0b', this)" class="color-dot" style="background-color: #f59e0b;" title="ذهبي ناصع"></div>
+                            <div onclick="setBrushColor('#ef4444', this)" class="color-dot" style="background-color: #ef4444;" title="أحمر ناري"></div>
+                            <div onclick="setBrushColor('#ffffff', this)" class="color-dot" style="background-color: #ffffff;" title="أبيض نقي"></div>
+                        </div>
+
                         <div class="flex justify-center">
-                            <canvas id="logoCanvas" width="160" height="160" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none"></canvas>
+                            <canvas id="logoCanvas" width="160" height="160" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none shadow-inner"></canvas>
                         </div>
                         <div class="flex space-x-2 space-x-reverse">
                             <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs">مسح 🗑️</button>
@@ -211,6 +226,7 @@
         let userAddress = "";
         let currentNetwork = "solana";
         let canvas, ctx, painting = false;
+        let brushColor = "#a855f7"; // اللون الافتراضي أرجواني Phantom
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -319,7 +335,7 @@
             canvas = document.getElementById('logoCanvas');
             if(!canvas) return;
             ctx = canvas.getContext('2d');
-            ctx.strokeStyle = '#a855f7';
+            ctx.strokeStyle = brushColor;
             ctx.lineWidth = 4;
             ctx.lineCap = 'round';
             ctx.fillStyle = '#080c14';
@@ -333,6 +349,13 @@
             canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
         }
 
+        function setBrushColor(color, element) {
+            brushColor = color;
+            if(ctx) ctx.strokeStyle = brushColor;
+            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+            element.classList.add('active');
+        }
+
         function startPosition(e) { painting = true; draw(e); }
         function endPosition() { painting = false; ctx.beginPath(); }
         function draw(e) {
@@ -340,6 +363,7 @@
             const rect = canvas.getBoundingClientRect();
             const x = (e.clientX || e.pageX) - rect.left;
             const y = (e.clientY || e.pageY) - rect.top;
+            ctx.strokeStyle = brushColor;
             ctx.lineTo(x, y);
             ctx.stroke();
             ctx.beginPath();
@@ -354,7 +378,7 @@
             if(!canvas) return;
             const dataUrl = canvas.toDataURL('image/png');
             document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
-            showStatus("تم اعتماد الرسم اليدوي بنجاح للشعار!", "success");
+            showStatus("تم اعتماد الرسم الحر الملون بنجاح للشعار!", "success");
         }
 
         async function generateRealAILogo() {
