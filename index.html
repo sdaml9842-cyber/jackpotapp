@@ -37,6 +37,12 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-emerald-600 selection:text-white">
 
+    <!-- تنبيه متصفح التطبيقات (يظهر تلقائياً إذا فُتح من فيسبوك لتسهيل الفتح الخارجي) -->
+    <div id="inAppWarning" class="hidden bg-amber-950/90 border-b border-amber-600/50 text-amber-200 text-xs py-2 px-4 text-center">
+        <span>⚠️ أنت تفتح المنصة من متصفح داخلي. لضمان ربط المحفظة بنجاح، </span>
+        <button onclick="openInExternalBrowser()" class="underline font-bold text-white mr-1">اضغط هنا لفتحها بمتصفحك الخارجي 🌐</button>
+    </div>
+
     <!-- شريط توثيق أمان البروتوكول -->
     <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
@@ -87,7 +93,7 @@
             </div>
             
             <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                يصرف نظام البروتوكول حافزاً فورياً بقيمة <strong class="text-emerald-400">$3.00 USDT</strong> لشركاء القنوات والمحتوى عن كل <strong class="text-slate-200">20 إحالة إطلاق ناجحة</strong> تتم عبر رابط الشريك الآمن (معتمد ومستقر عبر Vercel).
+                يصرف نظام البروتوكول حافزاً فورياً بقيمة <strong class="text-emerald-400">$3.00 USDT</strong> لشركاء القنوات والمحتوى عن كل <strong class="text-slate-200">20 إحالة إطلاق ناجحة</strong> تتم عبر النطاق الرسمي المعتمد.
             </p>
 
             <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 mb-3.5 text-xs space-y-2">
@@ -203,7 +209,7 @@
                     </div>
                 </div>
 
-                <!-- الزر الأخضر -->
+                <!-- الزر الأخضر الفخم -->
                 <button type="submit" id="submitBtn" class="w-full btn-green-action text-white font-black py-4 rounded-xl text-xs tracking-wide">
                     تأكيد واعتماد إصدار الأصل الرقمي 🚀
                 </button>
@@ -228,7 +234,7 @@
         </div>
     </footer>
 
-    <!-- Script Logic المعالج بالكامل لروابط Vercel -->
+    <!-- Script Logic العبقري لفتح الروابط عبر أي متصفح ومعالجة الإحالات -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105";
@@ -257,8 +263,15 @@
         let lastCreatedTokenAddress = "";
         let lastCreatedTokenSymbol = "";
 
-        // معالجة رابط الإحالة واستخراجه من دومين Vercel بذكاء
+        // كشف المتصفحات الداخلية (مثل فيسبوك وتليجرام) وإظهار شريط التوجيه الخارجي
         window.addEventListener('DOMContentLoaded', () => {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isInApp = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('Instagram') > -1) || (ua.indexOf('Telegram') > -1);
+            if (isInApp) {
+                document.getElementById('inAppWarning').classList.remove('hidden');
+            }
+
+            // معالجة وتنظيف رابط الإحالة من أي تداخل أو رموز مكسورة
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 let refParam = urlParams.get('ref');
@@ -267,17 +280,24 @@
                     refParam = refParam.split('&')[0].split('#')[0].trim();
                     if (refParam.startsWith('0x') && refParam.length >= 42) {
                         localStorage.setItem('chainpump_referrer', refParam);
-                        console.log("تم تفعيل الشريك عبر رابط Vercel بنجاح:", refParam);
+                        console.log("تم تفعيل الشريك بنجاح:", refParam);
                     }
                 }
             } catch (e) {
-                console.error("خطأ في معالجة رابط الإحالة:", e);
+                console.error("خطأ في معالجة الإحالة:", e);
             }
         });
 
+        // دالة لفتح الموقع في المتصفح الخارجي إجبارياً
+        function openInExternalBrowser() {
+            const currentUrl = window.location.href;
+            // محاولة فتح الرابط عبر متصفح نظام الهاتف الافتراضي
+            window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
+        }
+
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                alert("يرجى فتح الموقع من متصفح خارجي أو من داخل محفظة ويب 3 مباشرة.");
+                alert("يرجى فتح الموقع من متصفح خارجي (مثل Chrome) أو من داخل محفظة ويب 3 مباشرة.");
                 return;
             }
             try {
@@ -305,11 +325,11 @@
                 
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 
-                // توليد رابط الإحالة بناءً على دومين Vercel الحالي للموقع تلقائياً
-                const vercelUrl = window.location.origin + window.location.pathname.replace(/\/$/, "");
-                document.getElementById('referralLinkInput').value = `${vercelUrl}/?ref=${userAddress}`;
+                // توليد رابط الشريك نظيف ومستقر 100%
+                const cleanBaseUrl = window.location.origin + window.location.pathname.replace(/\/$/, "");
+                document.getElementById('referralLinkInput').value = `${cleanBaseUrl}/?ref=${userAddress}`;
 
-                showStatus("تم ربط المحفظة المعتمدة وتوليد رابط Vercel للشريك.", "success");
+                showStatus("تم ربط المحفظة وتوليد رابط الشريك الآمن.", "success");
             } catch (error) {
                 showStatus("فشل الاتصال بالمحفظة.", "error");
             }
@@ -326,7 +346,7 @@
             
             try {
                 navigator.clipboard.writeText(input.value).then(() => {
-                    alert("📋 تم نسخ رابط Vercel الآمن بنجاح! يعمل بكفاءة تامة على فيسبوك وتليجرام.");
+                    alert("📋 تم نسخ رابط الشريك الآمن بنجاح! يعمل بكفاءة على جميع المتصفحات.");
                 });
             } catch (err) {
                 document.execCommand('copy');
