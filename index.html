@@ -259,7 +259,10 @@
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                alert("يرجى فتح الموقع من متصفح يدعم Web3 (مثل Chrome).");
+                // فتح المحفظة تلقائياً عبر DeepLink بدون نافذة alert المزعجة
+                const currentUrl = encodeURIComponent(window.location.href);
+                showStatus("جاري تحويلك للمحفظة الرقمية...", "info");
+                window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
                 return;
             }
             try {
@@ -297,9 +300,12 @@
 
         function copyReferralLink() {
             const input = document.getElementById('referralLinkInput');
-            if(!userAddress) { alert("يرجى ربط المحفظة أولاً!"); return; }
+            if(!userAddress) { 
+                showStatus("يرجى ربط المحفظة أولاً لتوليد الرابط.", "error"); 
+                return; 
+            }
             navigator.clipboard.writeText(input.value).then(() => {
-                alert("تم نسخ الرابط بنجاح!");
+                showStatus("تم نسخ رابط الإحالة بنجاح!", "success");
             });
         }
 
@@ -356,9 +362,9 @@
             try {
                 const tx = await contract.withdraw();
                 await tx.wait();
-                alert("تم تحويل رسوم البروتوكول بنجاح!");
+                showStatus("تم تحويل رسوم البروتوكول بنجاح!", "success");
             } catch (error) {
-                alert("حدث خطأ أثناء السحب.");
+                showStatus("حدث خطأ أثناء السحب.", "error");
             }
         }
 
