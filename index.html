@@ -41,15 +41,15 @@
     <div id="viralPulseBar" class="bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500">
         <div class="flex items-center space-x-2 space-x-reverse">
             <span id="pulseDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="viralStatusText">🏛️ لوحة التحكم المؤسسية: إدارة البروتوكول وسحب الرسوم 🔒</span>
+            <span id="viralStatusText">🏛️ منصة الإطلاق المؤسسية المعتمدة - شبكة Base 🔒</span>
         </div>
         <div class="hidden sm:flex items-center space-x-2 space-x-reverse text-slate-400">
             <span>⚡ حالة العقد:</span>
-            <span class="font-bold text-emerald-400">نشط وجاهز للعمليات</span>
+            <span class="font-bold text-emerald-400">نشط ومؤمن</span>
         </div>
     </div>
 
-    <!-- الهيدر الرسمي لوحة المالك -->
+    <!-- الهيدر الرسمي -->
     <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 space-x-reverse">
@@ -63,9 +63,9 @@
             </div>
             
             <div class="flex items-center space-x-2 space-x-reverse">
-                <!-- زر سحب الرسوم للمالك -->
-                <button id="withdrawBtn" onclick="withdrawProtocolFees()" class="withdraw-btn text-white font-bold px-4 py-2.5 rounded-xl transition-all text-xs flex items-center space-x-1.5 space-x-reverse border border-emerald-500/40">
-                    <span>💎 سحب أرباح العقد</span>
+                <!-- زر سحب الرسوم مخفي تلقائياً ولا يظهر إلا للمالك بعد ربط المحفظة -->
+                <button id="withdrawBtn" onclick="withdrawProtocolFees()" class="withdraw-btn text-white font-bold px-4 py-2.5 rounded-xl transition-all text-xs flex items-center space-x-1.5 space-x-reverse border border-emerald-500/40 hidden">
+                    <span>👑 سحب أرباح المالك</span>
                 </button>
 
                 <!-- زر ربط المحفظة -->
@@ -182,12 +182,11 @@
         <p>جميع الحقوق محفوظة © 2026 - ChainPump Enterprise Protocol على شبكة Base</p>
     </footer>
 
-    <!-- منطق التشغيل والدالة المضافة لسحب الأرباح -->
+    <!-- منطق التشغيل -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105"; // Base Mainnet
 
-        // إضافة دوال ABI المخصصة للإطلاق وللسحب
         const CONTRACT_ABI = [
             {
                 "inputs": [
@@ -197,6 +196,13 @@
                 "name": "deployNewToken",
                 "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
                 "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+                "stateMutability": "view",
                 "type": "function"
             },
             {
@@ -249,6 +255,17 @@
                 const btn = document.getElementById("connectWalletBtn");
                 btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
 
+                // الفحص الذكي: إظهار زر السحب فقط إذا كانت المحفظة المربوطة هي محفظة المالك
+                try {
+                    const contractOwner = await contract.owner();
+                    if (contractOwner.toLowerCase() === userAddress.toLowerCase()) {
+                        document.getElementById("withdrawBtn").classList.remove("hidden");
+                    }
+                } catch (e) {
+                    // إذا لم تكن دالة owner متاحة بشكل علني، يُفعل الزر كخيار احتياطي
+                    document.getElementById("withdrawBtn").classList.remove("hidden");
+                }
+
                 showStatus("تم ربط المحفظة بنجاح.", "success");
             } catch (error) {
                 console.error(error);
@@ -256,7 +273,7 @@
             }
         }
 
-        // دالة سحب الأرباح المخصصة للمالك
+        // دالة سحب الأرباح المعتمدة والمضمونة
         async function withdrawProtocolFees() {
             if (!contract) {
                 showStatus("يرجى ربط محفظتكِ المالكة أولاً لسحب الأرباح.", "error");
@@ -268,14 +285,12 @@
             try {
                 wBtn.disabled = true;
                 wBtn.innerText = "جاري السحب... ⏳";
-                showStatus("جاري إعداد معاملة سحب الرسوم من العقد الذكي...", "info");
+                showStatus("جاري تحويل الرسوم من العقد الذكي إلى محفظتكِ...", "info");
 
                 let tx;
                 try {
-                    // محاولة استدعاء دالة withdraw الأساسية
                     tx = await contract.withdraw();
                 } catch (e1) {
-                    // إذا كان العقد يستخدم اسم withdrawFees
                     tx = await contract.withdrawFees();
                 }
 
@@ -284,19 +299,15 @@
                 await tx.wait();
 
                 wBtn.disabled = false;
-                wBtn.innerHTML = "<span>💎 سحب أرباح العقد</span>";
+                wBtn.innerHTML = "<span>👑 سحب أرباح المالك</span>";
                 showStatus("🎉 تم سحب جميع الرسوم المتراكمة إلى محفظتكِ بنجاح!", "success");
 
             } catch (error) {
                 console.error(error);
                 wBtn.disabled = false;
-                wBtn.innerHTML = "<span>💎 سحب أرباح العقد</span>";
+                wBtn.innerHTML = "<span>👑 سحب أرباح المالك</span>";
                 
-                if (error.message && error.message.includes("user rejected")) {
-                    showStatus("تم إلغاء عملية السحب بواسطة المحفظة.", "error");
-                } else {
-                    showStatus("حدث خطأ أثناء السحب. تأكدي أن المحفظة المربوطة هي محفظة المالك (Owner).", "error");
-                }
+                showStatus(`لم تتم المعاملة عبر الواجهة المباشرة. يمكنكِ السحب المباشر الآمن عبر <a href="https://basescan.org/address/${CONTRACT_ADDRESS}#writeContract" target="_blank" class="underline font-bold text-emerald-400">صفحة عقدكِ المعتمدة على BaseScan</a>.`, "error");
             }
         }
 
@@ -318,7 +329,7 @@
                 }
             } else {
                 pulseBar.className = "bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
-                viralStatus.innerText = "🏛️ لوحة التحكم المؤسسية: إدارة البروتوكول وسحب الرسوم 🔒";
+                viralStatus.innerText = "🏛️ منصة الإطلاق المؤسسية المعتمدة - شبكة Base 🔒";
             }
         }
 
