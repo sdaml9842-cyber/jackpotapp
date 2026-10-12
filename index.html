@@ -167,8 +167,14 @@
                         <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-2 rounded-lg text-xs">Generate Logo ✨</button>
                     </div>
 
-                    <div id="panelUpload" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden text-center">
-                        <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400">
+                    <!-- زر رفع ملف مخصص بالكامل ومضبوط مع الترجمة -->
+                    <div id="panelUpload" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden text-center space-y-2">
+                        <input type="file" id="logoFile" accept="image/*" class="hidden" onchange="handleFileSelected(this)">
+                        <button type="button" onclick="document.getElementById('logoFile').click()" id="customUploadBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-300 border border-purple-500/30 font-bold py-2.5 rounded-lg text-xs flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                            <span>📁</span>
+                            <span id="uploadBtnText">Choose Image File...</span>
+                        </button>
+                        <span id="fileNameDisplay" class="block text-[11px] text-slate-400 font-mono">No file chosen</span>
                     </div>
 
                     <div id="panelCanvas" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-2.5 text-center">
@@ -254,6 +260,8 @@
                 tabCanvas: "🎨 Color Canvas",
                 aiPromptPlaceholder: "Enter logo prompt...",
                 aiGenBtn: "Generate Logo ✨",
+                uploadBtn: "Choose Image File...",
+                noFile: "No file chosen",
                 brushColorText: "Color:",
                 clearBtn: "Clear 🗑️",
                 applyBtn: "Apply ✨",
@@ -290,6 +298,8 @@
                 tabCanvas: "🎨 رسم حر ملون",
                 aiPromptPlaceholder: "وصف شعار العملة...",
                 aiGenBtn: "توليد الشعار فوراً ✨",
+                uploadBtn: "اختيار صورة الشعار...",
+                noFile: "لم يتم اختيار أي ملف",
                 brushColorText: "اللون:",
                 clearBtn: "مسح 🗑️",
                 applyBtn: "اعتماد ✨",
@@ -339,12 +349,17 @@
             document.getElementById('tabCanvasText').innerText = t.tabCanvas;
             document.getElementById('aiPromptInput').placeholder = t.aiPromptPlaceholder;
             document.getElementById('aiGenBtn').innerText = t.aiGenBtn;
+            document.getElementById('uploadBtnText').innerText = t.uploadBtn;
+            document.getElementById('fileNameDisplay').innerText = t.noFile;
             document.getElementById('brushColorText').innerText = t.brushColorText;
             document.getElementById('clearBtn').innerText = t.clearBtn;
             document.getElementById('applyBtn').innerText = t.applyBtn;
             document.getElementById('supplyLabel').innerText = t.supply;
             document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
             document.getElementById('submitBtn').innerText = t.submitBtn;
+
+            // تحديث الرسوم حسب الشبكة واللغة
+            updateFeeLabel();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -358,14 +373,35 @@
                     }
                 }
             } catch (e) {}
+            updateFeeLabel();
         });
 
         function switchProtocolNetwork() {
             currentNetwork = document.getElementById('networkSelector').value;
-            const isSol = currentNetwork === 'solana';
             const t = translations[currentLang];
-            document.getElementById('feeLabel').innerText = isSol ? "0.0065 SOL" : "0.00025 ETH";
+            updateFeeLabel();
             showStatus(t.switchNetMsg, "info");
+        }
+
+        function updateFeeLabel() {
+            const isSol = currentNetwork === 'solana';
+            document.getElementById('feeLabel').innerText = isSol ? "0.0065 SOL" : "0.00025 ETH";
+        }
+
+        function handleFileSelected(input) {
+            const t = translations[currentLang];
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('fileNameDisplay').innerText = fileName;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewLogoContainer').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+                showStatus(currentLang === 'ar' ? "تم تحميل الصورة بنجاح!" : "Image loaded successfully!", "success");
+            } else {
+                document.getElementById('fileNameDisplay').innerText = t.noFile;
+            }
         }
 
         async function connectWallet() {
