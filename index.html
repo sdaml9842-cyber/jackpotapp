@@ -86,7 +86,6 @@
                 <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/20">عائد فوري 20%</span>
             </div>
             
-            <!-- لوحة الأرقام الذكية -->
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="bg-slate-950/90 border border-slate-800 p-3 rounded-xl">
                     <span class="block text-[10px] text-slate-500 font-semibold mb-1">عمليات الإطلاق المعتمدة</span>
@@ -151,21 +150,36 @@
                     <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded border border-emerald-500/20 font-bold">جاهز للتدشين</span>
                 </div>
 
-                <!-- خيارات الشعار -->
+                <!-- خيارات الهوية البصرية والشعار (AI + رفع ملف + رسم حر) -->
                 <div>
                     <label class="block text-xs font-bold mb-1.5 text-slate-300">مصدر الهوية البصرية (Token Logo)</label>
-                    <div class="grid grid-cols-2 gap-2 mb-2.5">
-                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs">✨ ذكاء اصطناعي</button>
-                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">📁 رفع ملف</button>
+                    <div class="grid grid-cols-3 gap-1.5 mb-2.5">
+                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs">✨ ذكاء اصطناعي</button>
+                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">📁 رفع ملف</button>
+                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">🎨 رسم وشخبطة</button>
                     </div>
 
+                    <!-- لوحة الذكاء الاصطناعي -->
                     <div id="panelAI" class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
                         <input type="text" id="aiPromptInput" placeholder="وصف الشعار المؤسسي..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
                         <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded-lg text-xs">توليد الشعار تلقائياً ✨</button>
                     </div>
 
+                    <!-- لوحة رفع الملفات -->
                     <div id="panelUpload" class="p-3 bg-slate-950 border border-slate-800 rounded-xl hidden text-center">
                         <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400">
+                    </div>
+
+                    <!-- لوحة الرسم والشخبطة الحر (Canvas Studio) -->
+                    <div id="panelCanvas" class="p-3 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-3 text-center">
+                        <p class="text-[11px] text-slate-400">ارسم أو شخبط شعارك المؤسسي بيدك مباشرة:</p>
+                        <div class="flex justify-center">
+                            <canvas id="logoCanvas" width="180" height="180" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none shadow-inner"></canvas>
+                        </div>
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs">مسح اللوحة 🗑️</button>
+                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold py-1.5 rounded-lg text-xs">اعتماد الرسم ✨</button>
+                        </div>
                     </div>
                 </div>
 
@@ -243,6 +257,9 @@
         let lastCreatedTokenAddress = "";
         let lastCreatedTokenSymbol = "";
 
+        // Canvas variables
+        let canvas, ctx, painting = false;
+
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -255,6 +272,57 @@
                 }
             } catch (e) {}
         });
+
+        function initCanvas() {
+            canvas = document.getElementById('logoCanvas');
+            if(!canvas) return;
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            canvas.addEventListener('mousedown', startPosition);
+            canvas.addEventListener('mouseup', endPosition);
+            canvas.addEventListener('mousemove', draw);
+
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); endPosition(); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        }
+
+        function startPosition(e) {
+            painting = true;
+            draw(e);
+        }
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
+        function draw(e) {
+            if(!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.pageX) - rect.left;
+            const y = (e.clientY || e.pageY) - rect.top;
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        function clearCanvas() {
+            if(!ctx) return;
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        function useCanvasAsLogo() {
+            if(!canvas) return;
+            const dataUrl = canvas.toDataURL('image/png');
+            document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
+            showStatus("تم اعتماد الرسم اليدوي كشعار فوري للأصل الرقمي بنجاح!", "success");
+        }
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
@@ -326,16 +394,24 @@
         }
 
         function switchLogoTab(tab) {
+            document.getElementById('panelAI').classList.add('hidden');
+            document.getElementById('panelUpload').classList.add('hidden');
+            document.getElementById('panelCanvas').classList.add('hidden');
+            
+            document.getElementById('tabAI').className = "py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabUpload').className = "py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabCanvas').className = "py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+
             if(tab === 'ai') {
                 document.getElementById('panelAI').classList.remove('hidden');
-                document.getElementById('panelUpload').classList.add('hidden');
-                document.getElementById('tabAI').className = "py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
-                document.getElementById('tabUpload').className = "py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
-            } else {
+                document.getElementById('tabAI').className = "py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
+            } else if(tab === 'upload') {
                 document.getElementById('panelUpload').classList.remove('hidden');
-                document.getElementById('panelAI').classList.add('hidden');
-                document.getElementById('tabUpload').className = "py-2 px-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
-                document.getElementById('tabAI').className = "py-2 px-2 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+                document.getElementById('tabUpload').className = "py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
+            } else {
+                document.getElementById('panelCanvas').classList.remove('hidden');
+                document.getElementById('tabCanvas').className = "py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
+                if(!canvas) setTimeout(initCanvas, 50);
             }
         }
 
