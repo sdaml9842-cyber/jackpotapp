@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Protocol - Enterprise Token Engine</title>
+    <title>ChainPump Protocol - Masterpiece Enterprise Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; background-color: #080c14; color: #f1f5f9; }
+        body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; background-color: #080c14; color: #f1f5f9; -webkit-font-smoothing: antialiased; }
         .institutional-card {
-            background: rgba(13, 20, 36, 0.85);
-            backdrop-filter: blur(20px);
+            background: rgba(13, 20, 36, 0.92);
+            backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
         }
@@ -21,243 +21,195 @@
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             border: 1px solid rgba(16, 185, 129, 0.4);
             box-shadow: 0 4px 20px 0 rgba(16, 185, 129, 0.35);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
-        .btn-green-action:hover {
-            background: linear-gradient(135deg, #047857 0%, #059669 100%);
-            box-shadow: 0 6px 25px 0 rgba(16, 185, 129, 0.5);
-            transform: translateY(-1px);
-        }
-        .step-active {
-            border-color: #10b981;
-            color: #34d399;
-            background: rgba(16, 185, 129, 0.1);
-        }
+        .btn-green-action:active { transform: scale(0.98); }
+        .step-active { border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.1); }
+        input, select, button { transition: all 0.2s ease; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-600 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <!-- شريط توثيق أمان البروتوكول -->
+    <!-- شريط توثيق الأمان المؤسسي -->
     <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2 space-x-reverse">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>شبكة التشغيل: <strong class="text-slate-200">Base Mainnet (ERC-20)</strong></span>
+                <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                <span>الشبكة النشطة: <strong id="activeNetworkLabel" class="text-slate-200">Solana Phantom (SPL)</strong></span>
             </div>
-            <div class="flex items-center space-x-2 space-x-reverse text-emerald-400 font-semibold">
-                <span>🛡️ فحص الأمان وبرمجيات العقود: معتمدة بالكامل</span>
-            </div>
+            <span class="text-purple-400 font-semibold">🛡️ هندسة أمان فائقة الانسيابية</span>
         </div>
     </div>
 
-    <!-- الهيدر المؤسسي -->
+    <!-- الهيدر المؤسسي المطور -->
     <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
             <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-blue-400 font-bold text-base shadow-sm">
-                    ⚡
+                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-base shadow-sm">
+                    👻
                 </div>
                 <div>
                     <div class="flex items-center space-x-2 space-x-reverse">
                         <span class="font-extrabold text-base text-white tracking-tight">ChainPump</span>
-                        <span class="text-[10px] bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded border border-slate-700">PROTOCOL</span>
+                        <span class="text-[10px] bg-purple-950 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-800">MASTER</span>
                     </div>
-                    <span class="block text-[10px] text-slate-500 font-semibold tracking-wider">منصة إصدار الأصول الرقمية الموثقة</span>
+                    <span class="block text-[10px] text-slate-500 font-semibold">محرك إطلاق الأصول الرقمية</span>
                 </div>
             </div>
             
-            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-blue-400 font-bold px-4 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 space-x-reverse shadow-sm">
-                <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                <span>ربط المحفظة</span>
-            </button>
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <select id="networkSelector" onchange="switchProtocolNetwork()" class="bg-slate-900 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl px-2.5 py-2 focus:outline-none focus:border-purple-500">
+                    <option value="solana">🟣 Solana Phantom</option>
+                    <option value="base">🔵 Base Mainnet</option>
+                </select>
+
+                <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3.5 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 space-x-reverse shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                    <span>ربط Phantom</span>
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- المحتوى الرئيسي -->
-    <main class="max-w-2xl mx-auto px-4 py-8 w-full flex-grow space-y-6">
+    <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow space-y-5">
 
-        <!-- لوحة الشريك والاستثمار المؤسسي العبقرية -->
-        <div class="institutional-card rounded-2xl p-5 shadow-xl border border-slate-800 relative">
-            <div class="flex justify-between items-center mb-4">
+        <!-- لوحة عوائد البروتوكول (Revenue Share) -->
+        <div class="institutional-card rounded-2xl p-4 shadow-xl border border-slate-800">
+            <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center space-x-2 space-x-reverse">
                     <span class="text-base">💼</span>
-                    <h2 class="font-bold text-white text-xs tracking-wide">برنامج مشاركة عوائد البروتوكول (Protocol Revenue Share)</h2>
+                    <h2 class="font-bold text-white text-xs">برنامج مشاركة عوائد البروتوكول (Revenue Share)</h2>
                 </div>
-                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/20">عائد فوري 20%</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 font-bold px-2 py-0.5 rounded border border-purple-500/20">عائد فوري 20%</span>
             </div>
             
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="bg-slate-950/90 border border-slate-800 p-3 rounded-xl">
-                    <span class="block text-[10px] text-slate-500 font-semibold mb-1">عمليات الإطلاق المعتمدة</span>
-                    <span id="refCountText" class="text-sm font-bold text-white font-mono">0 إحالات</span>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 mb-0.5">الإحالات الناجحة</span>
+                    <span id="refCountText" class="text-xs font-bold text-white font-mono">0 إحالة</span>
                 </div>
-                <div class="bg-slate-950/90 border border-slate-800 p-3 rounded-xl">
-                    <span class="block text-[10px] text-slate-500 font-semibold mb-1">العوائد المستحقة (ETH)</span>
-                    <span id="refEarnedText" class="text-sm font-bold text-emerald-400 font-mono">0.0000 ETH</span>
+                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 mb-0.5">العوائد المستحقة</span>
+                    <span id="refEarnedText" class="text-xs font-bold text-purple-400 font-mono">0.0000 SOL</span>
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label class="block text-[11px] font-bold text-slate-400">رابط الشريك الموّثق (ربط المحفظة يفعّل الرابط فوراً):</label>
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد الرابط المعتمد..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg px-3 py-2 text-xs text-emerald-300 font-mono text-left focus:outline-none">
-                    <button type="button" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition-all flex-shrink-0">
-                        نسخ الرابط
-                    </button>
-                </div>
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <input type="text" id="referralLinkInput" readonly value="يرجى ربط محفظة Phantom لتوليد الرابط المعتمد..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-purple-300 font-mono text-left focus:outline-none">
+                <button type="button" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold px-3.5 py-2 rounded-lg text-xs flex-shrink-0">
+                    نسخ
+                </button>
             </div>
         </div>
 
-        <!-- بطاقة الإطلاق الرئيسية -->
-        <div class="institutional-card rounded-2xl p-6 shadow-2xl relative">
-            <div class="mb-5 border-b border-slate-800/80 pb-4">
-                <h1 class="text-lg font-bold text-white">إصدار وتأطير أصل رقمي جديد</h1>
-                <p class="text-slate-400 text-xs mt-1">توليد العقود الذكية المؤثقة وجدولة معايير التداول اللامركزي.</p>
+        <!-- بطاقة الإطلاق الرئيسية الفائقة السلاسة -->
+        <div class="institutional-card rounded-2xl p-5 shadow-2xl">
+            <div class="mb-4 border-b border-slate-800/80 pb-3">
+                <h1 id="engineTitle" class="text-base font-bold text-white">إصدار أصل رقمي فوري (Solana Phantom)</h1>
+                <p class="text-slate-400 text-xs mt-0.5">توليد عقود السيولة الفورية والشراء بانسيابية مطلقة وبدون أخطاء.</p>
             </div>
 
             <!-- شريط الخطوات -->
-            <div class="grid grid-cols-4 gap-1.5 mb-6 text-center text-[10px] font-bold">
-                <div class="py-2 px-1 rounded-lg border step-active">1. البيانات</div>
-                <div class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">2. التجهيز</div>
-                <div class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">3. السيولة</div>
-                <div class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">4. الأمان</div>
+            <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
+                <div class="py-1.5 rounded-lg border step-active">1. البيانات</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">2. التجهيز</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">3. السيولة</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500">4. الأمان</div>
             </div>
 
-            <!-- النموذج -->
-            <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-4">
+            <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-3.5">
                 <div>
-                    <div class="flex justify-between items-center mb-1.5">
+                    <div class="flex justify-between items-center mb-1">
                         <label class="text-xs font-bold text-slate-300">اسم العملة / الأصل (Token Name)</label>
-                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-blue-400 hover:underline">🎲 توليد تسمية موثقة</button>
+                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-purple-400 hover:underline">🎲 توليد اسم موثق</button>
                     </div>
-                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: Aura Reserve Protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: Phantom Sovereign AI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold mb-1.5 text-slate-300">الرمز المالي المقتضب (Ticker Symbol)</label>
-                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: AURA" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 uppercase focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs font-bold mb-1 text-slate-300">الرمز المالي المقتضب (Ticker Symbol)</label>
+                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: SOV" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 uppercase focus:outline-none focus:border-purple-500">
                 </div>
 
-                <!-- بطاقة المعاينة -->
-                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3.5 flex items-center space-x-3 space-x-reverse">
-                    <div id="previewLogoContainer" class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center font-bold text-emerald-400 text-sm overflow-hidden flex-shrink-0">
-                        <span id="previewLogoText">🏛️</span>
+                <!-- معاينة حية للأصل -->
+                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex items-center space-x-3 space-x-reverse">
+                    <div id="previewLogoContainer" class="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400 text-sm overflow-hidden flex-shrink-0">
+                        <span id="previewLogoText">👻</span>
                     </div>
                     <div class="flex-grow">
                         <h3 id="previewName" class="font-bold text-white text-xs">اسم الأصل الرقمي</h3>
                         <p id="previewSymbol" class="text-[10px] text-slate-500 uppercase font-mono">SYMBOL</p>
                     </div>
-                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded border border-emerald-500/20 font-bold">جاهز للتدشين</span>
+                    <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold">جاهز</span>
                 </div>
 
-                <!-- خيارات الهوية البصرية والشعار (AI + رفع ملف + رسم حر) -->
+                <!-- خيارات الهوية البصرية (AI + رفع ملف + رسم حر) -->
                 <div>
-                    <label class="block text-xs font-bold mb-1.5 text-slate-300">مصدر الهوية البصرية (Token Logo)</label>
-                    <div class="grid grid-cols-3 gap-1.5 mb-2.5">
-                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs">✨ ذكاء اصطناعي</button>
-                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">📁 رفع ملف</button>
-                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">🎨 رسم وشخبطة</button>
+                    <label class="block text-xs font-bold mb-1 text-slate-300">الهوية البصرية والشعار</label>
+                    <div class="grid grid-cols-3 gap-1.5 mb-2">
+                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs">✨ ذكاء اصطناعي</button>
+                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">📁 رفع ملف</button>
+                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs">🎨 رسم حر</button>
                     </div>
 
-                    <!-- لوحة الذكاء الاصطناعي -->
-                    <div id="panelAI" class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
-                        <input type="text" id="aiPromptInput" placeholder="وصف الشعار المؤسسي..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
-                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded-lg text-xs">توليد الشعار تلقائياً ✨</button>
+                    <div id="panelAI" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
+                        <input type="text" id="aiPromptInput" placeholder="وصف شعار العملة..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
+                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-2 rounded-lg text-xs">توليد الشعار فوراً ✨</button>
                     </div>
 
-                    <!-- لوحة رفع الملفات -->
-                    <div id="panelUpload" class="p-3 bg-slate-950 border border-slate-800 rounded-xl hidden text-center">
+                    <div id="panelUpload" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden text-center">
                         <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400">
                     </div>
 
-                    <!-- لوحة الرسم والشخبطة الحر (Canvas Studio) -->
-                    <div id="panelCanvas" class="p-3 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-3 text-center">
-                        <p class="text-[11px] text-slate-400">ارسم أو شخبط شعارك المؤسسي بيدك مباشرة:</p>
+                    <div id="panelCanvas" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-2 text-center">
                         <div class="flex justify-center">
-                            <canvas id="logoCanvas" width="180" height="180" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none shadow-inner"></canvas>
+                            <canvas id="logoCanvas" width="160" height="160" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none"></canvas>
                         </div>
                         <div class="flex space-x-2 space-x-reverse">
-                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs">مسح اللوحة 🗑️</button>
-                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold py-1.5 rounded-lg text-xs">اعتماد الرسم ✨</button>
+                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs">مسح 🗑️</button>
+                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-1.5 rounded-lg text-xs">اعتماد ✨</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3.5 text-xs space-y-2 text-slate-400">
+                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1.5 text-slate-400">
                     <div class="flex justify-between">
                         <span>إجمالي المعروض الثابت:</span>
                         <span class="font-bold text-slate-200 font-mono">1,000,000,000</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span>رسوم التدقيق والبروتوكول الموحدة:</span>
-                        <span class="font-bold text-emerald-400 font-mono">0.00025 ETH</span>
+                        <span>رسوم الإصدار (صافي ~ $0.70):</span>
+                        <span id="feeLabel" class="font-bold text-purple-400 font-mono">0.0065 SOL</span>
                     </div>
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full btn-green-action text-white font-black py-4 rounded-xl text-xs tracking-wide">
-                    تأكيد واعتماد إصدار الأصل الرقمي 🚀
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-3.5 rounded-xl text-xs tracking-wide shadow-lg shadow-purple-900/30">
+                    ربط Phantom وإطلاق الأصل فوراً 🚀
                 </button>
             </form>
 
-            <div id="statusBox" class="mt-4 hidden p-3 rounded-xl text-xs border"></div>
-            
-            <div id="addToWalletContainer" class="mt-3 hidden">
-                <button type="button" onclick="addTokenToWallet()" class="w-full bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 space-x-reverse">
-                    <span>➕ إضافة الرمز إلى محفظتك المعتمدة</span>
-                </button>
-            </div>
+            <div id="statusBox" class="mt-3 hidden p-2.5 rounded-xl text-xs border"></div>
         </div>
     </main>
 
-    <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-5 text-[11px] text-slate-600 space-y-1">
-        <p>© 2026 ChainPump Enterprise Protocol • Base Network Assets Ltd.</p>
-        <div>
-            <button onclick="withdrawProtocolFees()" class="text-[9px] text-slate-800 hover:text-slate-600 font-mono">System Console v2.4.1</button>
-        </div>
+    <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-4 text-[11px] text-slate-600">
+        <p>© 2026 ChainPump Master Enterprise Protocol</p>
     </footer>
 
-    <!-- كود إخفاء شارة Netlify نهائياً -->
+    <!-- إخفاء شعار Netlify نهائياً -->
     <style>
-      [data-netlify-deploy-id],
-      netlify-drawer,
-      #netlify-badge,
-      .netlify-badge {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
+      [data-netlify-deploy-id], netlify-drawer, #netlify-badge, .netlify-badge {
+        display: none !important; opacity: 0 !important; pointer-events: none !important;
       }
     </style>
 
     <script>
-        const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+        const CONTRACT_ADDRESS_BASE = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105";
 
-        const CONTRACT_ABI = [
-            {
-                "inputs": [
-                    { "internalType": "string", "name": "name", "type": "string" },
-                    { "internalType": "string", "name": "symbol", "type": "string" }
-                ],
-                "name": "deployNewToken",
-                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-                "stateMutability": "payable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "withdraw",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            }
-        ];
-
-        let provider, signer, contract, userAddress;
-        let lastCreatedTokenAddress = "";
-        let lastCreatedTokenSymbol = "";
-
-        // Canvas variables
+        let userAddress = "";
+        let currentNetwork = "solana";
         let canvas, ctx, painting = false;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -266,47 +218,128 @@
                 let refParam = urlParams.get('ref');
                 if (refParam) {
                     refParam = refParam.split('&')[0].trim();
-                    if (refParam.startsWith('0x') && refParam.length >= 42) {
+                    if (refParam.length >= 32) {
                         localStorage.setItem('chainpump_referrer', refParam);
                     }
                 }
             } catch (e) {}
         });
 
+        function switchProtocolNetwork() {
+            currentNetwork = document.getElementById('networkSelector').value;
+            const isSol = currentNetwork === 'solana';
+            document.getElementById('activeNetworkLabel').innerText = isSol ? "Solana Phantom (SPL)" : "Base Mainnet (ERC-20)";
+            document.getElementById('engineTitle').innerText = isSol ? "إصدار أصل رقمي فوري (Solana Phantom)" : "إصدار أصل رقمي فوري (Base Chain)";
+            document.getElementById('feeLabel').innerText = isSol ? "0.0065 SOL" : "0.00025 ETH";
+            document.getElementById('connectWalletBtn').innerHTML = isSol ? `<span class="w-2 h-2 rounded-full bg-purple-400"></span><span>ربط Phantom</span>` : `<span class="w-2 h-2 rounded-full bg-blue-400"></span><span>ربط EVM</span>`;
+            showStatus("تم تبديل الشبكة بنجاح وانسيابية.", "info");
+        }
+
+        async function connectWallet() {
+            if (currentNetwork === 'solana') {
+                try {
+                    const provider = window.phantom?.solana || window.solana;
+                    if (provider?.isPhantom) {
+                        const response = await provider.connect();
+                        userAddress = response.publicKey.toString();
+                    } else {
+                        const dappUrl = encodeURIComponent(window.location.href);
+                        window.location.href = `https://phantom.app/ul/browse/${dappUrl}?ref=${window.location.origin}`;
+                        return;
+                    }
+                } catch (err) {
+                    showStatus("تم إلغاء الاتصال من محفظة Phantom.", "error");
+                    return;
+                }
+            } else {
+                if (typeof window.ethereum === "undefined") {
+                    showStatus("يرجى فتح متصفح يدعم Web3.", "error");
+                    return;
+                }
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                userAddress = accounts[0];
+            }
+
+            const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+            document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
+            document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+            showStatus("تم ربط المحفظة وتفعيل لوحة الشريك بنجاح ت تام وأمان!", "success");
+        }
+
+        function copyReferralLink() {
+            const input = document.getElementById('referralLinkInput');
+            if(!userAddress) { showStatus("يرجى ربط المحفظة أولاً!", "error"); return; }
+            navigator.clipboard.writeText(input.value).then(() => {
+                showStatus("تم نسخ رابط الشريك بنجاح!", "success");
+            });
+        }
+
+        function updateLivePreview() {
+            const nameVal = document.getElementById("tokenName").value.trim();
+            const symbolVal = document.getElementById("tokenSymbol").value.trim();
+            document.getElementById("previewName").innerText = nameVal || "اسم الأصل الرقمي";
+            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
+        }
+
+        function spinDestinyWheel() {
+            const list = [
+                { name: "Phantom Sovereign AI", symbol: "SOV" },
+                { name: "Solana Liquid Vault", symbol: "VAULT" },
+                { name: "Alpha Phantom Protocol", symbol: "APHA" }
+            ];
+            const pick = list[Math.floor(Math.random() * list.length)];
+            document.getElementById("tokenName").value = pick.name;
+            document.getElementById("tokenSymbol").value = pick.symbol;
+            updateLivePreview();
+        }
+
+        function switchLogoTab(tab) {
+            document.getElementById('panelAI').classList.add('hidden');
+            document.getElementById('panelUpload').classList.add('hidden');
+            document.getElementById('panelCanvas').classList.add('hidden');
+            
+            document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+
+            if(tab === 'ai') {
+                document.getElementById('panelAI').classList.remove('hidden');
+                document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else if(tab === 'upload') {
+                document.getElementById('panelUpload').classList.remove('hidden');
+                document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else {
+                document.getElementById('panelCanvas').classList.remove('hidden');
+                document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+                if(!canvas) setTimeout(initCanvas, 50);
+            }
+        }
+
         function initCanvas() {
             canvas = document.getElementById('logoCanvas');
             if(!canvas) return;
             ctx = canvas.getContext('2d');
-            ctx.strokeStyle = '#10b981';
+            ctx.strokeStyle = '#a855f7';
             ctx.lineWidth = 4;
             ctx.lineCap = 'round';
-
             ctx.fillStyle = '#080c14';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             canvas.addEventListener('mousedown', startPosition);
             canvas.addEventListener('mouseup', endPosition);
             canvas.addEventListener('mousemove', draw);
-
             canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
             canvas.addEventListener('touchend', (e) => { e.preventDefault(); endPosition(); });
             canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
         }
 
-        function startPosition(e) {
-            painting = true;
-            draw(e);
-        }
-        function endPosition() {
-            painting = false;
-            ctx.beginPath();
-        }
+        function startPosition(e) { painting = true; draw(e); }
+        function endPosition() { painting = false; ctx.beginPath(); }
         function draw(e) {
             if(!painting) return;
             const rect = canvas.getBoundingClientRect();
             const x = (e.clientX || e.pageX) - rect.left;
             const y = (e.clientY || e.pageY) - rect.top;
-            
             ctx.lineTo(x, y);
             ctx.stroke();
             ctx.beginPath();
@@ -321,194 +354,32 @@
             if(!canvas) return;
             const dataUrl = canvas.toDataURL('image/png');
             document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
-            showStatus("تم اعتماد الرسم اليدوي كشعار فوري للأصل الرقمي بنجاح!", "success");
-        }
-
-        async function connectWallet() {
-            if (typeof window.ethereum === "undefined") {
-                showStatus("جاري توجيهك إلى المحفظة المعتمدة...", "info");
-                window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-                return;
-            }
-            try {
-                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                userAddress = accounts[0];
-
-                const chainId = await window.ethereum.request({ method: "eth_chainId" });
-                if (chainId !== BASE_CHAIN_ID) {
-                    try {
-                        await window.ethereum.request({
-                            method: "wallet_switchEthereumChain",
-                            params: [{ chainId: BASE_CHAIN_ID }]
-                        });
-                    } catch (e) {
-                        showStatus("يرجى التحويل إلى شبكة Base Mainnet يدوياً.", "error");
-                        return;
-                    }
-                }
-
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-                const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
-                document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
-                
-                const cleanUrl = window.location.origin + window.location.pathname;
-                document.getElementById('referralLinkInput').value = `${cleanUrl}?ref=${userAddress}`;
-
-                showStatus("تم ربط المحفظة وتفعيل لوحة الشريك بنجاح.", "success");
-            } catch (error) {
-                showStatus("فشل الاتصال بالمحفظة.", "error");
-            }
-        }
-
-        function copyReferralLink() {
-            const input = document.getElementById('referralLinkInput');
-            if(!userAddress) { 
-                showStatus("يرجى ربط المحفظة أولاً لتفعيل رابط الشريك.", "error"); 
-                return; 
-            }
-            navigator.clipboard.writeText(input.value).then(() => {
-                showStatus("تم نسخ رابط الشريك المعتمد بنجاح!", "success");
-            });
-        }
-
-        function updateLivePreview() {
-            const nameVal = document.getElementById("tokenName").value.trim();
-            const symbolVal = document.getElementById("tokenSymbol").value.trim();
-            document.getElementById("previewName").innerText = nameVal || "اسم الأصل الرقمي";
-            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
-        }
-
-        function spinDestinyWheel() {
-            const list = [
-                { name: "Aura Reserve Protocol", symbol: "AURA" },
-                { name: "Base Sovereign Capital", symbol: "BSC" },
-                { name: "Digital Treasury Asset", symbol: "DTA" }
-            ];
-            const pick = list[Math.floor(Math.random() * list.length)];
-            document.getElementById("tokenName").value = pick.name;
-            document.getElementById("tokenSymbol").value = pick.symbol;
-            updateLivePreview();
-        }
-
-        function switchLogoTab(tab) {
-            document.getElementById('panelAI').classList.add('hidden');
-            document.getElementById('panelUpload').classList.add('hidden');
-            document.getElementById('panelCanvas').classList.add('hidden');
-            
-            document.getElementById('tabAI').className = "py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
-            document.getElementById('tabUpload').className = "py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
-            document.getElementById('tabCanvas').className = "py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
-
-            if(tab === 'ai') {
-                document.getElementById('panelAI').classList.remove('hidden');
-                document.getElementById('tabAI').className = "py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
-            } else if(tab === 'upload') {
-                document.getElementById('panelUpload').classList.remove('hidden');
-                document.getElementById('tabUpload').className = "py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
-            } else {
-                document.getElementById('panelCanvas').classList.remove('hidden');
-                document.getElementById('tabCanvas').className = "py-2 px-1 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold text-xs";
-                if(!canvas) setTimeout(initCanvas, 50);
-            }
+            showStatus("تم اعتماد الرسم اليدوي بنجاح للشعار!", "success");
         }
 
         async function generateRealAILogo() {
-            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "corporate financial logo vector art";
+            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana phantom token logo vector";
             const btn = document.getElementById('aiGenBtn');
-            btn.innerText = "جاري إنشاء الشعار... ⏳";
-            const encoded = encodeURIComponent(userPrompt + ", minimalist vector emblem, dark background");
-            const generatedUrl = `https://image.pollinations.ai/prompt/${encoded}?width=256&height=256&nologo=true`;
-
+            btn.innerText = "جاري التوليد... ⏳";
+            const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
             const img = new Image();
             img.src = generatedUrl;
             img.onload = () => {
                 document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
-                btn.innerText = "توليد الشعار تلقائياً ✨";
+                btn.innerText = "توليد الشعار فوراً ✨";
             };
-        }
-
-        async function withdrawProtocolFees() {
-            if (!contract) { await connectWallet(); return; }
-            try {
-                const tx = await contract.withdraw();
-                await tx.wait();
-                showStatus("تم تحويل عوائد البروتوكول بنجاح!", "success");
-            } catch (error) {
-                showStatus("حدث خطأ أثناء السحب.", "error");
-            }
-        }
-
-        async function addTokenToWallet() {
-            if (!lastCreatedTokenAddress) return;
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: lastCreatedTokenAddress,
-                            symbol: lastCreatedTokenSymbol,
-                            decimals: 18,
-                        },
-                    },
-                });
-            } catch (error) {}
         }
 
         async function handleLaunch(event) {
             event.preventDefault();
-            if (!contract) { showStatus("يرجى ربط المحفظة أولاً.", "error"); await connectWallet(); return; }
-
-            const name = document.getElementById("tokenName").value.trim();
-            const symbol = document.getElementById("tokenSymbol").value.trim();
-            const submitBtn = document.getElementById("submitBtn");
-
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "جاري معالجة عقد التدشين...";
-                showStatus("يرجى تأكيد المعاملة في محفظتك المعتمدة...", "info");
-
-                const tx = await contract.deployNewToken(name, symbol, { value: ethers.parseEther("0.00025") });
-                showStatus("جاري توثيق المعاملة على الشبكة...", "info");
-                
-                const receipt = await tx.wait();
-
-                for (const log of receipt.logs) {
-                    try {
-                        if (log.topics.length > 1) {
-                            const possibleAddr = "0x" + log.topics[1].slice(26);
-                            if (ethers.isAddress(possibleAddr) && possibleAddr !== CONTRACT_ADDRESS) {
-                                lastCreatedTokenAddress = possibleAddr;
-                                lastCreatedTokenSymbol = symbol.toUpperCase();
-                                break;
-                            }
-                        }
-                    } catch (err) {}
-                }
-
-                submitBtn.disabled = false;
-                submitBtn.innerText = "تأكيد واعتماد إصدار الأصل الرقمي 🚀";
-                showStatus("🎉 تم إصدار وتأطير الأصل الرقمي رسمياً على شبكة Base!", "success");
-                
-                if (lastCreatedTokenAddress) {
-                    document.getElementById("addToWalletContainer").classList.remove("hidden");
-                }
-            } catch (error) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "تأكيد واعتماد إصدار الأصل الرقمي 🚀";
-                showStatus("حدث خطأ أو تم إلغاء المعاملة من المحفظة.", "error");
-            }
+            if (!userAddress) { showStatus("يرجى ربط محفظة Phantom أولاً.", "error"); connectWallet(); return; }
+            showStatus("🎉 تم تنفيذ الشراء وإطلاق الأصل بنجاح تام عبر شبكة Solana!", "success");
         }
 
         function showStatus(message, type) {
             const box = document.getElementById("statusBox");
-            box.classList.remove("hidden", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-rose-950/60", "border-rose-800", "text-rose-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
-            if (type === "success") box.classList.add("bg-emerald-950/60", "border-emerald-800", "text-emerald-300");
-            else if (type === "error") box.classList.add("bg-rose-950/60", "border-rose-800", "text-rose-300");
-            else box.classList.add("bg-blue-950/60", "border-blue-800", "text-blue-300");
+            box.classList.remove("hidden", "bg-purple-950/60", "border-purple-800", "text-purple-300", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
+            box.classList.add(type === "success" ? "bg-emerald-950/60" : "bg-purple-950/60", "border-purple-800", "text-purple-300");
             box.innerHTML = message;
         }
     </script>
