@@ -17,7 +17,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
         }
-        /* الزر الرئيسي الأخضر الجديد */
         .btn-green-action {
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             border: 1px solid rgba(16, 185, 129, 0.4);
@@ -88,7 +87,7 @@
             </div>
             
             <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                يصرف نظام البروتوكول حافزاً فورياً بقيمة <strong class="text-emerald-400">$3.00 USDT</strong> لشركاء القنوات والمحتوى عن كل <strong class="text-slate-200">20 إحالة إطلاق ناجحة</strong> تتم عبر الرابط المعتمد.
+                يصرف نظام البروتوكول حافزاً فورياً بقيمة <strong class="text-emerald-400">$3.00 USDT</strong> لشركاء القنوات والمحتوى عن كل <strong class="text-slate-200">20 إحالة إطلاق ناجحة</strong> تتم عبر الرابط المعتمد. (يعمل بكفاءة على جميع المتصفحات وتطبيقات التواصل).
             </p>
 
             <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 mb-3.5 text-xs space-y-2">
@@ -108,7 +107,7 @@
 
             <div class="space-y-2">
                 <div class="flex items-center space-x-2 space-x-reverse">
-                    <input type="text" id="referralLinkInput" readonly value="https://x-launchpad.vercel.app/?ref=YOUR_WALLET_ADDRESS" class="w-full bg-slate-900/90 border border-slate-800 rounded-lg px-3 py-2 text-xs text-emerald-300 font-mono text-left focus:outline-none">
+                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد الرابط الآمن..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg px-3 py-2 text-xs text-emerald-300 font-mono text-left focus:outline-none">
                     <button type="button" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition-all flex-shrink-0">
                         نسخ الرابط
                     </button>
@@ -204,7 +203,7 @@
                     </div>
                 </div>
 
-                <!-- الزر بالأخضر الفخم وفقاً لطلبك -->
+                <!-- الزر الأخضر -->
                 <button type="submit" id="submitBtn" class="w-full btn-green-action text-white font-black py-4 rounded-xl text-xs tracking-wide">
                     تأكيد واعتماد إصدار الأصل الرقمي 🚀
                 </button>
@@ -229,7 +228,7 @@
         </div>
     </footer>
 
-    <!-- Script Logic -->
+    <!-- Script Logic مع الفلترة الذكية لروابط فيسبوك وتطبيقات التواصل -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105";
@@ -258,17 +257,29 @@
         let lastCreatedTokenAddress = "";
         let lastCreatedTokenSymbol = "";
 
+        // فحص وإصلاح الروابط القادمة من فيسبوك أو المتصفحات الداخلية تلقائياً
         window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref');
-            if (refParam && refParam.startsWith('0x')) {
-                localStorage.setItem('chainpump_referrer', refParam);
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                let refParam = urlParams.get('ref');
+
+                // إذا كان الرابط مكسوراً أو يحتوي على رموز إضافية من فيسبوك، نقوم بتنظيفه
+                if (refParam) {
+                    refParam = refParam.split('&')[0].split('#')[0].trim();
+                    if (refParam.startsWith('0x') && refParam.length >= 42) {
+                        localStorage.setItem('chainpump_referrer', refParam);
+                        console.log("تم حفظ معرف الإحالة بأمان:", refParam);
+                    }
+                }
+            } catch (e) {
+                console.error("خطأ في معالجة رابط الإحالة:", e);
             }
         });
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                showStatus("يرجى فتح المنصة من متصفح محفظة ويب 3 مدعومة.", "error");
+                // حل ذكي: إذا تم فتحه من متصفح فيسبوك الداخلي، يتم توجيهه لفتح المتصفح الخارجي
+                alert("يرجى فتح الموقع من متصفح خارجي (مثل Chrome أو Safari) أو من داخل محفظة ويب 3 مباشرة لتتمكن من الربط بسلاسة.");
                 return;
             }
             try {
@@ -296,10 +307,11 @@
                 
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 
-                const baseUrl = window.location.origin + window.location.pathname;
-                document.getElementById('referralLinkInput').value = `${baseUrl}?ref=${userAddress}`;
+                // توليد رابط نظيف ومستقر يعمل على جميع المنصات
+                const cleanBaseUrl = window.location.origin + window.location.pathname;
+                document.getElementById('referralLinkInput').value = `${cleanBaseUrl}?ref=${userAddress}`;
 
-                showStatus("تم ربط المحفظة المعتمدة وتحديث بروتوكول الشريك.", "success");
+                showStatus("تم ربط المحفظة المعتمدة وتفعيل رابط الشريك الآمن.", "success");
             } catch (error) {
                 showStatus("فشل الاتصال بالمحفظة.", "error");
             }
@@ -312,18 +324,28 @@
                 return;
             }
             input.select();
-            document.execCommand('copy');
-            alert("📋 تم نسخ رابط الشريك المعتمد بنجاح! شاركه للوصول لحوافز الـ 3$ USDT عند كل 20 إحالة.");
+            input.setSelectionRange(0, 99999); // دعم الهواتف المحمولة للنسخ
+            
+            try {
+                navigator.clipboard.writeText(input.value).then(() => {
+                    alert("📋 تم نسخ رابط الشريك الآمن بنجاح! يعمل بكفاءة على فيسبوك وتليجرام.");
+                });
+            } catch (err) {
+                document.execCommand('copy');
+                alert("📋 تم نسخ الرابط بنجاح!");
+            }
         }
 
         function shareOnTelegram() {
             const refLink = document.getElementById('referralLinkInput').value;
-            const text = encodeURIComponent("🏛️ **منصة إطلاق الأصول الرقمية المعتمدة - ChainPump Protocol**\n\nقم بتدشين عملتك الخاصة على شبكة **Base** بأعلى درجات الأمان والتوثيق.\n\n👇 **ابدأ عبر رابط الشريك الرسمي:**\n");
+            if(!userAddress) { alert("يرجى ربط المحفظة أولاً."); return; }
+            const text = encodeURIComponent("🏛️ **منصة إطلاق الأصول الرقمية المعتمدة - ChainPump Protocol**\n\nقم بتدشين عملتك الخاصة على شبكة **Base** بأعلى درجات الأمان.\n\n👇 **ابدأ عبر رابط الشريك الرسمي:**\n");
             window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${text}`, '_blank');
         }
 
         function shareOnX() {
             const refLink = document.getElementById('referralLinkInput').value;
+            if(!userAddress) { alert("يرجى ربط المحفظة أولاً."); return; }
             const text = encodeURIComponent("🚀 Issue and verify your enterprise digital asset on Base Chain via ChainPump Protocol.\n\nDeploy now:");
             window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(refLink)}`, '_blank');
         }
