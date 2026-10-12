@@ -87,7 +87,7 @@
             </div>
             
             <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                يصرف نظام البروتوكول حافزاً فورياً بقيمة <strong class="text-emerald-400">$3.00 USDT</strong> لشركاء القنوات والمحتوى عن كل <strong class="text-slate-200">20 إحالة إطلاق ناجحة</strong> تتم عبر الرابط المعتمد. (يعمل بكفاءة على جميع المتصفحات وتطبيقات التواصل).
+                يصرف نظام البروتوكول حافزاً فورياً بقيمة <strong class="text-emerald-400">$3.00 USDT</strong> لشركاء القنوات والمحتوى عن كل <strong class="text-slate-200">20 إحالة إطلاق ناجحة</strong> تتم عبر رابط الشريك الآمن (معتمد ومستقر عبر Vercel).
             </p>
 
             <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 mb-3.5 text-xs space-y-2">
@@ -228,7 +228,7 @@
         </div>
     </footer>
 
-    <!-- Script Logic مع الفلترة الذكية لروابط فيسبوك وتطبيقات التواصل -->
+    <!-- Script Logic المعالج بالكامل لروابط Vercel -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105";
@@ -257,18 +257,17 @@
         let lastCreatedTokenAddress = "";
         let lastCreatedTokenSymbol = "";
 
-        // فحص وإصلاح الروابط القادمة من فيسبوك أو المتصفحات الداخلية تلقائياً
+        // معالجة رابط الإحالة واستخراجه من دومين Vercel بذكاء
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 let refParam = urlParams.get('ref');
 
-                // إذا كان الرابط مكسوراً أو يحتوي على رموز إضافية من فيسبوك، نقوم بتنظيفه
                 if (refParam) {
                     refParam = refParam.split('&')[0].split('#')[0].trim();
                     if (refParam.startsWith('0x') && refParam.length >= 42) {
                         localStorage.setItem('chainpump_referrer', refParam);
-                        console.log("تم حفظ معرف الإحالة بأمان:", refParam);
+                        console.log("تم تفعيل الشريك عبر رابط Vercel بنجاح:", refParam);
                     }
                 }
             } catch (e) {
@@ -278,8 +277,7 @@
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                // حل ذكي: إذا تم فتحه من متصفح فيسبوك الداخلي، يتم توجيهه لفتح المتصفح الخارجي
-                alert("يرجى فتح الموقع من متصفح خارجي (مثل Chrome أو Safari) أو من داخل محفظة ويب 3 مباشرة لتتمكن من الربط بسلاسة.");
+                alert("يرجى فتح الموقع من متصفح خارجي أو من داخل محفظة ويب 3 مباشرة.");
                 return;
             }
             try {
@@ -307,11 +305,11 @@
                 
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 
-                // توليد رابط نظيف ومستقر يعمل على جميع المنصات
-                const cleanBaseUrl = window.location.origin + window.location.pathname;
-                document.getElementById('referralLinkInput').value = `${cleanBaseUrl}?ref=${userAddress}`;
+                // توليد رابط الإحالة بناءً على دومين Vercel الحالي للموقع تلقائياً
+                const vercelUrl = window.location.origin + window.location.pathname.replace(/\/$/, "");
+                document.getElementById('referralLinkInput').value = `${vercelUrl}/?ref=${userAddress}`;
 
-                showStatus("تم ربط المحفظة المعتمدة وتفعيل رابط الشريك الآمن.", "success");
+                showStatus("تم ربط المحفظة المعتمدة وتوليد رابط Vercel للشريك.", "success");
             } catch (error) {
                 showStatus("فشل الاتصال بالمحفظة.", "error");
             }
@@ -324,11 +322,11 @@
                 return;
             }
             input.select();
-            input.setSelectionRange(0, 99999); // دعم الهواتف المحمولة للنسخ
+            input.setSelectionRange(0, 99999);
             
             try {
                 navigator.clipboard.writeText(input.value).then(() => {
-                    alert("📋 تم نسخ رابط الشريك الآمن بنجاح! يعمل بكفاءة على فيسبوك وتليجرام.");
+                    alert("📋 تم نسخ رابط Vercel الآمن بنجاح! يعمل بكفاءة تامة على فيسبوك وتليجرام.");
                 });
             } catch (err) {
                 document.execCommand('copy');
