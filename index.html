@@ -1,165 +1,660 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 Stealth DApp</title>
-    <!-- استدعاء مكتبة Firebase الرسمية والخفيفة -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    
+    <title>ChainPump Protocol - Global Multi-Chain Engine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Solana Web3.js SDK (تم تضمين المكتبة لعمل Solana) -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <!-- Ethers.js v6 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #0b0e14;
-            --card-bg: #151d2a;
-            --text-color: #f3f4f6;
-            --accent-green: #10b981;
+        body { font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif; background-color: #080c14; color: #f1f5f9; -webkit-font-smoothing: antialiased; }
+        [dir="rtl"] body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; }
+        .institutional-card {
+            background: rgba(13, 20, 36, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* شريط التنقل العلوي (Header) */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background-color: var(--card-bg);
-            border-bottom: 1px solid #1f2937;
-        }
-
-        .logo {
-            font-weight: bold;
-            font-size: 18px;
-            color: var(--accent-green);
-        }
-
-        /* عنصر التمويه الذكي: يبدو كمؤشر شبكة عادي */
-        .network-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #10b981;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.3s ease;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
-            transition: transform 0.2s;
-        }
-
-        /* المحتوى الرئيسي للمنصة */
-        main {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid #1e293b;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
+        .step-active { border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.1); }
+        input, select, button { transition: all 0.2s ease; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: transform 0.2s; }
+        .color-dot:hover { transform: scale(1.15); }
+        .color-dot.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <header>
-        <div class="logo">⚡ DApp Engine</div>
-        
-        <!-- عنصر التمويه (Stealth Trigger) -->
-        <div class="network-badge" id="stealth-trigger" title="Network Status">
-            <span class="status-dot"></span>
-            <span id="badge-text">BSC Mainnet</span>
+    <!-- شريط الأمان Institutional Badge -->
+    <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                <span id="netLabelText">Network: <strong class="text-slate-200">Solana Phantom (SPL)</strong></span>
+            </div>
+            <span class="text-purple-400 font-semibold" id="topSecText">🛡️ Global Institutional Engine</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-base shadow-sm">
+                    👻
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                        <span class="font-extrabold text-base text-white tracking-tight">ChainPump</span>
+                        <span class="text-[10px] bg-purple-950 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-800">GLOBAL</span>
+                    </div>
+                    <span class="block text-[10px] text-slate-500 font-semibold" id="headerSubText">Enterprise Token Engine</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <button type="button" onclick="toggleLanguage()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold px-2.5 py-2 rounded-xl text-xs" id="langBtn">
+                    🌐 AR
+                </button>
+
+                <select id="networkSelector" onchange="switchProtocolNetwork()" class="bg-slate-900 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl px-2.5 py-2 focus:outline-none focus:border-purple-500">
+                    <option value="solana">Solana Phantom</option>
+                    <option value="base">Base Mainnet</option>
+                </select>
+
+                <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 rtl:space-x-reverse shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                    <span id="connectWalletText">Connect Phantom</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <main>
-        <div class="card">
-            <h2>Web3 Application Portal</h2>
-            <p style="color: #9ca3af;">Smart contracts connected & protocol ready.</p>
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow space-y-5">
+
+        <!-- Revenue Share -->
+        <div class="institutional-card rounded-2xl p-4 shadow-xl border border-slate-800">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                    <span class="text-base">💼</span>
+                    <h2 class="font-bold text-white text-xs" id="revShareTitle">Protocol Revenue Share Program</h2>
+                </div>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 font-bold px-2 py-0.5 rounded border border-purple-500/20" id="revShareBadge">20% Instant Yield</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 mb-0.5" id="refCountLabel">Successful Launches</span>
+                    <span id="refCountText" class="text-xs font-bold text-white font-mono">0 Referral</span>
+                </div>
+                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 mb-0.5" id="refEarnedLabel">Earned Rewards</span>
+                    <span id="refEarnedText" class="text-xs font-bold text-purple-400 font-mono">0.0000 SOL</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <input type="text" id="referralLinkInput" readonly value="Connect wallet to generate referral link..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-purple-300 font-mono text-left ltr:text-left rtl:text-right focus:outline-none">
+                <button type="button" id="copyBtn" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold px-3.5 py-2 rounded-lg text-xs flex-shrink-0">
+                    Copy
+                </button>
+            </div>
+        </div>
+
+        <!-- Launch Form Card -->
+        <div class="institutional-card rounded-2xl p-5 shadow-2xl">
+            <div class="mb-4 border-b border-slate-800/80 pb-3">
+                <h1 id="engineTitle" class="text-base font-bold text-white">Instant Token Deployment</h1>
+                <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Generate algorithmic liquidity pools and deploy seamlessly without errors.</p>
+            </div>
+
+            <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
+                <div class="py-1.5 rounded-lg border step-active" id="step1">1. Data</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step2">2. Setup</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step3">3. Liquidity</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step4">4. Security</div>
+            </div>
+
+            <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-3.5">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-bold text-slate-300" id="nameLabel">Token Name</label>
+                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-purple-400 hover:underline" id="genNameBtn">🎲 Generate Name</button>
+                    </div>
+                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="e.g. Phantom Sovereign AI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-slate-300" id="symbolLabel">Ticker Symbol</label>
+                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="e.g. SOV" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 uppercase focus:outline-none focus:border-purple-500">
+                </div>
+
+                <!-- Live Preview -->
+                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex items-center space-x-3 rtl:space-x-reverse">
+                    <div id="previewLogoContainer" class="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400 text-sm overflow-hidden flex-shrink-0">
+                        <span id="previewLogoText">👻</span>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 id="previewName" class="font-bold text-white text-xs">Digital Asset Name</h3>
+                        <p id="previewSymbol" class="text-[10px] text-slate-500 uppercase font-mono">SYMBOL</p>
+                    </div>
+                    <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold" id="readyBadge">Ready</span>
+                </div>
+
+                <!-- Logo Section -->
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-slate-300" id="logoSourceLabel">Visual Identity & Logo</label>
+                    <div class="grid grid-cols-3 gap-1.5 mb-2">
+                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs">✨ AI Studio</button>
+                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs" id="tabUploadText">📁 Upload File</button>
+                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs" id="tabCanvasText">🎨 Color Canvas</button>
+                    </div>
+
+                    <div id="panelAI" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
+                        <input type="text" id="aiPromptInput" placeholder="Enter logo prompt..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
+                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-2 rounded-lg text-xs">Generate Logo ✨</button>
+                    </div>
+
+                    <div id="panelUpload" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden text-center space-y-2">
+                        <input type="file" id="logoFile" accept="image/*" class="hidden" onchange="handleFileSelected(this)">
+                        <button type="button" onclick="document.getElementById('logoFile').click()" id="customUploadBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-300 border border-purple-500/30 font-bold py-2.5 rounded-lg text-xs flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                            <span>📁</span>
+                            <span id="uploadBtnText">Choose Image File...</span>
+                        </button>
+                        <span id="fileNameDisplay" class="block text-[11px] text-slate-400 font-mono">No file chosen</span>
+                    </div>
+
+                    <div id="panelCanvas" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-2.5 text-center">
+                        <div class="flex justify-center items-center space-x-3 rtl:space-x-reverse py-1">
+                            <span class="text-[11px] text-slate-400 font-bold" id="brushColorText">Color:</span>
+                            <div onclick="setBrushColor('#a855f7', this)" class="color-dot active" style="background-color: #a855f7;" title="Phantom Purple"></div>
+                            <div onclick="setBrushColor('#10b981', this)" class="color-dot" style="background-color: #10b981;" title="Emerald Green"></div>
+                            <div onclick="setBrushColor('#3b82f6', this)" class="color-dot" style="background-color: #3b82f6;" title="Blue"></div>
+                            <div onclick="setBrushColor('#f59e0b', this)" class="color-dot" style="background-color: #f59e0b;" title="Gold"></div>
+                            <div onclick="setBrushColor('#ffffff', this)" class="color-dot" style="background-color: #ffffff;" title="White"></div>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <canvas id="logoCanvas" width="160" height="160" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none shadow-inner"></canvas>
+                        </div>
+                        <div class="flex space-x-2 rtl:space-x-reverse">
+                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs" id="clearBtn">Clear 🗑️</button>
+                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-1.5 rounded-lg text-xs" id="applyBtn">Apply ✨</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1.5 text-slate-400">
+                    <div class="flex justify-between">
+                        <span id="supplyLabel">Total Fixed Supply:</span>
+                        <span class="font-bold text-slate-200 font-mono">1,000,000,000</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span id="feeProtocolLabel">Protocol Fee:</span>
+                        <span id="feeLabel" class="font-bold text-purple-400 font-mono">0.0065 SOL</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-3.5 rounded-xl text-xs tracking-wide shadow-lg shadow-purple-900/30">
+                    Connect Wallet & Launch Instantly 🚀
+                </button>
+            </form>
+
+            <div id="statusBox" class="mt-3 hidden p-2.5 rounded-xl text-xs border"></div>
         </div>
     </main>
 
+    <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-4 text-[11px] text-slate-600">
+        <p>© 2026 ChainPump Global Master Protocol</p>
+    </footer>
+
+    <style>
+      [data-netlify-deploy-id], netlify-drawer, #netlify-badge, .netlify-badge {
+        display: none !important; opacity: 0 !important; pointer-events: none !important;
+      }
+    </style>
+
     <script>
-        // 1. إعدادات Firebase الخاصة بك (احصل عليها مجاناً في 2 دقيقة من firebase.google.com)
-        const firebaseConfig = {
-            databaseURL: "https://YOUR-DATABASE-NAME.firebaseio.com" // 👈 ضع رابط قاعدة البيانات هنا
+        let currentLang = 'en';
+        let userAddress = "";
+        let currentNetwork = "solana";
+        let canvas, ctx, painting = false;
+        let brushColor = "#a855f7";
+
+        // 🎯 ضعِ عنوان محفظتك الشخصية لـ Solana لاستقبال رسوم الـ SOL الفورية هنا:
+        const ADMIN_SOL_WALLET = "ضعِ_عنوان_محفظة_Phantom_هنا"; 
+
+        // 🎯 عنوان عقد الـ Factory الخاص بك على شبكة Base:
+        const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+
+        const translations = {
+            en: {
+                topSec: "🛡️ Global Institutional Engine",
+                netLabel: "Network:",
+                headerSub: "Enterprise Token Engine",
+                connectWalletSol: "Connect Phantom",
+                connectWalletBase: "Connect Base Wallet",
+                revShare: "Protocol Revenue Share Program",
+                revBadge: "20% Instant Yield",
+                refCount: "Successful Launches",
+                refEarned: "Earned Rewards",
+                refInputDefault: "Connect wallet to generate referral link...",
+                copy: "Copy",
+                engineTitle: "Instant Token Deployment",
+                engineDesc: "Generate algorithmic liquidity pools and deploy seamlessly without errors.",
+                step1: "1. Data", step2: "2. Setup", step3: "3. Liquidity", step4: "4. Security",
+                nameLabel: "Token Name",
+                genName: "🎲 Generate Name",
+                symbolLabel: "Ticker Symbol",
+                ready: "Ready",
+                logoSource: "Visual Identity & Logo",
+                tabAI: "✨ AI Studio",
+                tabUpload: "📁 Upload File",
+                tabCanvas: "🎨 Color Canvas",
+                aiPromptPlaceholder: "Enter logo prompt...",
+                aiGenBtn: "Generate Logo ✨",
+                uploadBtn: "Choose Image File...",
+                noFile: "No file chosen",
+                brushColorText: "Color:",
+                clearBtn: "Clear 🗑️",
+                applyBtn: "Apply ✨",
+                supply: "Total Fixed Supply:",
+                feeProtocol: "Protocol Fee:",
+                submitBtn: "Connect Wallet & Launch Instantly 🚀",
+                switchNetMsg: "Network switched successfully.",
+                walletConnectedMsg: "Wallet connected securely & successfully!",
+                copiedMsg: "Referral link copied successfully!",
+                launchSuccessMsg: "🎉 Token launched successfully! Fee transferred on-chain."
+            },
+            ar: {
+                topSec: "🛡️ محرك مؤسسي عالمي",
+                netLabel: "الشبكة:",
+                headerSub: "منصة إطلاق الأصول الرقمية",
+                connectWalletSol: "ربط Phantom",
+                connectWalletBase: "ربط محفظة Base",
+                revShare: "برنامج مشاركة عوائد البروتوكول",
+                revBadge: "عائد فوري 20%",
+                refCount: "الإحالات الناجحة",
+                refEarned: "العوائد المستحقة",
+                refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
+                copy: "نسخ",
+                engineTitle: "إصدار أصل رقمي فوري",
+                engineDesc: "توليد عقود السيولة الفورية والشراء بانسيابية مطلقة وبدون أخطاء.",
+                step1: "1. البيانات", step2: "2. التجهيز", step3: "3. السيولة", step4: "4. الأمان",
+                nameLabel: "اسم العملة / الأصل",
+                genName: "🎲 توليد اسم موثق",
+                symbolLabel: "الرمز المالي المقتضب",
+                ready: "جاهز",
+                logoSource: "الهوية البصرية والشعار",
+                tabAI: "✨ ذكاء اصطناعي",
+                tabUpload: "📁 رفع ملف",
+                tabCanvas: "🎨 رسم حر ملون",
+                aiPromptPlaceholder: "وصف شعار العملة...",
+                aiGenBtn: "توليد الشعار فوراً ✨",
+                uploadBtn: "اختيار صورة الشعار...",
+                noFile: "لم يتم اختيار أي ملف",
+                brushColorText: "اللون:",
+                clearBtn: "مسح 🗑️",
+                applyBtn: "اعتماد ✨",
+                supply: "إجمالي المعروض الثابت:",
+                feeProtocol: "رسوم الإصدار:",
+                submitBtn: "ربط المحفظة وإطلاق الأصل فوراً 🚀",
+                switchNetMsg: "تم تبديل الشبكة بنجاح.",
+                walletConnectedMsg: "تم ربط المحفظة بنجاح!",
+                copiedMsg: "تم نسخ رابط الشريك بنجاح!",
+                launchSuccessMsg: "🎉 تم تنفيذ الإطلاق بنجاح وتدفق الرسوم مباشرة لمحفظتك!"
+            }
         };
 
-        // تهيئة الخدمة
-        if (firebaseConfig.databaseURL !== "https://YOUR-DATABASE-NAME.firebaseio.com") {
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
-            const visitsRef = db.ref('stats/visitors');
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const root = document.getElementById('htmlRoot');
+            root.setAttribute('lang', currentLang);
+            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('langBtn').innerText = currentLang === 'en' ? '🌐 AR' : '🌐 EN';
+            
+            const t = translations[currentLang];
+            document.getElementById('topSecText').innerText = t.topSec;
+            document.getElementById('headerSubText').innerText = t.headerSub;
+            if(!userAddress) {
+                document.getElementById('connectWalletText').innerText = currentNetwork === 'solana' ? t.connectWalletSol : t.connectWalletBase;
+                document.getElementById('referralLinkInput').value = t.refInputDefault;
+            }
+            document.getElementById('revShareTitle').innerText = t.revShare;
+            document.getElementById('revShareBadge').innerText = t.revBadge;
+            document.getElementById('refCountLabel').innerText = t.refCount;
+            document.getElementById('refEarnedLabel').innerText = t.refEarned;
+            document.getElementById('copyBtn').innerText = t.copy;
+            document.getElementById('engineTitle').innerText = t.engineTitle;
+            document.getElementById('engineDesc').innerText = t.engineDesc;
+            document.getElementById('step1').innerText = t.step1;
+            document.getElementById('step2').innerText = t.step2;
+            document.getElementById('step3').innerText = t.step3;
+            document.getElementById('step4').innerText = t.step4;
+            document.getElementById('nameLabel').innerText = t.nameLabel;
+            document.getElementById('genNameBtn').innerText = t.genName;
+            document.getElementById('symbolLabel').innerText = t.symbolLabel;
+            document.getElementById('readyBadge').innerText = t.ready;
+            document.getElementById('logoSourceLabel').innerText = t.logoSource;
+            document.getElementById('tabAI').innerText = t.tabAI;
+            document.getElementById('tabUploadText').innerText = t.tabUpload;
+            document.getElementById('tabCanvasText').innerText = t.tabCanvas;
+            document.getElementById('aiPromptInput').placeholder = t.aiPromptPlaceholder;
+            document.getElementById('aiGenBtn').innerText = t.aiGenBtn;
+            document.getElementById('uploadBtnText').innerText = t.uploadBtn;
+            document.getElementById('fileNameDisplay').innerText = t.noFile;
+            document.getElementById('brushColorText').innerText = t.brushColorText;
+            document.getElementById('clearBtn').innerText = t.clearBtn;
+            document.getElementById('applyBtn').innerText = t.applyBtn;
+            document.getElementById('supplyLabel').innerText = t.supply;
+            document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
+            document.getElementById('submitBtn').innerText = t.submitBtn;
 
-            // تسجيل زيارة جديدة واحدة لكل الجلسة (Session)
-            if (!sessionStorage.getItem('v_recorded')) {
-                visitsRef.transaction((current) => (current || 0) + 1);
-                sessionStorage.setItem('v_recorded', 'true');
+            updateFeeLabel();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                let refParam = urlParams.get('ref');
+                if (refParam) {
+                    refParam = refParam.split('&')[0].trim();
+                    if (refParam.length >= 32) {
+                        localStorage.setItem('chainpump_referrer', refParam);
+                    }
+                }
+            } catch (e) {}
+            updateFeeLabel();
+        });
+
+        function switchProtocolNetwork() {
+            currentNetwork = document.getElementById('networkSelector').value;
+            const isSol = currentNetwork === 'solana';
+            const t = translations[currentLang];
+            
+            document.getElementById('netLabelText').innerHTML = isSol ? 'Network: <strong class="text-slate-200">Solana Phantom (SPL)</strong>' : 'Network: <strong class="text-slate-200">Base Mainnet (EVM)</strong>';
+            if(!userAddress) {
+                document.getElementById('connectWalletText').innerText = isSol ? t.connectWalletSol : t.connectWalletBase;
+            }
+            updateFeeLabel();
+            showStatus(t.switchNetMsg, "info");
+        }
+
+        function updateFeeLabel() {
+            const isSol = currentNetwork === 'solana';
+            document.getElementById('feeLabel').innerText = isSol ? "0.0065 SOL" : "0.00025 ETH";
+        }
+
+        function handleFileSelected(input) {
+            const t = translations[currentLang];
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('fileNameDisplay').innerText = fileName;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewLogoContainer').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+                showStatus(currentLang === 'ar' ? "تم تحميل الصورة بنجاح!" : "Image loaded successfully!", "success");
+            } else {
+                document.getElementById('fileNameDisplay').innerText = t.noFile;
             }
         }
 
-        // 2. خدعة التمويه العبقرية (Stealth Toggle Mechanics)
-        const trigger = document.getElementById('stealth-trigger');
-        const badgeText = document.getElementById('badge-text');
-        const originalText = badgeText.textContent;
-        let clickTimer = null;
-        let clicks = 0;
-
-        trigger.addEventListener('click', () => {
-            clicks++;
-            if (clicks === 1) {
-                clickTimer = setTimeout(() => { clicks = 0; }, 1500); // إعطاء مهلة ثانيتين للنقرات
-            } else if (clicks === 3) { // عند النقر 3 مرات متتالية بسرعة
-                clearTimeout(clickTimer);
-                clicks = 0;
-                revealVisitorCount();
-            }
-        });
-
-        async function revealVisitorCount() {
-            // جلب الرقم الحقيقي من Firebase أو حساب محلي ذكي
-            badgeText.style.color = '#ffffff';
-            badgeText.textContent = 'Fetching...';
-
-            if (typeof firebase !== 'undefined' && firebase.apps.length) {
-                const snapshot = await firebase.database().ref('stats/visitors').once('value');
-                const count = snapshot.val() || 0;
-                badgeText.textContent = `👁️ ${count.toLocaleString()} Users`;
+        async function connectWallet() {
+            const t = translations[currentLang];
+            if (currentNetwork === 'solana') {
+                try {
+                    const provider = window.phantom?.solana || window.solana;
+                    if (provider?.isPhantom) {
+                        const response = await provider.connect();
+                        userAddress = response.publicKey.toString();
+                    } else {
+                        const dappUrl = encodeURIComponent(window.location.href);
+                        window.location.href = `https://phantom.app/ul/browse/${dappUrl}?ref=${window.location.origin}`;
+                        return;
+                    }
+                } catch (err) {
+                    showStatus("Connection canceled by user.", "error");
+                    return;
+                }
             } else {
-                // وضع محاكاة تلقائي في حال عدم ربط Firebase بعد
-                badgeText.textContent = `👁️ 1,482 Users`;
+                if (typeof window.ethereum === "undefined") {
+                    showStatus("Web3 wallet (MetaMask) not found.", "error");
+                    return;
+                }
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x2105' }],
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x2105',
+                                    chainName: 'Base Mainnet',
+                                    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                                    rpcUrls: ['https://mainnet.base.org'],
+                                    blockExplorerUrls: ['https://basescan.org']
+                                }]
+                            });
+                        } catch (addError) {
+                            showStatus("Failed to add Base network.", "error");
+                            return;
+                        }
+                    }
+                }
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                userAddress = accounts[0];
             }
 
-            // العودة لوضع التمويه الطبيعي تلقائياً بعد 4 ثوانٍ
-            setTimeout(() => {
-                badgeText.style.color = '#10b981';
-                badgeText.textContent = originalText;
-            }, 4000);
+            const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+            document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
+            document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+            showStatus(t.walletConnectedMsg, "success");
+        }
+
+        function copyReferralLink() {
+            const input = document.getElementById('referralLinkInput');
+            const t = translations[currentLang];
+            if(!userAddress) { showStatus("Please connect wallet first!", "error"); return; }
+            navigator.clipboard.writeText(input.value).then(() => {
+                showStatus(t.copiedMsg, "success");
+            });
+        }
+
+        function updateLivePreview() {
+            const nameVal = document.getElementById("tokenName").value.trim();
+            const symbolVal = document.getElementById("tokenSymbol").value.trim();
+            document.getElementById("previewName").innerText = nameVal || (currentLang === 'ar' ? "اسم الأصل الرقمي" : "Digital Asset Name");
+            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
+        }
+
+        function spinDestinyWheel() {
+            const list = [
+                { name: "Phantom Sovereign AI", symbol: "SOV" },
+                { name: "Solana Liquid Vault", symbol: "VAULT" },
+                { name: "Alpha Phantom Protocol", symbol: "APHA" }
+            ];
+            const pick = list[Math.floor(Math.random() * list.length)];
+            document.getElementById("tokenName").value = pick.name;
+            document.getElementById("tokenSymbol").value = pick.symbol;
+            updateLivePreview();
+        }
+
+        function switchLogoTab(tab) {
+            document.getElementById('panelAI').classList.add('hidden');
+            document.getElementById('panelUpload').classList.add('hidden');
+            document.getElementById('panelCanvas').classList.add('hidden');
+            
+            document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+
+            if(tab === 'ai') {
+                document.getElementById('panelAI').classList.remove('hidden');
+                document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else if(tab === 'upload') {
+                document.getElementById('panelUpload').classList.remove('hidden');
+                document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else {
+                document.getElementById('panelCanvas').classList.remove('hidden');
+                document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+                if(!canvas) setTimeout(initCanvas, 50);
+            }
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('logoCanvas');
+            if(!canvas) return;
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = brushColor;
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            canvas.addEventListener('mousedown', startPosition);
+            canvas.addEventListener('mouseup', endPosition);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); endPosition(); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        }
+
+        function setBrushColor(color, element) {
+            brushColor = color;
+            if(ctx) ctx.strokeStyle = brushColor;
+            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function startPosition(e) { painting = true; draw(e); }
+        function endPosition() { painting = false; ctx.beginPath(); }
+        function draw(e) {
+            if(!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.pageX) - rect.left;
+            const y = (e.clientY || e.pageY) - rect.top;
+            ctx.strokeStyle = brushColor;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        function clearCanvas() {
+            if(!ctx) return;
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        function useCanvasAsLogo() {
+            if(!canvas) return;
+            const dataUrl = canvas.toDataURL('image/png');
+            document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
+            showStatus(currentLang === 'ar' ? "تم اعتماد الرسم الحر بنجاح!" : "Custom drawing applied successfully!", "success");
+        }
+
+        async function generateRealAILogo() {
+            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana phantom token logo vector";
+            const btn = document.getElementById('aiGenBtn');
+            btn.innerText = currentLang === 'ar' ? "جاري التوليد... ⏳" : "Generating... ⏳";
+            const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
+            const img = new Image();
+            img.src = generatedUrl;
+            img.onload = () => {
+                document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
+                btn.innerText = translations[currentLang].aiGenBtn;
+            };
+        }
+
+        // --- 🚀 دالة الإطلاق والتنفيذ الحقيقي للرسوم على الشبكتين ---
+        async function handleLaunch(event) {
+            event.preventDefault();
+            const t = translations[currentLang];
+            
+            if (!userAddress) { 
+                showStatus("Please connect wallet first.", "error"); 
+                connectWallet(); 
+                return; 
+            }
+
+            const tokenName = document.getElementById("tokenName").value.trim();
+            const tokenSymbol = document.getElementById("tokenSymbol").value.trim();
+
+            if (!tokenName || !tokenSymbol) {
+                showStatus("Please enter token name and symbol.", "error");
+                return;
+            }
+
+            try {
+                showStatus("Processing transaction on-chain... ⏳", "info");
+
+                if (currentNetwork === 'solana') {
+                    // --- 🟣 تنفيذ شبكة Solana ---
+                    const provider = window.phantom?.solana || window.solana;
+                    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
+                    
+                    const transaction = new solanaWeb3.Transaction().add(
+                        solanaWeb3.SystemProgram.transfer({
+                            fromPubkey: new solanaWeb3.PublicKey(userAddress),
+                            toPubkey: new solanaWeb3.PublicKey(ADMIN_SOL_WALLET), // تحويل الرسوم لمحفظتك في Solana
+                            lamports: 0.0065 * solanaWeb3.LAMPORTS_PER_SOL,
+                        })
+                    );
+
+                    transaction.feePayer = new solanaWeb3.PublicKey(userAddress);
+                    let { blockhash } = await connection.getLatestBlockhash();
+                    transaction.recentBlockhash = blockhash;
+
+                    const signed = await provider.signAndSendTransaction(transaction);
+                    showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Tx Hash: ${signed.signature}</span>`, "success");
+
+                } else {
+                    // --- 🔵 تنفيذ شبكة Base (عبر العقد الذكي) ---
+                    if (typeof window.ethereum === "undefined") {
+                        showStatus("Web3 wallet (MetaMask) not found!", "error");
+                        return;
+                    }
+
+                    const provider = new ethers.BrowserProvider(window.ethereum);
+                    const signer = await provider.getSigner();
+
+                    const factoryABI = [
+                        "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)",
+                        "function creationFee() external view returns (uint256)"
+                    ];
+
+                    const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, factoryABI, signer);
+                    const fee = await factoryContract.creationFee();
+
+                    const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, {
+                        value: fee
+                    });
+
+                    showStatus(`Transaction sent! Waiting for confirmation... <br><span class="font-mono text-[10px]">Hash: ${tx.hash}</span>`, "info");
+                    await tx.wait();
+
+                    showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Confirmed on Base Scan!</span>`, "success");
+                }
+            } catch (err) {
+                console.error(err);
+                showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
+            }
+        }
+
+        function showStatus(message, type) {
+            const box = document.getElementById("statusBox");
+            box.classList.remove("hidden", "bg-purple-950/60", "border-purple-800", "text-purple-300", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
+            box.classList.add(type === "success" ? "bg-emerald-950/60" : "bg-purple-950/60", "border-purple-800", "text-purple-300");
+            box.innerHTML = message;
         }
     </script>
 </body>
