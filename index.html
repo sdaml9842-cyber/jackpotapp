@@ -76,33 +76,32 @@
     <!-- المحتوى الرئيسي -->
     <main class="max-w-2xl mx-auto px-4 py-8 w-full flex-grow space-y-6">
 
-        <!-- بطاقة برنامج الشركاء والقنوات -->
+        <!-- لوحة الشريك والاستثمار المؤسسي العبقرية -->
         <div class="institutional-card rounded-2xl p-5 shadow-xl border border-slate-800 relative">
-            <div class="flex justify-between items-center mb-3">
+            <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center space-x-2 space-x-reverse">
-                    <span class="text-base">🏛️</span>
-                    <h2 class="font-bold text-white text-xs tracking-wide">برنامج الشركاء والقنوات المعتمدة (Affiliate Portal)</h2>
+                    <span class="text-base">💼</span>
+                    <h2 class="font-bold text-white text-xs tracking-wide">برنامج مشاركة عوائد البروتوكول (Protocol Revenue Share)</h2>
                 </div>
-                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/20">عائد مالي معتمد</span>
+                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/20">عائد فوري 20%</span>
             </div>
             
-            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                يصرف نظام البروتوكول حافزاً فورياً بقيمة <strong class="text-emerald-400">$3.00 USDT</strong> لشركاء القنوات والمحتوى عن كل <strong class="text-slate-200">20 إحالة إطلاق ناجحة</strong> تتم عبر النطاق الرسمي المعتمد.
-            </p>
-
-            <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 mb-3.5 text-xs space-y-2">
-                <div class="flex justify-between items-center text-slate-400">
-                    <span>مستوى تقدم الإحالات الموثقة:</span>
-                    <span class="font-bold text-emerald-400" id="affiliateProgressText">0 / 20 إحالة</span>
+            <!-- لوحة الأرقام الذكية -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-slate-950/90 border border-slate-800 p-3 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 font-semibold mb-1">عمليات الإطلاق المعتمدة</span>
+                    <span id="refCountText" class="text-sm font-bold text-white font-mono">0 إحالات</span>
                 </div>
-                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
-                    <div id="affiliateProgressBar" class="bg-emerald-500 h-full w-[0%] transition-all duration-500"></div>
+                <div class="bg-slate-950/90 border border-slate-800 p-3 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 font-semibold mb-1">العوائد المستحقة (ETH)</span>
+                    <span id="refEarnedText" class="text-sm font-bold text-emerald-400 font-mono">0.0000 ETH</span>
                 </div>
             </div>
 
             <div class="space-y-2">
+                <label class="block text-[11px] font-bold text-slate-400">رابط الشريك الموّثق (ربط المحفظة يفعّل الرابط فوراً):</label>
                 <div class="flex items-center space-x-2 space-x-reverse">
-                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد الرابط الرسمي..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg px-3 py-2 text-xs text-emerald-300 font-mono text-left focus:outline-none">
+                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد الرابط المعتمد..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg px-3 py-2 text-xs text-emerald-300 font-mono text-left focus:outline-none">
                     <button type="button" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition-all flex-shrink-0">
                         نسخ الرابط
                     </button>
@@ -259,9 +258,7 @@
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
-                // فتح المحفظة تلقائياً عبر DeepLink بدون نافذة alert المزعجة
-                const currentUrl = encodeURIComponent(window.location.href);
-                showStatus("جاري تحويلك للمحفظة الرقمية...", "info");
+                showStatus("جاري توجيهك إلى المحفظة المعتمدة...", "info");
                 window.location.href = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
                 return;
             }
@@ -292,7 +289,7 @@
                 const cleanUrl = window.location.origin + window.location.pathname;
                 document.getElementById('referralLinkInput').value = `${cleanUrl}?ref=${userAddress}`;
 
-                showStatus("تم ربط المحفظة وتوليد رابط الشريك بنجاح.", "success");
+                showStatus("تم ربط المحفظة وتفعيل لوحة الشريك بنجاح.", "success");
             } catch (error) {
                 showStatus("فشل الاتصال بالمحفظة.", "error");
             }
@@ -301,11 +298,11 @@
         function copyReferralLink() {
             const input = document.getElementById('referralLinkInput');
             if(!userAddress) { 
-                showStatus("يرجى ربط المحفظة أولاً لتوليد الرابط.", "error"); 
+                showStatus("يرجى ربط المحفظة أولاً لتفعيل رابط الشريك.", "error"); 
                 return; 
             }
             navigator.clipboard.writeText(input.value).then(() => {
-                showStatus("تم نسخ رابط الإحالة بنجاح!", "success");
+                showStatus("تم نسخ رابط الشريك المعتمد بنجاح!", "success");
             });
         }
 
@@ -362,7 +359,7 @@
             try {
                 const tx = await contract.withdraw();
                 await tx.wait();
-                showStatus("تم تحويل رسوم البروتوكول بنجاح!", "success");
+                showStatus("تم تحويل عوائد البروتوكول بنجاح!", "success");
             } catch (error) {
                 showStatus("حدث خطأ أثناء السحب.", "error");
             }
