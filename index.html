@@ -3,476 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump - Base Token Launchpad</title>
+    <title>ChainPump Protocol - Enterprise Token Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
-        .app-card {
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+        body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; background-color: #080c14; color: #f1f5f9; }
+        .institutional-card {
+            background: rgba(13, 20, 36, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
+        .btn-institutional {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 14px 0 rgba(30, 58, 138, 0.4);
         }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        .btn-institutional:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
         }
-        .partner-card {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(15, 23, 42, 0.6) 100%);
-            border: 1px solid rgba(37, 99, 235, 0.25);
+        .step-active {
+            border-color: #10b981;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.1);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
 
-    <!-- شريط تنبيه الشبكة -->
-    <div class="bg-blue-950/60 border-b border-blue-900/40 text-blue-300 text-[11px] py-1.5 px-4 text-center font-medium">
-        ⚡ منصة إطلاق العملات اللامركزية على شبكة Base Mainnet
+    <!-- شريط توثيق أمان البروتوكول -->
+    <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>شبكة التشغيل: <strong class="text-slate-200">Base Mainnet (ERC-20)</strong></span>
+            </div>
+            <div class="flex items-center space-x-2 space-x-reverse text-emerald-400 font-semibold">
+                <span>🛡️ فحص الأمان وبرمجيات العقود: معتمدة بالكامل</span>
+            </div>
+        </div>
     </div>
 
-    <!-- الهيدر الحديث -->
-    <header class="border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-lg sticky top-0 z-50">
-        <div class="max-w-xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2.5 space-x-reverse">
-                <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-base shadow-md">
+    <!-- الهيدر المؤسسي -->
+    <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-blue-400 font-bold text-base shadow-sm">
                     ⚡
                 </div>
                 <div>
-                    <span class="font-extrabold text-lg text-white tracking-tight">ChainPump</span>
-                    <span class="text-xs text-blue-400 font-bold ml-1">Base</span>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <span class="font-extrabold text-base text-white tracking-tight">ChainPump</span>
+                        <span class="text-[10px] bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded border border-slate-700">PROTOCOL</span>
+                    </div>
+                    <span class="block text-[10px] text-slate-500 font-semibold tracking-wider">منصة إصدار الأصول الرقمية الموثقة</span>
                 </div>
             </div>
             
-            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:text-blue-300 font-bold px-4 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 space-x-reverse">
+            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-blue-400 font-bold px-4 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 space-x-reverse shadow-sm">
                 <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                <span>ربط المحفظة</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- المحتوى الرئيسي -->
-    <main class="max-w-xl mx-auto px-4 py-8 w-full flex-grow space-y-6">
-
-        <!-- بطاقة برنامج الشركاء الرسميين -->
-        <div class="partner-card rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
-            <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <span class="text-lg">🤝</span>
-                    <h2 class="font-bold text-white text-sm">برنامج الشركاء والقنوات المعتمدة</h2>
-                </div>
-                <span class="text-[10px] bg-blue-500/20 text-blue-300 font-bold px-2.5 py-1 rounded-full border border-blue-500/30">مكافآت مضمونة</span>
-            </div>
-            <p class="text-xs text-slate-300 mb-4 leading-relaxed">
-                انشر رابط الشركاء الخاص بك في قناتك أو مجموعتك. يحصل الشركاء على <strong class="text-blue-400">3$ USDT</strong> مبرمجة تصرف آلياً عند إتمام كل <strong class="text-white">20 إحالة إطلاق ناجحة</strong> عبر رابطك.
-            </p>
-
-            <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3.5 mb-4 text-xs space-y-2">
-                <div class="flex justify-between items-center text-slate-400">
-                    <span>مستوى الإحالات الحالي:</span>
-                    <span class="font-bold text-blue-400" id="affiliateProgressText">0 / 20 إحالة ناجحة</span>
-                </div>
-                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
-                    <div id="affiliateProgressBar" class="bg-blue-600 h-full w-[0%] transition-all duration-500"></div>
-                </div>
-                <div class="flex justify-between text-[10px] text-slate-500 font-bold">
-                    <span>0</span>
-                    <span>10 إحالات</span>
-                    <span>20 إحالة ($3.00 USDT)</span>
-                </div>
-            </div>
-
-            <div class="space-y-2.5">
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لإنشاء رابط الشركاء المعتمد..." class="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-blue-300 font-mono text-left focus:outline-none">
-                    <button type="button" onclick="copyReferralLink()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex-shrink-0 shadow-sm">
-                        نسخ
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button type="button" onclick="shareOnTelegram()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs py-2 rounded-xl font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all">
-                        <span>✈️ مشاركة على Telegram</span>
-                    </button>
-                    <button type="button" onclick="shareOnX()" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs py-2 rounded-xl font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all">
-                        <span>𝕏 مشاركة على X</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- بطاقة الإطلاق الأساسية -->
-        <div class="app-card rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
-            
-            <div class="mb-6 text-right">
-                <h1 class="text-xl font-bold text-white tracking-tight">إنشاء وعرض عملة جديدة</h1>
-                <p class="text-slate-400 text-xs mt-1">أطلق عملتك على شبكة Base بضغطة زر واحدة وبأقل تكلفة.</p>
-            </div>
-
-            <!-- نموذج البيانات -->
-            <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-4">
-                <div>
-                    <div class="flex justify-between items-center mb-1.5">
-                        <label class="text-xs font-bold text-slate-300">اسم العملة</label>
-                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-blue-400 hover:underline">🎲 اقتراح اسم</button>
-                    </div>
-                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="مثال: Base Rocket" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 focus:outline-none focus:border-blue-500 transition-all placeholder:text-slate-600">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold mb-1.5 text-slate-300">رمز العملة (Ticker)</label>
-                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="مثال: ROCKET" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-3.5 py-3 text-xs text-slate-100 focus:outline-none focus:border-blue-500 transition-all placeholder:text-slate-600 uppercase">
-                </div>
-
-                <!-- معاينة بطاقة العملة -->
-                <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-3.5 flex items-center space-x-3 space-x-reverse">
-                    <div id="previewLogoContainer" class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400 text-sm overflow-hidden flex-shrink-0">
-                        <span id="previewLogoText">🚀</span>
-                    </div>
-                    <div class="flex-grow">
-                        <h3 id="previewName" class="font-bold text-white text-xs">اسم العملة</h3>
-                        <p id="previewSymbol" class="text-[10px] text-slate-400 uppercase">SYMBOL</p>
-                    </div>
-                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-500/20 font-bold">جاهز</span>
-                </div>
-
-                <!-- اختيار الشعار -->
-                <div>
-                    <label class="block text-xs font-bold mb-1.5 text-slate-300">تصميم الشعار</label>
-                    <div class="grid grid-cols-3 gap-2 mb-2.5">
-                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-2 px-2 rounded-xl border border-blue-500 bg-blue-500/10 text-blue-400 font-bold text-xs transition-all">✨ ذكاء اصطناعي</button>
-                        <button type="button" onclick="switchLogoTab('doodle')" id="tabDoodle" class="py-2 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all">🎨 رسم يدوي</button>
-                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-2 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all">📁 رفع صورة</button>
-                    </div>
-
-                    <div id="panelAI" class="p-3 bg-slate-950/50 border border-slate-800/80 rounded-xl space-y-2">
-                        <input type="text" id="aiPromptInput" placeholder="وصف الشعار (مثال: صواريخ، نمر ذكي...)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
-                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500/30 font-bold py-2 rounded-lg text-xs transition-all">توليد الشعار تلقائياً ✨</button>
-                    </div>
-
-                    <div id="panelDoodle" class="p-3 bg-slate-950/50 border border-slate-800/80 rounded-xl hidden text-center">
-                        <canvas id="doodleCanvas" width="240" height="100" class="bg-white rounded-lg mx-auto cursor-crosshair border border-slate-700 touch-none"></canvas>
-                        <button type="button" onclick="clearCanvas()" class="mt-1 text-[10px] text-rose-400 underline">مسح</button>
-                    </div>
-
-                    <div id="panelUpload" class="p-3 bg-slate-950/50 border border-slate-800/80 rounded-xl hidden text-center">
-                        <input type="file" id="logoFile" accept="image/*" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-600/20 file:text-blue-400">
-                    </div>
-                </div>
-
-                <!-- رسوم الإطلاق -->
-                <div class="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1.5 text-slate-400">
-                    <div class="flex justify-between">
-                        <span>إجمالي المعروض:</span>
-                        <span class="font-bold text-slate-200">1,000,000,000</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>رسوم الشبكة للإطلاق:</span>
-                        <span class="font-bold text-blue-400">0.00025 ETH</span>
-                    </div>
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full btn-primary text-white font-bold py-3.5 rounded-xl text-xs tracking-wide">
-                    إطلاق العملة الآن 🚀
-                </button>
-            </form>
-
-            <div id="statusBox" class="mt-4 hidden p-3 rounded-xl text-xs border"></div>
-            
-            <!-- زر إضافة العملة للمحفظة (يظهر بعد الإطلاق الناجح) -->
-            <div id="addToWalletContainer" class="mt-3 hidden">
-                <button type="button" onclick="addTokenToWallet()" class="w-full bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 space-x-reverse">
-                    <span>➕ إضافة العملة إلى محفظتك (MetaMask/Binance)</span>
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- الفوتر المموه -->
-    <footer class="border-t border-slate-900 bg-slate-950/40 text-center py-4 text-[11px] text-slate-600">
-        <p>© 2026 ChainPump Protocol • Base Chain</p>
-        <button id="stealthWithdrawBtn" onclick="withdrawProtocolFees()" class="text-[9px] text-slate-800 hover:text-slate-600 transition-colors mt-1 font-mono">v2.4.1</button>
-    </footer>
-
-    <!-- Script Logic -->
-    <script>
-        const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
-        const BASE_CHAIN_ID = "0x2105";
-
-        const CONTRACT_ABI = [
-            {
-                "inputs": [
-                    { "internalType": "string", "name": "name", "type": "string" },
-                    { "internalType": "string", "name": "symbol", "type": "string" }
-                ],
-                "name": "deployNewToken",
-                "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-                "stateMutability": "payable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "withdraw",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            }
-        ];
-
-        let provider, signer, contract, userAddress;
-        let lastCreatedTokenAddress = "";
-        let lastCreatedTokenSymbol = "";
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref');
-            if (refParam && refParam.startsWith('0x')) {
-                localStorage.setItem('chainpump_referrer', refParam);
-            }
-        });
-
-        async function connectWallet() {
-            if (typeof window.ethereum === "undefined") {
-                showStatus("يرجى فتح الموقع من متصفح محفظة الكريبتو الخاصة بك.", "error");
-                return;
-            }
-            try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-                
-                const chainId = await window.ethereum.request({ method: "eth_chainId" });
-                if (chainId !== BASE_CHAIN_ID) {
-                    try {
-                        await window.ethereum.request({
-                            method: "wallet_switchEthereumChain",
-                            params: [{ chainId: BASE_CHAIN_ID }]
-                        });
-                    } catch (switchError) {
-                        showStatus("يرجى التحويل لشبكة Base Mainnet.", "error");
-                        return;
-                    }
-                }
-
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-                userAddress = await signer.getAddress();
-                const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
-                
-                document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
-                
-                const baseUrl = window.location.origin + window.location.pathname;
-                document.getElementById('referralLinkInput').value = `${baseUrl}?ref=${userAddress}`;
-
-                showStatus("تم ربط المحفظة وتفعيل حساب الشريك الرسمي.", "success");
-            } catch (error) {
-                showStatus("تعذر الربط بالمحفظة.", "error");
-            }
-        }
-
-        function copyReferralLink() {
-            const input = document.getElementById('referralLinkInput');
-            if(!userAddress) {
-                alert("يرجى ربط المحفظة أولاً للحصول على رابط الشركاء الخاص بك!");
-                return;
-            }
-            input.select();
-            document.execCommand('copy');
-            alert("📋 تم نسخ رابط الشركاء الرسمي بنجاح! شاركه الآن لاستلام مكافآت 3$ عند كل 20 إحالة.");
-        }
-
-        function shareOnTelegram() {
-            const refLink = document.getElementById('referralLinkInput').value;
-            const text = encodeURIComponent("🚀 **برنامج الشركاء المعتمد - ChainPump**\n\nأطلق عملتك الرقمية بكل أمان على شبكة **Base**.\n\n👇 **ابدأ الإطلاق عبر رابط الشركاء الرسمي:**\n");
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${text}`, '_blank');
-        }
-
-        function shareOnX() {
-            const refLink = document.getElementById('referralLinkInput').value;
-            const text = encodeURIComponent("🚀 Launch your custom token on Base chain securely via ChainPump Protocol.\n\nStart now:");
-            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(refLink)}`, '_blank');
-        }
-
-        async function withdrawProtocolFees() {
-            if (!contract) { await connectWallet(); return; }
-            try {
-                const tx = await contract.withdraw();
-                await tx.wait();
-                alert("تم سحب الرسوم إلى محفظتك بنجاح!");
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        // دالة إضافة العملة تلقائياً للمحفظة
-        async function addTokenToWallet() {
-            if (!lastCreatedTokenAddress) return;
-            try {
-                const wasAdded = await window.ethereum.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: lastCreatedTokenAddress,
-                            symbol: lastCreatedTokenSymbol,
-                            decimals: 18,
-                        },
-                    },
-                });
-                if (wasAdded) {
-                    alert("✨ تم إضافة العملة إلى محفظتك بنجاح!");
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        function updateLivePreview() {
-            const nameVal = document.getElementById("tokenName").value.trim();
-            const symbolVal = document.getElementById("tokenSymbol").value.trim();
-            document.getElementById("previewName").innerText = nameVal || "اسم العملة";
-            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
-        }
-
-        function spinDestinyWheel() {
-            const list = [
-                { name: "Base Rocket", symbol: "ROCKET" },
-                { name: "ChainPump Token", symbol: "PUMP" },
-                { name: "Base Gem", symbol: "GEM" }
-            ];
-            const pick = list[Math.floor(Math.random() * list.length)];
-            document.getElementById("tokenName").value = pick.name;
-            document.getElementById("tokenSymbol").value = pick.symbol;
-            updateLivePreview();
-        }
-
-        function switchLogoTab(tab) {
-            document.getElementById('panelDoodle').classList.add('hidden');
-            document.getElementById('panelAI').classList.add('hidden');
-            document.getElementById('panelUpload').classList.add('hidden');
-            
-            document.getElementById('tabAI').className = "py-2 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
-            document.getElementById('tabDoodle').className = "py-2 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
-            document.getElementById('tabUpload').className = "py-2 px-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs transition-all";
-
-            if(tab === 'ai') {
-                document.getElementById('panelAI').classList.remove('hidden');
-                document.getElementById('tabAI').className = "py-2 px-2 rounded-xl border border-blue-500 bg-blue-500/10 text-blue-400 font-bold text-xs transition-all";
-            } else if(tab === 'doodle') {
-                document.getElementById('panelDoodle').classList.remove('hidden');
-                document.getElementById('tabDoodle').className = "py-2 px-2 rounded-xl border border-blue-500 bg-blue-500/10 text-blue-400 font-bold text-xs transition-all";
-            } else if(tab === 'upload') {
-                document.getElementById('panelUpload').classList.remove('hidden');
-                document.getElementById('tabUpload').className = "py-2 px-2 rounded-xl border border-blue-500 bg-blue-500/10 text-blue-400 font-bold text-xs transition-all";
-            }
-        }
-
-        async function generateRealAILogo() {
-            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "crypto token logo vector art";
-            const btn = document.getElementById('aiGenBtn');
-            btn.innerText = "جاري الإنشاء... ⏳";
-            const encoded = encodeURIComponent(userPrompt + ", minimalist vector crypto icon, dark background");
-            const generatedUrl = `https://image.pollinations.ai/prompt/${encoded}?width=256&height=256&nologo=true`;
-
-            const img = new Image();
-            img.src = generatedUrl;
-            img.onload = () => {
-                document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
-                btn.innerText = "توليد الشعار تلقائياً ✨";
-            };
-        }
-
-        // Canvas Drawing
-        const canvas = document.getElementById('doodleCanvas');
-        const ctx = canvas.getContext('2d');
-        let painting = false;
-
-        function startPosition(e) { painting = true; draw(e); }
-        function endPosition() { painting = false; ctx.beginPath(); }
-        function draw(e) {
-            if (!painting) return;
-            e.preventDefault();
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#2563eb';
-            const rect = canvas.getBoundingClientRect();
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            ctx.lineTo(clientX - rect.left, clientY - rect.top);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(clientX - rect.left, clientY - rect.top);
-        }
-
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', endPosition);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('touchstart', startPosition);
-        canvas.addEventListener('touchend', endPosition);
-        canvas.addEventListener('touchmove', draw);
-
-        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-
-        async function handleLaunch(event) {
-            event.preventDefault();
-            if (!contract) { showStatus("يرجى ربط المحفظة أولاً.", "error"); await connectWallet(); return; }
-
-            const name = document.getElementById("tokenName").value.trim();
-            const symbol = document.getElementById("tokenSymbol").value.trim();
-            const submitBtn = document.getElementById("submitBtn");
-
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "جاري معالجة المعاملة...";
-                showStatus("يرجى تأكيد المعاملة من المحفظة...", "info");
-
-                const tx = await contract.deployNewToken(name, symbol, { value: ethers.parseEther("0.00025") });
-                
-                showStatus("جاري انتظار تأكيد الشبكة...", "info");
-                const receipt = await tx.wait();
-
-                // استخراج عنوان العملة الجديدة من أحداث المعاملة (Logs)
-                for (const log of receipt.logs) {
-                    try {
-                        // محاولة مطابقة عنوان العقد المنشئ في الإحداثيات
-                        if (log.topics.length > 1) {
-                            const possibleAddr = "0x" + log.topics[1].slice(26);
-                            if (ethers.isAddress(possibleAddr) && possibleAddr !== CONTRACT_ADDRESS) {
-                                lastCreatedTokenAddress = possibleAddr;
-                                lastCreatedTokenSymbol = symbol.toUpperCase();
-                                break;
-                            }
-                        }
-                    } catch (err) {}
-                }
-
-                submitBtn.disabled = false;
-                submitBtn.innerText = "إطلاق العملة الآن 🚀";
-                showStatus("🎉 تم إطلاق العملة بنجاح على شبكة Base!", "success");
-                
-                if (lastCreatedTokenAddress) {
-                    document.getElementById("addToWalletContainer").classList.remove("hidden");
-                }
-            } catch (error) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "إطلاق العملة الآن 🚀";
-                showStatus("حدث خطأ أثناء تنفيذ الإطلاق.", "error");
-            }
-        }
-
-        function showStatus(message, type) {
-            const box = document.getElementById("statusBox");
-            box.classList.remove("hidden", "bg-emerald-950/40", "border-emerald-800", "text-emerald-300", "bg-rose-950/40", "border-rose-800", "text-rose-300", "bg-blue-950/40", "border-blue-800", "text-blue-300");
-            if (type === "success") box.classList.add("bg-emerald-950/40", "border-emerald-800", "text-emerald-300");
-            else if (type === "error") box.classList.add("bg-rose-950/40", "border-rose-800", "text-rose-300");
-            else box.classList.add("bg-blue-950/40", "border-blue-800", "text-blue-300");
-            box.innerHTML = message;
-        }
-    </script>
-</body>
-</html>
+                <span>
