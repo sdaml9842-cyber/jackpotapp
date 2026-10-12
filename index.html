@@ -203,6 +203,19 @@
         </div>
     </footer>
 
+    <!-- كود إخفاء شارة Netlify نهائياً -->
+    <style>
+      [data-netlify-deploy-id],
+      netlify-drawer,
+      #netlify-badge,
+      .netlify-badge {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    </style>
+
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105";
