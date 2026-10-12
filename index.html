@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Pro - Enterprise & Viral Launchpad</title>
+    <title>ChainPump Pro - Enterprise Protocol</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v6 -->
@@ -26,100 +26,61 @@
             box-shadow: 0 0 30px rgba(2, 132, 199, 0.5);
             transform: translateY(-1px);
         }
-        .telegram-gold-card {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(14, 165, 233, 0.1) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.4);
+        .withdraw-btn {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+        .withdraw-btn:hover {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
 
-    <!-- الشريط العلوي المالي والتنافسي -->
-    <div id="viralPulseBar" class="bg-slate-900 border-b border-slate-800 text-emerald-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500">
+    <!-- الشريط العلوي المالي وتدفق الرسوم -->
+    <div id="viralPulseBar" class="bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500">
         <div class="flex items-center space-x-2 space-x-reverse">
             <span id="pulseDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="viralStatusText">🔥 تحدي السفير الفيروسي: احصل على $3.00 USDT لكل 20 إحالة إطلاق ناجحة! 🚀</span>
+            <span id="viralStatusText">🏛️ لوحة التحكم المؤسسية: إدارة البروتوكول وسحب الرسوم 🔒</span>
         </div>
         <div class="hidden sm:flex items-center space-x-2 space-x-reverse text-slate-400">
-            <span>🎁 مكافأة التجميع:</span>
-            <span class="font-bold text-emerald-400">$3.00 / 20 إحالة (20%)</span>
+            <span>⚡ حالة العقد:</span>
+            <span class="font-bold text-emerald-400">نشط وجاهز للعمليات</span>
         </div>
     </div>
 
-    <!-- الهيدر الرسمي والمؤسسي -->
+    <!-- الهيدر الرسمي لوحة المالك -->
     <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-emerald-600 flex items-center justify-center shadow-md text-white font-black text-lg">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-blue-700 flex items-center justify-center shadow-md text-white font-black text-lg">
                     🏛️
                 </div>
                 <div>
-                    <span class="font-extrabold text-xl tracking-tight text-white">ChainPump <span class="text-emerald-400 font-medium text-sm">Enterprise</span></span>
+                    <span class="font-extrabold text-xl tracking-tight text-white">ChainPump <span class="text-sky-400 font-medium text-sm">Enterprise</span></span>
                     <span class="block text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Base Protocol Infrastructure</span>
                 </div>
             </div>
             
-            <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-400 font-semibold px-5 py-2.5 rounded-xl transition-all text-sm shadow-sm flex items-center space-x-2 space-x-reverse">
-                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>ربط المحفظة</span>
-            </button>
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <!-- زر سحب الرسوم للمالك -->
+                <button id="withdrawBtn" onclick="withdrawProtocolFees()" class="withdraw-btn text-white font-bold px-4 py-2.5 rounded-xl transition-all text-xs flex items-center space-x-1.5 space-x-reverse border border-emerald-500/40">
+                    <span>💎 سحب أرباح العقد</span>
+                </button>
+
+                <!-- زر ربط المحفظة -->
+                <button id="connectWalletBtn" onclick="connectWallet()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-sky-400 font-semibold px-4 py-2.5 rounded-xl transition-all text-xs shadow-sm flex items-center space-x-2 space-x-reverse">
+                    <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                    <span>ربط المحفظة</span>
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- المحتوى الرئيسي -->
     <main class="max-w-xl mx-auto px-4 py-8 w-full flex-grow space-y-6">
 
-        <!-- بطاقة أصحاب قنوات التلجرام ونظام الحوافز بالتجميع (3$ / 20 إحالة) -->
-        <div class="telegram-gold-card rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
-            <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <span class="text-2xl">⚡</span>
-                    <h2 class="font-black text-white text-base">برنامج أصحاب القنوات والمروجين (20% أرباح)</h2>
-                </div>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">3$ / 20 إحالة</span>
-            </div>
-            
-            <p class="text-xs text-slate-300 mb-4 leading-relaxed">
-                انشر رابط قناتك الخاص وجمع الإحالات: **احصل على 3.00$ USDT كاش فوراً** عند الوصول إلى **20 إحالة إطلاق ناجحة** عبر رابطك!
-            </p>
-
-            <!-- شريط تقدم الإحالات -->
-            <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 mb-4 text-xs space-y-2.5">
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-400">تقدم إحالات قناتك:</span>
-                    <span class="font-bold text-emerald-400" id="referralProgressText">0 / 20 إحالة (المكافأة: $3.00)</span>
-                </div>
-                <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                    <div id="referralProgressBar" class="bg-gradient-to-r from-emerald-500 to-sky-500 h-full w-[0%] transition-all duration-500"></div>
-                </div>
-                <div class="flex justify-between text-[10px] text-slate-500 font-bold">
-                    <span>0 إحالة</span>
-                    <span>10 إحالات</span>
-                    <span>20 إحالة ($3.00)</span>
-                </div>
-            </div>
-
-            <div class="space-y-3">
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <input type="text" id="referralLinkInput" readonly value="يرجى ربط المحفظة لتوليد رابط القناة الخاص..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-emerald-300 font-mono text-left focus:outline-none">
-                    <button type="button" onclick="copyReferralLink()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex-shrink-0 shadow-md">
-                        📋 نسخ
-                    </button>
-                </div>
-
-                <!-- أزرار المشاركة السريعة -->
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button type="button" onclick="shareOnTelegram()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs py-2.5 rounded-xl font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all shadow-md">
-                        <span>✈️ نشر مباشر للقناة</span>
-                    </button>
-                    <button type="button" onclick="shareOnX()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs py-2.5 rounded-xl font-bold flex items-center justify-center space-x-1.5 space-x-reverse transition-all">
-                        <span>𝕏 مشاركة على X</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- بطاقة نموذج الإصدار الرئيسي -->
+        <!-- بطاقة نموذج الإصدار -->
         <div id="mainCard" class="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden transition-all duration-500">
             
             <div class="mb-6 text-center sm:text-right">
@@ -221,11 +182,12 @@
         <p>جميع الحقوق محفوظة © 2026 - ChainPump Enterprise Protocol على شبكة Base</p>
     </footer>
 
-    <!-- منطق التشغيل التقني -->
+    <!-- منطق التشغيل والدالة المضافة لسحب الأرباح -->
     <script>
         const CONTRACT_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
         const BASE_CHAIN_ID = "0x2105"; // Base Mainnet
 
+        // إضافة دوال ABI المخصصة للإطلاق وللسحب
         const CONTRACT_ABI = [
             {
                 "inputs": [
@@ -236,19 +198,25 @@
                 "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
                 "stateMutability": "payable",
                 "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdraw",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdrawFees",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
             }
         ];
 
         let provider, signer, contract, userAddress;
         let aiImageUrl = "";
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref');
-            if (refParam && refParam.startsWith('0x')) {
-                localStorage.setItem('chainpump_referrer', refParam);
-            }
-        });
 
         async function connectWallet() {
             if (typeof window.ethereum === "undefined") {
@@ -280,39 +248,56 @@
                 
                 const btn = document.getElementById("connectWalletBtn");
                 btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
-                
-                const baseUrl = window.location.origin + window.location.pathname;
-                const refLink = `${baseUrl}?ref=${userAddress}`;
-                document.getElementById('referralLinkInput').value = refLink;
 
-                showStatus("تم ربط المحفظة وتفعيل رابط تحدي الـ 3$ USDT الخاص بك!", "success");
+                showStatus("تم ربط المحفظة بنجاح.", "success");
             } catch (error) {
                 console.error(error);
                 showStatus("فشل الاتصال بالمحفظة.", "error");
             }
         }
 
-        function copyReferralLink() {
-            const input = document.getElementById('referralLinkInput');
-            if(!userAddress) {
-                alert("يرجى ربط المحفظة أولاً للحصول على رابط التلجرام الخاص بك!");
+        // دالة سحب الأرباح المخصصة للمالك
+        async function withdrawProtocolFees() {
+            if (!contract) {
+                showStatus("يرجى ربط محفظتكِ المالكة أولاً لسحب الأرباح.", "error");
+                await connectWallet();
                 return;
             }
-            input.select();
-            document.execCommand('copy');
-            alert("🎉 تم نسخ رابط القناة الخاص بك بنجاح! انشره الآن لتحقيق هدف الـ 20 إحالة وحصد 3.00$ USDT.");
-        }
 
-        function shareOnTelegram() {
-            const refLink = document.getElementById('referralLinkInput').value;
-            const text = encodeURIComponent("🚨 **فرصة استثمارية لأعضاء القناة!** 🚀\n\nأطلق عملتك الرقمية المعتمدة فوراً على شبكة **Base** بأسهل وأسرع طريقة عبر منصة **ChainPump Enterprise**!\n\n👇 **ابدأ الإطلاق الآن عبر الرابط التالي:**\n");
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${text}`, '_blank');
-        }
+            const wBtn = document.getElementById("withdrawBtn");
+            try {
+                wBtn.disabled = true;
+                wBtn.innerText = "جاري السحب... ⏳";
+                showStatus("جاري إعداد معاملة سحب الرسوم من العقد الذكي...", "info");
 
-        function shareOnX() {
-            const refLink = document.getElementById('referralLinkInput').value;
-            const text = encodeURIComponent("🚀 Launch your custom enterprise token on Base Chain via ChainPump Enterprise Platform!\n\nDeploy here:");
-            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(refLink)}`, '_blank');
+                let tx;
+                try {
+                    // محاولة استدعاء دالة withdraw الأساسية
+                    tx = await contract.withdraw();
+                } catch (e1) {
+                    // إذا كان العقد يستخدم اسم withdrawFees
+                    tx = await contract.withdrawFees();
+                }
+
+                showStatus(`تم إرسال معاملة السحب! <a href="https://basescan.org/tx/${tx.hash}" target="_blank" class="underline font-bold text-sky-400">متابعة على BaseScan</a>`, "info");
+                
+                await tx.wait();
+
+                wBtn.disabled = false;
+                wBtn.innerHTML = "<span>💎 سحب أرباح العقد</span>";
+                showStatus("🎉 تم سحب جميع الرسوم المتراكمة إلى محفظتكِ بنجاح!", "success");
+
+            } catch (error) {
+                console.error(error);
+                wBtn.disabled = false;
+                wBtn.innerHTML = "<span>💎 سحب أرباح العقد</span>";
+                
+                if (error.message && error.message.includes("user rejected")) {
+                    showStatus("تم إلغاء عملية السحب بواسطة المحفظة.", "error");
+                } else {
+                    showStatus("حدث خطأ أثناء السحب. تأكدي أن المحفظة المربوطة هي محفظة المالك (Owner).", "error");
+                }
+            }
         }
 
         function updateLivePreview() {
@@ -332,8 +317,8 @@
                     document.getElementById("previewLogoText").innerText = symbolVal.substring(0, 2).toUpperCase();
                 }
             } else {
-                pulseBar.className = "bg-slate-900 border-b border-slate-800 text-emerald-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
-                viralStatus.innerText = "🔥 تحدي السفير الفيروسي: احصل على $3.00 USDT لكل 20 إحالة إطلاق ناجحة! 🚀";
+                pulseBar.className = "bg-slate-900 border-b border-slate-800 text-sky-400 text-xs py-2 px-4 flex justify-between items-center transition-all duration-500";
+                viralStatus.innerText = "🏛️ لوحة التحكم المؤسسية: إدارة البروتوكول وسحب الرسوم 🔒";
             }
         }
 
