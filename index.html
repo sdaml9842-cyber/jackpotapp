@@ -224,12 +224,8 @@
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
-        // 🎯 عنوان محفظة Solana لاستلام الرسوم:
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
-
-        // 🎯 عنوان عقد الـ Factory الموثق على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
-
         const BASE_FACTORY_ABI = [
             "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)"
         ];
@@ -423,6 +419,7 @@
             }
         }
 
+        // 🛡️ دالة ربط آمنة لا تتجمد أبداً في أي متصفح جوال عادٍ
         async function connectWallet() {
             const t = translations[currentLang];
             if (currentNetwork === 'solana') {
@@ -441,21 +438,17 @@
                     return;
                 }
             } else {
+                // الفحص الآمن لشبكة Base لتجنب أي تجمد في متصفحات كروم أو سفاري العادية
                 if (typeof window.ethereum === "undefined") {
                     const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
                     const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
                     
                     showStatus(
-                        currentLang === 'ar' 
-                        ? `<b>🦊 جاهز للاتصال على Base!</b><br><br><a href="${mmDeepLink}" id="mmDirectAnchor" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">فتح التطبيق والاتصال المباشر عبر MetaMask 🚀</a>`
-                        : `<b>🦊 Ready for Base Connection!</b><br><br><a href="${mmDeepLink}" id="mmDirectAnchor" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open & Connect in MetaMask 🚀</a>`,
-                        "success"
+                        currentLang === 'ar'
+                        ? `<b>🦊 فتح محفظة Base (MetaMask):</b><br>متصفحك الحالي لا يدعم الاتصال المباشر. انقر للانتقال الفوري داخل تطبيق MetaMask:<br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:10px; font-weight:bold; text-decoration:none;">فتح في MetaMask DApp Browser 🚀</a>`
+                        : `<b>🦊 Open in MetaMask:</b><br>Your browser doesn't inject Web3. Click to open directly inside MetaMask app:<br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:10px; font-weight:bold; text-decoration:none;">Open in MetaMask DApp Browser 🚀</a>`,
+                        "error"
                     );
-
-                    setTimeout(() => {
-                        const anchor = document.getElementById("mmDirectAnchor");
-                        if (anchor) anchor.click();
-                    }, 100);
                     return;
                 }
 
