@@ -589,7 +589,7 @@
             };
         }
 
-        // الدالة المعدلة والمضمونة لاستجابة فورية عبر زر HTML مباشر
+        // الدالة النهائية بعد التعديل المباشر لمنع التجميد والتحويل التلقائي لتطبيق Phantom
         async function handleLaunch(event) {
             event.preventDefault();
             const t = translations[currentLang];
@@ -604,13 +604,14 @@
 
             if (currentNetwork === 'solana') {
                 const lamports = Math.floor(0.0065 * 1_000_000_000);
-                const redirectUrl = encodeURIComponent(window.location.href);
-                const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
+                
+                // استخدام بروتوكول phantom:// المباشر لتجاوز الصفحة البيضاء والتجميد
+                const phantomPayUrl = `phantom://transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL`;
                 
                 showStatus(
                     currentLang === 'ar' 
-                    ? `<b>✅ جاهز للإطلاق!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">اضغط هنا لفتح محفظة Phantom ودفع الرسوم 👻</a>`
-                    : `<b>✅ Ready for launch!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click here to open Phantom & pay fee 👻</a>`,
+                    ? `<b>✅ جاهز للإطلاق!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">اضغط هنا لفتح تطبيق Phantom مباشرة ودفع الرسوم 👻</a>`
+                    : `<b>✅ Ready for launch!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click to open Phantom app & pay fee 👻</a>`,
                     "success"
                 );
 
