@@ -227,8 +227,13 @@
         // 🎯 عنوان محفظة Solana لاستلام الرسوم:
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
-        // 🎯 عنوان عقد الـ Factory على شبكة Base:
+        // 🎯 عنوان عقد الـ Factory الموثق على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+
+        // 🎯 الـ ABI الخاص بالعقد لتنفيذ الدالة المباشرة:
+        const BASE_FACTORY_ABI = [
+            "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)"
+        ];
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -295,7 +300,7 @@
                 switchNetMsg: "Network switched successfully.",
                 walletConnectedMsg: "Wallet connected securely & successfully!",
                 copiedMsg: "Referral link copied successfully!",
-                launchSuccessMsg: "🎉 Token launched successfully! Fee transferred on-chain."
+                launchSuccessMsg: "🎉 Token launched successfully! Contract created on Base."
             },
             ar: {
                 topSec: "🛡️ محرك مؤسسي عالمي",
@@ -333,7 +338,7 @@
                 switchNetMsg: "تم تبديل الشبكة بنجاح.",
                 walletConnectedMsg: "تم ربط المحفظة بنجاح!",
                 copiedMsg: "تم نسخ رابط الشريك بنجاح!",
-                launchSuccessMsg: "🎉 تم تنفيذ الإطلاق بنجاح وتدفق الرسوم مباشرة لمحفظتك!"
+                launchSuccessMsg: "🎉 تم إطلاق العملة وتوليد العقد بنجاح على شبكة Base!"
             }
         };
 
@@ -418,7 +423,6 @@
             }
         }
 
-        // دالة ربط المحفظة المزدوجة والمحدثة بالكامل
         async function connectWallet() {
             const t = translations[currentLang];
             if (currentNetwork === 'solana') {
@@ -437,9 +441,15 @@
                     return;
                 }
             } else {
-                // قسم شبكة Base
                 if (typeof window.ethereum === "undefined") {
-                    showStatus(currentLang === 'ar' ? "يرجى تجربة فتح المنصة داخل متصفح MetaMask أو محفظة EVM." : "Web3 wallet (MetaMask) not found.", "error");
+                    const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
+                    const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
+                    showStatus(
+                        currentLang === 'ar'
+                        ? `<b>⚠️ يرجى فتح المنصة داخل MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:10px; border-radius:10px; font-weight:bold; text-decoration:none;">فتح في MetaMask 🦊</a>`
+                        : `<b>⚠️ Please open in MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:10px; border-radius:10px; font-weight:bold; text-decoration:none;">Open in MetaMask 🦊</a>`,
+                        "error"
+                    );
                     return;
                 }
                 try {
@@ -593,7 +603,6 @@
             };
         }
 
-        // الدالة النهائية الشاملة لإطلاق الأصول على Solana و Base
         function handleLaunch(event) {
             if (event) event.preventDefault();
             const t = translations[currentLang];
@@ -623,28 +632,29 @@
                 }, 100);
 
             } else {
-                // إطلاق شبكة Base عبر Ethers.js المباشر
                 if (typeof window.ethereum === "undefined") {
-                    showStatus(currentLang === 'ar' ? "يرجى استخدام متصفح يدعم Web3 (مثل MetaMask) لإكمال العملية على شبكة Base." : "Web3 wallet (MetaMask) not found.", "error");
+                    const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
+                    const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
+                    showStatus(
+                        currentLang === 'ar' 
+                        ? `<b>⚠️ يتطلب فتح المنصة في متصفح MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">افتح الموقع داخل تطبيق MetaMask 🦊</a>`
+                        : `<b>⚠️ MetaMask required</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open in MetaMask app 🦊</a>`,
+                        "error"
+                    );
                     return;
                 }
 
                 (async () => {
                     try {
-                        showStatus("Processing transaction on-chain... ⏳", "info");
+                        showStatus("Processing Base transaction on-chain... ⏳", "info");
                         const provider = new ethers.BrowserProvider(window.ethereum);
                         const signer = await provider.getSigner();
 
-                        const factoryABI = [
-                            "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)",
-                            "function creationFee() external view returns (uint256)"
-                        ];
-
-                        const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, factoryABI, signer);
-                        const fee = await factoryContract.creationFee();
+                        const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, BASE_FACTORY_ABI, signer);
+                        const feeInWei = ethers.parseEther("0.00025");
 
                         const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, {
-                            value: fee
+                            value: feeInWei
                         });
 
                         showStatus(`Transaction sent! Waiting for confirmation... <br><span class="font-mono text-[10px]">Hash: ${tx.hash}</span>`, "info");
