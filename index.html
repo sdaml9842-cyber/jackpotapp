@@ -40,7 +40,7 @@
         </div>
     </div>
 
-    <!-- Header (اضغطي هنا 5 مرات متتالية ليعرض لكِ عداد الزيارات السري) -->
+    <!-- Header -->
     <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50" onclick="revealSecretStats()">
         <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center cursor-pointer">
             <div class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -111,6 +111,14 @@
             <div class="mb-4 border-b border-slate-800/80 pb-3">
                 <h1 id="engineTitle" class="text-base font-bold text-white">Instant Token Deployment</h1>
                 <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Generate algorithmic liquidity pools and deploy seamlessly without errors.</p>
+            </div>
+
+            <!-- زر الطوارئ المباشر لتطبيق Phantom على الهاتف إذا لم يستجب الزر العادي -->
+            <div id="phantomFallbackContainer" class="hidden mb-4 p-3 bg-purple-950/40 border border-purple-500/40 rounded-xl text-center space-y-2">
+                <p class="text-xs text-purple-200" id="phantomNoticeText">إذا لم يتم فتح محفظة Phantom تلقائياً، اضغط هنا لفتحها:</p>
+                <a id="phantomDeepLinkBtn" href="#" target="_blank" class="inline-block bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg text-xs shadow-md">
+                    👻 فتح تطبيق Phantom مباشرة
+                </a>
             </div>
 
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
@@ -232,7 +240,6 @@
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
 
-        // 🕵️ نظام العداد الخفي الآمن
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 let visits = localStorage.getItem('chainpump_secret_visits') || 0;
@@ -396,6 +403,8 @@
             if(!userAddress) {
                 document.getElementById('connectWalletText').innerText = isSol ? t.connectWalletSol : t.connectWalletBase;
             }
+            // إخفاء زر الطوارئ عند تبديل الشبكة
+            document.getElementById('phantomFallbackContainer').classList.add('hidden');
             updateFeeLabel();
             showStatus(t.switchNetMsg, "info");
         }
@@ -421,19 +430,23 @@
             }
         }
 
-        // دالة ربط المحفظة المحدثة بذكاء لتفعيل تطبيق Phantom على الهواتف فوراً
+        // دالة الاتصال المحدثة مع تفعيل زر الطوارئ المباشر في حال لم تفتح المحفظة تلقائياً
         async function connectWallet() {
             const t = translations[currentLang];
             if (currentNetwork === 'solana') {
                 try {
                     const provider = window.phantom?.solana || window.solana;
-                    if (provider && provider.isPhantom) {
+                    if (provider) {
                         const response = await provider.connect();
                         userAddress = response.publicKey.toString();
                     } else {
-                        // توجيه ذكي وآمن لتطبيق Phantom على الهاتف إذا لم يكن المتصفح داخلياً
+                        // إظهار زر الطوارئ المباشر للمستخدم ليقوم بفتح Phantom بنقرة واحدة
                         const currentUrl = window.location.href;
                         const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
+                        document.getElementById('phantomDeepLinkBtn').href = phantomDeepLink;
+                        document.getElementById('phantomFallbackContainer').classList.remove('hidden');
+                        
+                        // محاولة فتح الرابط تلقائياً
                         window.location.href = phantomDeepLink;
                         return;
                     }
@@ -475,6 +488,7 @@
             }
 
             if(userAddress) {
+                document.getElementById('phantomFallbackContainer').classList.add('hidden');
                 const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
