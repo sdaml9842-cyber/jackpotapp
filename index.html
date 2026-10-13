@@ -6,7 +6,7 @@
     <title>ChainPump Protocol - Global Multi-Chain Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Solana Web3.js SDK v1.95.4 -->
+    <!-- Solana Web3.js SDK -->
     <script src="https://unpkg.com/@solana/web3.js@1.95.4/lib/index.iife.min.js"></script>
     <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
@@ -227,7 +227,7 @@
         let brushColor = "#a855f7";
 
         // 🎯 عنوان محفظة Phantom الخاص بكِ:
-        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";[span_1](start_span)[span_1](end_span)
+        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";[span_0](start_span)[span_0](end_span)
 
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
@@ -421,21 +421,24 @@
             }
         }
 
+        // دالة ربط المحفظة المحدثة بذكاء لتفعيل تطبيق Phantom على الهواتف فوراً
         async function connectWallet() {
             const t = translations[currentLang];
             if (currentNetwork === 'solana') {
                 try {
                     const provider = window.phantom?.solana || window.solana;
-                    if (provider?.isPhantom) {
+                    if (provider && provider.isPhantom) {
                         const response = await provider.connect();
                         userAddress = response.publicKey.toString();
                     } else {
-                        const dappUrl = encodeURIComponent(window.location.href);
-                        window.location.href = `https://phantom.app/ul/browse/${dappUrl}?ref=${window.location.origin}`;
+                        // توجيه ذكي وآمن لتطبيق Phantom على الهاتف إذا لم يكن المتصفح داخلياً
+                        const currentUrl = window.location.href;
+                        const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
+                        window.location.href = phantomDeepLink;
                         return;
                     }
                 } catch (err) {
-                    showStatus("Connection canceled by user.", "error");
+                    showStatus("Connection canceled or failed: " + (err.message || err), "error");
                     return;
                 }
             } else {
@@ -471,10 +474,12 @@
                 userAddress = accounts[0];
             }
 
-            const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
-            document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
-            document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
-            showStatus(t.walletConnectedMsg, "success");
+            if(userAddress) {
+                const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+                document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
+                document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+                showStatus(t.walletConnectedMsg, "success");
+            }
         }
 
         function copyReferralLink() {
@@ -613,9 +618,9 @@
 
                 if (currentNetwork === 'solana') {
                     const provider = window.phantom?.solana || window.solana;
-                    
-                    // الاتصال الآمن والمباشر عبر الـ Provider الخاص بمحفظة Phantom لتجاوز أي قيود RPC
-                    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+                    if (!provider) {
+                        throw new Error("Phantom provider not found.");
+                    }
                     
                     const transaction = new solanaWeb3.Transaction().add(
                         solanaWeb3.SystemProgram.transfer({
@@ -626,17 +631,6 @@
                     );
 
                     transaction.feePayer = new solanaWeb3.PublicKey(userAddress);
-                    
-                    // استخدام محفظة Phantom للتوقيع الداخلي مباشرة دون أخطاء خارجية
-                    const { blockhash } = await provider.request({
-                        method: "getLatestBlockhash",
-                        params: [{ commitment: "confirmed" }]
-                    }).catch(async () => {
-                        return await connection.getLatestBlockhash("confirmed");
-                    });
-
-                    transaction.recentBlockhash = blockhash.blockhash || blockhash;
-
                     const signed = await provider.signAndSendTransaction(transaction);
                     showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Tx Hash: ${signed.signature}</span>`, "success");
 
