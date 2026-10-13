@@ -419,11 +419,12 @@
             }
         }
 
-        // 🛡️ دالة ربط آمنة لا تتجمد أبداً في أي متصفح جوال عادٍ
+        // 🧠 دالة ربط ذكية تدعم متصفحات الإضافات (Mises) والمتصفحات العادية
         async function connectWallet() {
             const t = translations[currentLang];
             if (currentNetwork === 'solana') {
                 try {
+                    // دعم فانتوم عبر الإضافة المدمجة (مثل Mises) أو التطبيق
                     const provider = window.phantom?.solana || window.solana;
                     if (provider && provider.isPhantom) {
                         const response = await provider.connect();
@@ -434,36 +435,37 @@
                         return;
                     }
                 } catch (err) {
-                    showStatus("Connection canceled or failed.", "error");
+                    showStatus("Phantom connection canceled or failed.", "error");
                     return;
                 }
             } else {
-                // الفحص الآمن لشبكة Base لتجنب أي تجمد في متصفحات كروم أو سفاري العادية
-                if (typeof window.ethereum === "undefined") {
+                // دعم Base / EVM عبر الإضافة (مثل Mises) أو التوجيه الذكي
+                const providerEth = window.ethereum || (window.evmproviders ? window.evmproviders.provider : null);
+                if (!providerEth) {
                     const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
                     const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
                     
                     showStatus(
                         currentLang === 'ar'
-                        ? `<b>🦊 فتح محفظة Base (MetaMask):</b><br>متصفحك الحالي لا يدعم الاتصال المباشر. انقر للانتقال الفوري داخل تطبيق MetaMask:<br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:10px; font-weight:bold; text-decoration:none;">فتح في MetaMask DApp Browser 🚀</a>`
-                        : `<b>🦊 Open in MetaMask:</b><br>Your browser doesn't inject Web3. Click to open directly inside MetaMask app:<br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:10px; font-weight:bold; text-decoration:none;">Open in MetaMask DApp Browser 🚀</a>`,
+                        ? `<b>🦊 يرجى تثبيت أو تفعيل إضافة المحفظة:</b><br>متصفح Mises يتطلب تثبيت إضافة MetaMask أو فتح الرابط في تطبيق المحفظة:<br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:10px; font-weight:bold; text-decoration:none;">فتح في MetaMask DApp 🚀</a>`
+                        : `<b>🦊 Wallet Extension Required:</b><br>Please install MetaMask extension or use wallet app:<br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:10px; font-weight:bold; text-decoration:none;">Open in MetaMask DApp 🚀</a>`,
                         "error"
                     );
                     return;
                 }
 
                 try {
-                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    const accounts = await providerEth.request({ method: "eth_requestAccounts" });
                     userAddress = accounts[0];
 
                     try {
-                        await window.ethereum.request({
+                        await providerEth.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: '0x2105' }],
                         });
                     } catch (switchError) {
                         if (switchError.code === 4902 || switchError.code === -32603) {
-                            await window.ethereum.request({
+                            await providerEth.request({
                                 method: 'wallet_addEthereumChain',
                                 params: [{
                                     chainId: '0x2105',
@@ -603,7 +605,7 @@
             };
         }
 
-        function handleLaunch(event) {
+        async function handleLaunch(event) {
             if (event) event.preventDefault();
             const t = translations[currentLang];
             
@@ -632,40 +634,32 @@
                 }, 100);
 
             } else {
-                if (typeof window.ethereum === "undefined") {
-                    const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
-                    const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
-                    showStatus(
-                        currentLang === 'ar' 
-                        ? `<b>⚠️ يتطلب فتح المنصة في متصفح MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">افتح الموقع داخل تطبيق MetaMask 🦊</a>`
-                        : `<b>⚠️ MetaMask required</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open in MetaMask app 🦊</a>`,
-                        "error"
-                    );
+                const providerEth = window.ethereum || (window.evmproviders ? window.evmproviders.provider : null);
+                if (!providerEth) {
+                    showStatus(currentLang === 'ar' ? "يرجى تثبيت إضافة المحفظة في متصفح Mises." : "Please install wallet extension.", "error");
                     return;
                 }
 
-                (async () => {
-                    try {
-                        showStatus("Processing Base transaction on-chain... ⏳", "info");
-                        const provider = new ethers.BrowserProvider(window.ethereum);
-                        const signer = await provider.getSigner();
+                try {
+                    showStatus("Processing Base transaction on-chain... ⏳", "info");
+                    const provider = new ethers.BrowserProvider(providerEth);
+                    const signer = await provider.getSigner();
 
-                        const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, BASE_FACTORY_ABI, signer);
-                        const feeInWei = ethers.parseEther("0.00025");
+                    const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, BASE_FACTORY_ABI, signer);
+                    const feeInWei = ethers.parseEther("0.00025");
 
-                        const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, {
-                            value: feeInWei
-                        });
+                    const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, {
+                        value: feeInWei
+                    });
 
-                        showStatus(`Transaction sent! Waiting for confirmation... <br><span class="font-mono text-[10px]">Hash: ${tx.hash}</span>`, "info");
-                        await tx.wait();
+                    showStatus(`Transaction sent! Waiting for confirmation... <br><span class="font-mono text-[10px]">Hash: ${tx.hash}</span>`, "info");
+                    await tx.wait();
 
-                        showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Confirmed on Base Scan!</span>`, "success");
-                    } catch (err) {
-                        console.error(err);
-                        showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
-                    }
-                })();
+                    showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Confirmed on Base Scan!</span>`, "success");
+                } catch (err) {
+                    console.error(err);
+                    showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
+                }
             }
         }
 
