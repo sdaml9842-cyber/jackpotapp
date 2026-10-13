@@ -6,7 +6,7 @@
     <title>ChainPump Protocol - Global Multi-Chain Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers.js v6 for Base Network -->
+    <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -224,7 +224,7 @@
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
-        // 🎯 عنوان محفظة Phantom الخاص بكِ لاستلام الرسوم:
+        // 🎯 عنوان محفظة Phantom الخاص بك لاستلام رسوم الإصدار:
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";[span_0](start_span)[span_0](end_span)
 
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
@@ -427,7 +427,6 @@
                         const response = await provider.connect();
                         userAddress = response.publicKey.toString();
                     } else {
-                        // محاكاة الاتصال عبر Deep Link المباشر لمحفظة Phantom على الهواتف
                         const currentUrl = window.location.href;
                         window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
                         return;
@@ -590,7 +589,7 @@
             };
         }
 
-        // الحل الهندسي النظيف: استخدام بروتوكول Phantom Transfer Link للتوجيه الفوري لمحفظة Phantom على الموبايل لتنفيذ الدفع بسلاسة مطلقة وبدون أي أخطاء برمجية
+        // الدالة المحدثة بدقة تامة باستخدام Phantom Universal Link
         async function handleLaunch(event) {
             event.preventDefault();
             const t = translations[currentLang];
@@ -599,21 +598,26 @@
             const tokenSymbol = document.getElementById("tokenSymbol").value.trim();
 
             if (!tokenName || !tokenSymbol) {
-                showStatus("Please enter token name and symbol.", "error");
+                showStatus(currentLang === 'ar' ? "يرجى إدخال اسم ورمز العملة." : "Please enter token name and symbol.", "error");
                 return;
             }
 
             if (currentNetwork === 'solana') {
-                showStatus("Redirecting to Phantom Wallet for secure transfer... ⏳", "info");
+                showStatus(currentLang === 'ar' ? "جاري تحويلك لمحفظة Phantom لإتمام رسوم الإطلاق... ⏳" : "Redirecting to Phantom Wallet for secure transfer... ⏳", "info");
                 
-                // التوجيه المباشر لتطبيق Phantom لإتمام إرسال رسوم الـ SOL بدقة تامة وبدون أي تعقيدات
-                const lamports = 0.0065 * 1_000_000_000;
-                const redirectUrl = encodeURIComponent(window.location.href);
-                const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
-                
-                setTimeout(() => {
-                    window.location.href = phantomPayUrl;
-                }, 1000);
+                try {
+                    const lamports = Math.floor(0.0065 * 1_000_000_000);
+                    const redirectUrl = encodeURIComponent(window.location.href);
+                    const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
+                    
+                    setTimeout(() => {
+                        window.location.href = phantomPayUrl;
+                    }, 500);
+
+                } catch (err) {
+                    console.error(err);
+                    showStatus("Transaction redirection failed.", "error");
+                }
 
             } else {
                 if (typeof window.ethereum === "undefined") {
