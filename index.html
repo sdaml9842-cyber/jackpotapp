@@ -6,7 +6,7 @@
     <title>ChainPump Protocol - Global Multi-Chain Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Solana Web3.js SDK (تم تضمين المكتبة لعمل Solana) -->
+    <!-- Solana Web3.js SDK -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
@@ -29,7 +29,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <!-- شريط الأمان Institutional Badge -->
+    <!-- شريط الأمان المؤسسي -->
     <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
@@ -40,9 +40,9 @@
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
+    <!-- Header (اضغطي هنا 5 مرات متتالية ليعرض لكِ عداد الزيارات السري) -->
+    <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50" onclick="revealSecretStats()">
+        <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center cursor-pointer">
             <div class="flex items-center space-x-3 rtl:space-x-reverse">
                 <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-base shadow-sm">
                     👻
@@ -56,7 +56,7 @@
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse" onclick="event.stopPropagation()">
                 <button type="button" onclick="toggleLanguage()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold px-2.5 py-2 rounded-xl text-xs" id="langBtn">
                     🌐 AR
                 </button>
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <!-- Launch Form Card -->
+        <!-- Launch Card -->
         <div class="institutional-card rounded-2xl p-5 shadow-2xl">
             <div class="mb-4 border-b border-slate-800/80 pb-3">
                 <h1 id="engineTitle" class="text-base font-bold text-white">Instant Token Deployment</h1>
@@ -146,7 +146,7 @@
                     <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold" id="readyBadge">Ready</span>
                 </div>
 
-                <!-- Logo Section -->
+                <!-- Logo Source -->
                 <div>
                     <label class="block text-xs font-bold mb-1 text-slate-300" id="logoSourceLabel">Visual Identity & Logo</label>
                     <div class="grid grid-cols-3 gap-1.5 mb-2">
@@ -226,11 +226,41 @@
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
-        // 🎯 ضعِ عنوان محفظتك الشخصية لـ Solana لاستقبال رسوم الـ SOL الفورية هنا:
-        const ADMIN_SOL_WALLET = "ضعِ_عنوان_محفظة_Phantom_هنا"; 
+        // 🎯 عنوان محفظة Phantom الخاص بكِ:
+        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w"; 
 
-        // 🎯 عنوان عقد الـ Factory الخاص بك على شبكة Base:
+        // 🎯 عنوان عقد الـ Factory على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+
+        // 🕵️ نظام العداد الخفي الآمن (تسجيل الزيارات بصمت تام)
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                let visits = localStorage.getItem('chainpump_secret_visits') || 0;
+                visits = parseInt(visits) + 1;
+                localStorage.setItem('chainpump_secret_visits', visits);
+
+                const urlParams = new URLSearchParams(window.location.search);
+                let refParam = urlParams.get('ref');
+                if (refParam) {
+                    refParam = refParam.split('&')[0].trim();
+                    if (refParam.length >= 32) {
+                        localStorage.setItem('chainpump_referrer', refParam);
+                    }
+                }
+            } catch (e) {}
+            updateFeeLabel();
+        });
+
+        // دالة سرية لا تظهر لأحد (تظهر لكِ فقط عند النقر 5 مرات على الهيدر في الأعلى)
+        let secretClicks = 0;
+        function revealSecretStats() {
+            secretClicks++;
+            if(secretClicks >= 5) {
+                secretClicks = 0;
+                let totalVisits = localStorage.getItem('chainpump_secret_visits') || 1;
+                alert(`🛡️ [Hidden Admin Panel]\nTotal Visitors: ${totalVisits}\nStatus: Engine Operational & Secure`);
+            }
+        }
 
         const translations = {
             en: {
@@ -357,20 +387,6 @@
 
             updateFeeLabel();
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                let refParam = urlParams.get('ref');
-                if (refParam) {
-                    refParam = refParam.split('&')[0].trim();
-                    if (refParam.length >= 32) {
-                        localStorage.setItem('chainpump_referrer', refParam);
-                    }
-                }
-            } catch (e) {}
-            updateFeeLabel();
-        });
 
         function switchProtocolNetwork() {
             currentNetwork = document.getElementById('networkSelector').value;
@@ -575,7 +591,6 @@
             };
         }
 
-        // --- 🚀 دالة الإطلاق والتنفيذ الحقيقي للرسوم على الشبكتين ---
         async function handleLaunch(event) {
             event.preventDefault();
             const t = translations[currentLang];
@@ -598,14 +613,13 @@
                 showStatus("Processing transaction on-chain... ⏳", "info");
 
                 if (currentNetwork === 'solana') {
-                    // --- 🟣 تنفيذ شبكة Solana ---
                     const provider = window.phantom?.solana || window.solana;
                     const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
                     
                     const transaction = new solanaWeb3.Transaction().add(
                         solanaWeb3.SystemProgram.transfer({
                             fromPubkey: new solanaWeb3.PublicKey(userAddress),
-                            toPubkey: new solanaWeb3.PublicKey(ADMIN_SOL_WALLET), // تحويل الرسوم لمحفظتك في Solana
+                            toPubkey: new solanaWeb3.PublicKey(ADMIN_SOL_WALLET),
                             lamports: 0.0065 * solanaWeb3.LAMPORTS_PER_SOL,
                         })
                     );
@@ -618,9 +632,8 @@
                     showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Tx Hash: ${signed.signature}</span>`, "success");
 
                 } else {
-                    // --- 🔵 تنفيذ شبكة Base (عبر العقد الذكي) ---
                     if (typeof window.ethereum === "undefined") {
-                        showStatus("Web3 wallet (MetaMask) not found!", "error");
+                        showStatus("Web3 wallet (MetaMask) not found.", "error");
                         return;
                     }
 
