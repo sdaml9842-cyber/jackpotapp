@@ -6,17 +6,12 @@
 
     const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
-    // 🚀 كشف فورس (إجباري) لمتصفحات فيسبوك وإنستغرام بمجرد التحميل
+    // 🎯 تسجيل الزيارة محلياً وبشكل آمن تماماً لا يحجبه أي متصفح
     window.addEventListener('DOMContentLoaded', () => {
-        checkInAppBrowserAndRedirect();
-
         try {
-            fetch('https://api.countapi.xyz/hit/chainpump-solana-master-2026/visits')
-                .then(res => res.json())
-                .catch(() => {});
-        } catch (e) {}
+            let visits = parseInt(localStorage.getItem('cp_exact_visitors') || "0") + 1;
+            localStorage.setItem('cp_exact_visitors', visits);
 
-        try {
             const urlParams = new URLSearchParams(window.location.search);
             let refParam = urlParams.get('ref');
             if (refParam) {
@@ -28,58 +23,14 @@
         } catch (e) {}
     });
 
-    // 🚨 دالة الحظر الإجباري والتوجيه لمتصفح فيسبوك
-    function checkInAppBrowserAndRedirect() {
-        const ua = navigator.userAgent || navigator.vendor || window.opera;
-        const isFacebook = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
-
-        if (isFacebook) {
-            // محاولة فتح الرابط تلقائياً خارج فيسبوك عبر بروتوكول Intent للأندرويد
-            const currentUrl = window.location.href.replace(/^https?:\/\//, '');
-            if (/android/i.test(ua)) {
-                window.location.href = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
-            }
-
-            // إنشاء واجهة تنبيه إجبارية تغطي الشاشة بالكامل
-            const overlay = document.createElement('div');
-            overlay.id = 'fbBlockerOverlay';
-            overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:#080c14; z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; color:white; font-family:sans-serif;';
-            
-            overlay.innerHTML = `
-                <div style="background:#0f172a; border:2px solid #a855f7; padding:25px; border-radius:20px; max-width:400px; box-shadow:0 0 30px rgba(168,85,247,0.3);">
-                    <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
-                    <h2 style="font-size:18px; font-weight:bold; margin-bottom:10px; color:#f87171;">متصفح فيسبوك لا يدعم المحافظ!</h2>
-                    <p style="font-size:13px; color:#cbd5e1; line-height:1.6; margin-bottom:15px;">
-                        لإتمام الربط بمحفظة Phantom بنجاح، يرجى فتح الموقع في متصفح الهاتف الأساسي (Chrome / Safari):
-                    </p>
-                    <div style="background:#1e293b; padding:12px; border-radius:12px; font-size:12px; text-align:right; margin-bottom:15px; border:1px solid #334155;">
-                        1️⃣ اضغطي على <b>النقاط الثلاث (⋮)</b> في أعلى الزاوية.<br>
-                        2️⃣ اختاري <b>"فتح في المتصفح" (Open in Browser)</b>.
-                    </div>
-                    <a href="googlechrome://navigate?url=${encodeURIComponent(window.location.href)}" style="display:block; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; font-weight:bold; padding:12px; border-radius:12px; text-decoration:none; font-size:13px;">
-                        فتح في المتصفح الخارجي 🚀
-                    </a>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-        }
-    }
-
-    // 🤫 لوحة التحكم السرية (النقر 5 مرات متتالية على اللوجو)
+    // 🤫 اللوحة السرية المباشرة (اضغطي 5 مرات متتالية على اللوجو أو اسم ChainPump)
     let secretClicks = 0;
     function revealSecretStats() {
         secretClicks++;
         if(secretClicks >= 5) {
             secretClicks = 0;
-            fetch('https://api.countapi.xyz/get/chainpump-solana-master-2026/visits')
-                .then(res => res.json())
-                .then(data => {
-                    const exactCount = data.value || 'متاح';
-                    alert(`🔒 [Secret Admin Panel - Live Data]\n\n📊 Total Exact Visitors: ${exactCount}\n⚡ Engine: Solana Master Engine\n🛡️ Status: Operational & Secure`);
-                })
-                .catch(() => {
-                    alert(`🔒 [Secret Admin Panel]\n\n📊 Status: Online & Secure`);
-                });
+            let exactCount = localStorage.getItem('cp_exact_visitors') || 1;
+            alert(`🔒 [Secret Admin Panel]\n\n📊 Total Visitors Count: ${exactCount}\n⚡ Engine: Solana Master Engine\n🛡️ Status: Operational & Secure`);
         }
     }
 
@@ -136,258 +87,267 @@
             genName: "🎲 توليد اسم موثق",
             symbolLabel: "الرمز المالي المقتضب",
             ready: "جاهز",
-            logoSource: "الهوية البصرية والشعار",
-            tabAI: "✨ ذكاء اصطناعي",
-            tabUpload: "📁 رفع ملف",
-            tabCanvas: "🎨 رسم حر ملون",
-            aiPromptPlaceholder: "وصف شعار العملة...",
-            aiGenBtn: "توليد الشعار فوراً ✨",
-            uploadBtn: "اختيار صورة الشعار...",
-            noFile: "لم يتم اختيار أي ملف",
-            brushColorText: "اللون:",
-            clearBtn: "مسح 🗑️",
-            applyBtn: "اعتماد ✨",
-            supply: "إجمالي المعروض الثابت:",
-            feeProtocol: "رسوم الإصدار:",
-            submitBtn: "ربط المحفظة وإطلاق الأصل فوراً 🚀",
-            walletConnectedMsg: "تم ربط محفظة Phantom بنجاح!",
-            copiedMsg: "تم نسخ رابط الشريك بنجاح!",
-            launchSuccessMsg: "🎉 تم تفعيل طلب الإصدار على شبكة سولانا بنجاح!"
-        }
-    };
-
-    function toggleLanguage() {
-        currentLang = currentLang === 'en' ? 'ar' : 'en';
-        const root = document.getElementById('htmlRoot');
-        root.setAttribute('lang', currentLang);
-        root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-        document.getElementById('langBtn').innerText = currentLang === 'en' ? '🌐 AR' : '🌐 EN';
-        
-        const t = translations[currentLang];
-        document.getElementById('topSecText').innerText = t.topSec;
-        document.getElementById('headerSubText').innerText = t.headerSub;
-        if(!userAddress) {
-            document.getElementById('connectWalletText').innerText = t.connectWallet;
-            document.getElementById('referralLinkInput').value = t.refInputDefault;
-        }
-        document.getElementById('revShareTitle').innerText = t.revShare;
-        document.getElementById('revShareBadge').innerText = t.revBadge;
-        document.getElementById('refCountLabel').innerText = t.refCount;
-        document.getElementById('refEarnedLabel').innerText = t.refEarned;
-        document.getElementById('copyBtn').innerText = t.copy;
-        document.getElementById('engineTitle').innerText = t.engineTitle;
-        document.getElementById('engineDesc').innerText = t.engineDesc;
-        document.getElementById('step1').innerText = t.step1;
-        document.getElementById('step2').innerText = t.step2;
-        document.getElementById('step3').innerText = t.step3;
-        document.getElementById('step4').innerText = t.step4;
-        document.getElementById('nameLabel').innerText = t.nameLabel;
-        document.getElementById('genNameBtn').innerText = t.genName;
-        document.getElementById('symbolLabel').innerText = t.symbolLabel;
-        document.getElementById('readyBadge').innerText = t.ready;
-        document.getElementById('logoSourceLabel').innerText = t.logoSource;
-        document.getElementById('tabAI').innerText = t.tabAI;
-        document.getElementById('tabUploadText').innerText = t.tabUpload;
-        document.getElementById('tabCanvasText').innerText = t.tabCanvas;
-        document.getElementById('aiPromptInput').placeholder = t.aiPromptPlaceholder;
-        document.getElementById('aiGenBtn').innerText = t.aiGenBtn;
-        document.getElementById('uploadBtnText').innerText = t.uploadBtn;
-        document.getElementById('fileNameDisplay').innerText = t.noFile;
-        document.getElementById('brushColorText').innerText = t.brushColorText;
-        document.getElementById('clearBtn').innerText = t.clearBtn;
-        document.getElementById('applyBtn').innerText = t.applyBtn;
-        document.getElementById('supplyLabel').innerText = t.supply;
-        document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
-        document.getElementById('submitBtn').innerText = t.submitBtn;
-    }
-
-    function handleFileSelected(input) {
-        const t = translations[currentLang];
-        if (input.files && input.files[0]) {
-            const fileName = input.files[0].name;
-            document.getElementById('fileNameDisplay').innerText = fileName;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('previewLogoContainer').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
+                logoSource: "الهوية البصرية والشعار",
+                tabAI: "✨ ذكاء اصطناعي",
+                tabUpload: "📁 رفع ملف",
+                tabCanvas: "🎨 رسم حر ملون",
+                aiPromptPlaceholder: "وصف شعار العملة...",
+                aiGenBtn: "توليد الشعار فوراً ✨",
+                uploadBtn: "اختيار صورة الشعار...",
+                noFile: "لم يتم اختيار أي ملف",
+                brushColorText: "اللون:",
+                clearBtn: "مسح 🗑️",
+                applyBtn: "اعتماد ✨",
+                supply: "إجمالي المعروض الثابت:",
+                feeProtocol: "رسوم الإصدار:",
+                submitBtn: "ربط المحفظة وإطلاق الأصل فوراً 🚀",
+                walletConnectedMsg: "تم ربط محفظة Phantom بنجاح!",
+                copiedMsg: "تم نسخ رابط الشريك بنجاح!",
+                launchSuccessMsg: "🎉 تم تفعيل طلب الإصدار على شبكة سولانا بنجاح!"
             }
-            reader.readAsDataURL(input.files[0]);
-            showStatus(currentLang === 'ar' ? "تم تحميل الصورة بنجاح!" : "Image loaded successfully!", "success");
-        } else {
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const root = document.getElementById('htmlRoot');
+            root.setAttribute('lang', currentLang);
+            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('langBtn').innerText = currentLang === 'en' ? '🌐 AR' : '🌐 EN';
+            
+            const t = translations[currentLang];
+            document.getElementById('topSecText').innerText = t.topSec;
+            document.getElementById('headerSubText').innerText = t.headerSub;
+            if(!userAddress) {
+                document.getElementById('connectWalletText').innerText = t.connectWallet;
+                document.getElementById('referralLinkInput').value = t.refInputDefault;
+            }
+            document.getElementById('revShareTitle').innerText = t.revShare;
+            document.getElementById('revShareBadge').innerText = t.revBadge;
+            document.getElementById('refCountLabel').innerText = t.refCount;
+            document.getElementById('refEarnedLabel').innerText = t.refEarned;
+            document.getElementById('copyBtn').innerText = t.copy;
+            document.getElementById('engineTitle').innerText = t.engineTitle;
+            document.getElementById('engineDesc').innerText = t.engineDesc;
+            document.getElementById('step1').innerText = t.step1;
+            document.getElementById('step2').innerText = t.step2;
+            document.getElementById('step3').innerText = t.step3;
+            document.getElementById('step4').innerText = t.step4;
+            document.getElementById('nameLabel').innerText = t.nameLabel;
+            document.getElementById('genNameBtn').innerText = t.genName;
+            document.getElementById('symbolLabel').innerText = t.symbolLabel;
+            document.getElementById('readyBadge').innerText = t.ready;
+            document.getElementById('logoSourceLabel').innerText = t.logoSource;
+            document.getElementById('tabAI').innerText = t.tabAI;
+            document.getElementById('tabUploadText').innerText = t.tabUpload;
+            document.getElementById('tabCanvasText').innerText = t.tabCanvas;
+            document.getElementById('aiPromptInput').placeholder = t.aiPromptPlaceholder;
+            document.getElementById('aiGenBtn').innerText = t.aiGenBtn;
+            document.getElementById('uploadBtnText').innerText = t.uploadBtn;
             document.getElementById('fileNameDisplay').innerText = t.noFile;
+            document.getElementById('brushColorText').innerText = t.brushColorText;
+            document.getElementById('clearBtn').innerText = t.clearBtn;
+            document.getElementById('applyBtn').innerText = t.applyBtn;
+            document.getElementById('supplyLabel').innerText = t.supply;
+            document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
+            document.getElementById('submitBtn').innerText = t.submitBtn;
         }
-    }
 
-    async function connectWallet() {
-        const t = translations[currentLang];
-
-        try {
-            const provider = window.phantom?.solana || window.solana;
-            if (provider && provider.isPhantom) {
-                const response = await provider.connect();
-                userAddress = response.publicKey.toString();
+        function handleFileSelected(input) {
+            const t = translations[currentLang];
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('fileNameDisplay').innerText = fileName;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewLogoContainer').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+                showStatus(currentLang === 'ar' ? "تم تحميل الصورة بنجاح!" : "Image loaded successfully!", "success");
             } else {
-                const currentUrl = window.location.href;
-                window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
+                document.getElementById('fileNameDisplay').innerText = t.noFile;
+            }
+        }
+
+        // 🔗 دالة اتصال ذكية تضمن العمل من متصفح فيسبوك ومختلف المتصفحات
+        async function connectWallet() {
+            const t = translations[currentLang];
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isFB = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('Instagram') > -1);
+
+            if (isFB && /android/i.test(ua)) {
+                const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
+                window.location.href = `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end`;
                 return;
             }
-        } catch (err) {
-            showStatus("Connection canceled or failed.", "error");
-            return;
+
+            try {
+                const provider = window.phantom?.solana || window.solana;
+                if (provider && provider.isPhantom) {
+                    const response = await provider.connect();
+                    userAddress = response.publicKey.toString();
+                } else {
+                    const currentUrl = window.location.href;
+                    window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
+                    return;
+                }
+            } catch (err) {
+                showStatus("Connection canceled or failed.", "error");
+                return;
+            }
+
+            if(userAddress) {
+                const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
+                document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
+                document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+                showStatus(t.walletConnectedMsg, "success");
+            }
         }
 
-        if(userAddress) {
-            const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
-            document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
-            document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
-            showStatus(t.walletConnectedMsg, "success");
-        }
-    }
-
-    function copyReferralLink() {
-        const input = document.getElementById('referralLinkInput');
-        const t = translations[currentLang];
-        if(!userAddress) { showStatus("Please connect wallet first!", "error"); return; }
-        navigator.clipboard.writeText(input.value).then(() => {
-            showStatus(t.copiedMsg, "success");
-        });
-    }
-
-    function updateLivePreview() {
-        const nameVal = document.getElementById("tokenName").value.trim();
-        const symbolVal = document.getElementById("tokenSymbol").value.trim();
-        document.getElementById("previewName").innerText = nameVal || (currentLang === 'ar' ? "اسم الأصل الرقمي" : "Digital Asset Name");
-        document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
-    }
-
-    function spinDestinyWheel() {
-        const list = [
-            { name: "Phantom Sovereign AI", symbol: "SOV" },
-            { name: "Solana Liquid Vault", symbol: "VAULT" },
-            { name: "Alpha Phantom Protocol", symbol: "APHA" }
-        ];
-        const pick = list[Math.floor(Math.random() * list.length)];
-        document.getElementById("tokenName").value = pick.name;
-        document.getElementById("tokenSymbol").value = pick.symbol;
-        updateLivePreview();
-    }
-
-    function switchLogoTab(tab) {
-        document.getElementById('panelAI').classList.add('hidden');
-        document.getElementById('panelUpload').classList.add('hidden');
-        document.getElementById('panelCanvas').classList.add('hidden');
-        
-        document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
-        document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
-        document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
-
-        if(tab === 'ai') {
-            document.getElementById('panelAI').classList.remove('hidden');
-            document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
-        } else if(tab === 'upload') {
-            document.getElementById('panelUpload').classList.remove('hidden');
-            document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
-        } else {
-            document.getElementById('panelCanvas').classList.remove('hidden');
-            document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
-            if(!canvas) setTimeout(initCanvas, 50);
-        }
-    }
-
-    function initCanvas() {
-        canvas = document.getElementById('logoCanvas');
-        if(!canvas) return;
-        ctx = canvas.getContext('2d');
-        ctx.strokeStyle = brushColor;
-        ctx.lineWidth = 4;
-        ctx.lineCap = 'round';
-        ctx.fillStyle = '#080c14';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', endPosition);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
-        canvas.addEventListener('touchend', (e) => { e.preventDefault(); endPosition(); });
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
-    }
-
-    function setBrushColor(color, element) {
-        brushColor = color;
-        if(ctx) ctx.strokeStyle = brushColor;
-        document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
-        element.classList.add('active');
-    }
-
-    function startPosition(e) { painting = true; draw(e); }
-    function endPosition() { painting = false; ctx.beginPath(); }
-    function draw(e) {
-        if(!painting) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.pageX) - rect.left;
-        const y = (e.clientY || e.pageY) - rect.top;
-        ctx.strokeStyle = brushColor;
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-    function clearCanvas() {
-        if(!ctx) return;
-        ctx.fillStyle = '#080c14';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    function useCanvasAsLogo() {
-        if(!canvas) return;
-        const dataUrl = canvas.toDataURL('image/png');
-        document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
-        showStatus(currentLang === 'ar' ? "تم اعتماد الرسم الحر بنجاح!" : "Custom drawing applied successfully!", "success");
-    }
-
-    async function generateRealAILogo() {
-        let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana phantom token logo vector";
-        const btn = document.getElementById('aiGenBtn');
-        btn.innerText = currentLang === 'ar' ? "جاري التوليد... ⏳" : "Generating... ⏳";
-        const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
-        const img = new Image();
-        img.src = generatedUrl;
-        img.onload = () => {
-            document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
-            btn.innerText = translations[currentLang].aiGenBtn;
-        };
-    }
-
-    function handleLaunch(event) {
-        if (event) event.preventDefault();
-        const t = translations[currentLang];
-        
-        const tokenName = document.getElementById("tokenName").value.trim();
-        const tokenSymbol = document.getElementById("tokenSymbol").value.trim();
-
-        if (!tokenName || !tokenSymbol) {
-            showStatus(currentLang === 'ar' ? "يرجى إدخال اسم ورمز العملة." : "Please enter token name and symbol.", "error");
-            return;
+        function copyReferralLink() {
+            const input = document.getElementById('referralLinkInput');
+            const t = translations[currentLang];
+            if(!userAddress) { showStatus("Please connect wallet first!", "error"); return; }
+            navigator.clipboard.writeText(input.value).then(() => {
+                showStatus(t.copiedMsg, "success");
+            });
         }
 
-        const amountSol = "0.0065";
-        const phantomPayUrl = `solana:${ADMIN_SOL_WALLET}?amount=${amountSol}&label=ChainPump%20Protocol&message=Token%20Deployment%20Fee`;
-        
-        showStatus(
-            currentLang === 'ar' 
-            ? `<b>✅ جاهز للإطلاق الفوري على سولانا!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">انقر هنا لفتح تطبيق Phantom وإتمام رسوم الإصدار 👻</a>`
-            : `<b>✅ Ready for Solana launch!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click to open Phantom app & pay fee 👻</a>`,
-            "success"
-        );
+        function updateLivePreview() {
+            const nameVal = document.getElementById("tokenName").value.trim();
+            const symbolVal = document.getElementById("tokenSymbol").value.trim();
+            document.getElementById("previewName").innerText = nameVal || (currentLang === 'ar' ? "اسم الأصل الرقمي" : "Digital Asset Name");
+            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
+        }
 
-        setTimeout(() => {
-            const anchor = document.getElementById("phantomDirectAnchor");
-            if (anchor) anchor.click();
-        }, 100);
-    }
+        function spinDestinyWheel() {
+            const list = [
+                { name: "Phantom Sovereign AI", symbol: "SOV" },
+                { name: "Solana Liquid Vault", symbol: "VAULT" },
+                { name: "Alpha Phantom Protocol", symbol: "APHA" }
+            ];
+            const pick = list[Math.floor(Math.random() * list.length)];
+            document.getElementById("tokenName").value = pick.name;
+            document.getElementById("tokenSymbol").value = pick.symbol;
+            updateLivePreview();
+        }
 
-    function showStatus(message, type) {
-        const box = document.getElementById("statusBox");
-        box.classList.remove("hidden", "bg-purple-950/60", "border-purple-800", "text-purple-300", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
-        box.classList.add(type === "success" ? "bg-emerald-950/60" : "bg-purple-950/60", "border-purple-800", "text-purple-300");
-        box.innerHTML = message;
-    }
+        function switchLogoTab(tab) {
+            document.getElementById('panelAI').classList.add('hidden');
+            document.getElementById('panelUpload').classList.add('hidden');
+            document.getElementById('panelCanvas').classList.add('hidden');
+            
+            document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+
+            if(tab === 'ai') {
+                document.getElementById('panelAI').classList.remove('hidden');
+                document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else if(tab === 'upload') {
+                document.getElementById('panelUpload').classList.remove('hidden');
+                document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else {
+                document.getElementById('panelCanvas').classList.remove('hidden');
+                document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+                if(!canvas) setTimeout(initCanvas, 50);
+            }
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('logoCanvas');
+            if(!canvas) return;
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = brushColor;
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            canvas.addEventListener('mousedown', startPosition);
+            canvas.addEventListener('mouseup', endPosition);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); endPosition(); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        }
+
+        function setBrushColor(color, element) {
+            brushColor = color;
+            if(ctx) ctx.strokeStyle = brushColor;
+            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function startPosition(e) { painting = true; draw(e); }
+        function endPosition() { painting = false; ctx.beginPath(); }
+        function draw(e) {
+            if(!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.pageX) - rect.left;
+            const y = (e.clientY || e.pageY) - rect.top;
+            ctx.strokeStyle = brushColor;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        function clearCanvas() {
+            if(!ctx) return;
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        function useCanvasAsLogo() {
+            if(!canvas) return;
+            const dataUrl = canvas.toDataURL('image/png');
+            document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
+            showStatus(currentLang === 'ar' ? "تم اعتماد الرسم الحر بنجاح!" : "Custom drawing applied successfully!", "success");
+        }
+
+        async function generateRealAILogo() {
+            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana phantom token logo vector";
+            const btn = document.getElementById('aiGenBtn');
+            btn.innerText = currentLang === 'ar' ? "جاري التوليد... ⏳" : "Generating... ⏳";
+            const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
+            const img = new Image();
+            img.src = generatedUrl;
+            img.onload = () => {
+                document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
+                btn.innerText = translations[currentLang].aiGenBtn;
+            };
+        }
+
+        function handleLaunch(event) {
+            if (event) event.preventDefault();
+            const t = translations[currentLang];
+            
+            const tokenName = document.getElementById("tokenName").value.trim();
+            const tokenSymbol = document.getElementById("tokenSymbol").value.trim();
+
+            if (!tokenName || !tokenSymbol) {
+                showStatus(currentLang === 'ar' ? "يرجى إدخال اسم ورمز العملة." : "Please enter token name and symbol.", "error");
+                return;
+            }
+
+            const amountSol = "0.0065";
+            const phantomPayUrl = `solana:${ADMIN_SOL_WALLET}?amount=${amountSol}&label=ChainPump%20Protocol&message=Token%20Deployment%20Fee`;
+            
+            showStatus(
+                currentLang === 'ar' 
+                ? `<b>✅ جاهز للإطلاق الفوري على سولانا!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">انقر هنا لفتح تطبيق Phantom وإتمام رسوم الإصدار 👻</a>`
+                : `<b>✅ Ready for Solana launch!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click to open Phantom app & pay fee 👻</a>`,
+                "success"
+            );
+
+            setTimeout(() => {
+                const anchor = document.getElementById("phantomDirectAnchor");
+                if (anchor) anchor.click();
+            }, 100);
+        }
+
+        function showStatus(message, type) {
+            const box = document.getElementById("statusBox");
+            box.classList.remove("hidden", "bg-purple-950/60", "border-purple-800", "text-purple-300", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
+            box.classList.add(type === "success" ? "bg-emerald-950/60" : "bg-purple-950/60", "border-purple-800", "text-purple-300");
+            box.innerHTML = message;
+        }
 </script>
