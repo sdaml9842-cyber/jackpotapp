@@ -589,9 +589,9 @@
             };
         }
 
-        // الدالة النهائية بعد التعديل المباشر لمنع التجميد والتحويل التلقائي لتطبيق Phantom
-        async function handleLaunch(event) {
-            event.preventDefault();
+        // الدالة النهائية المعدلة لتجنب التجمد وتدفق النقرات بسلاسة مطلقة
+        function handleLaunch(event) {
+            if (event) event.preventDefault();
             const t = translations[currentLang];
             
             const tokenName = document.getElementById("tokenName").value.trim();
@@ -604,16 +604,20 @@
 
             if (currentNetwork === 'solana') {
                 const lamports = Math.floor(0.0065 * 1_000_000_000);
-                
-                // استخدام بروتوكول phantom:// المباشر لتجاوز الصفحة البيضاء والتجميد
-                const phantomPayUrl = `phantom://transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL`;
+                const redirectUrl = encodeURIComponent(window.location.href);
+                const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
                 
                 showStatus(
                     currentLang === 'ar' 
-                    ? `<b>✅ جاهز للإطلاق!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">اضغط هنا لفتح تطبيق Phantom مباشرة ودفع الرسوم 👻</a>`
-                    : `<b>✅ Ready for launch!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click to open Phantom app & pay fee 👻</a>`,
+                    ? `<b>✅ جاهز للإطلاق!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">فتح Phantom لإتمام عملية الدفع 👻</a>`
+                    : `<b>✅ Ready for launch!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open Phantom & Pay Fee 👻</a>`,
                     "success"
                 );
+
+                setTimeout(() => {
+                    const anchor = document.getElementById("phantomDirectAnchor");
+                    if (anchor) anchor.click();
+                }, 100);
 
             } else {
                 if (typeof window.ethereum === "undefined") {
@@ -621,31 +625,33 @@
                     return;
                 }
 
-                try {
-                    showStatus("Processing transaction on-chain... ⏳", "info");
-                    const provider = new ethers.BrowserProvider(window.ethereum);
-                    const signer = await provider.getSigner();
+                (async () => {
+                    try {
+                        showStatus("Processing transaction on-chain... ⏳", "info");
+                        const provider = new ethers.BrowserProvider(window.ethereum);
+                        const signer = await provider.getSigner();
 
-                    const factoryABI = [
-                        "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)",
-                        "function creationFee() external view returns (uint256)"
-                    ];
+                        const factoryABI = [
+                            "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)",
+                            "function creationFee() external view returns (uint256)"
+                        ];
 
-                    const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, factoryABI, signer);
-                    const fee = await factoryContract.creationFee();
+                        const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, factoryABI, signer);
+                        const fee = await factoryContract.creationFee();
 
-                    const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, {
-                        value: fee
-                    });
+                        const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, {
+                            value: fee
+                        });
 
-                    showStatus(`Transaction sent! Waiting for confirmation... <br><span class="font-mono text-[10px]">Hash: ${tx.hash}</span>`, "info");
-                    await tx.wait();
+                        showStatus(`Transaction sent! Waiting for confirmation... <br><span class="font-mono text-[10px]">Hash: ${tx.hash}</span>`, "info");
+                        await tx.wait();
 
-                    showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Confirmed on Base Scan!</span>`, "success");
-                } catch (err) {
-                    console.error(err);
-                    showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
-                }
+                        showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Confirmed on Base Scan!</span>`, "success");
+                    } catch (err) {
+                        console.error(err);
+                        showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
+                    }
+                })();
             }
         }
 
