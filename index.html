@@ -36,11 +36,10 @@
         </div>
     </div>
 
-    <!-- Header (المنطقة السرية للنقر) -->
+    <!-- Header (المنطقة السرية للنقر 5 مرات لعرض الزوار) -->
     <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
             
-            <!-- انقري هنا 5 مرات متتالية لمعرفة العدد الدقيق -->
             <div class="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer select-none" onclick="revealSecretStats()">
                 <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-base shadow-sm">
                     👻
@@ -220,10 +219,8 @@
 
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
-        // 🎯 عداد سحابي حي ومطلق بدقة 100% لا يخطئ أبداً
         window.addEventListener('DOMContentLoaded', () => {
             try {
-                // استخدام عداد سحابي مخصص حصرياً للمنصة عبر API موثق
                 fetch('https://api.countapi.xyz/hit/chainpump-solana-master-2026/visits')
                     .then(res => res.json())
                     .catch(() => {});
@@ -241,13 +238,12 @@
             } catch (e) {}
         });
 
-        // 🤫 لوحة التحكم السرية الدقيقة بدقة مطلقة (النقر 5 مرات متتالية على اللوجو)
+        // 🤫 لوحة التحكم السرية (النقر 5 مرات متتالية على أيقونة أو اسم المنصة في الهيدر)
         let secretClicks = 0;
         function revealSecretStats() {
             secretClicks++;
             if(secretClicks >= 5) {
                 secretClicks = 0;
-                // جلب العدد الدقيق والحقيقي فورا من السحابة عند الفتح
                 fetch('https://api.countapi.xyz/get/chainpump-solana-master-2026/visits')
                     .then(res => res.json())
                     .then(data => {
@@ -394,8 +390,25 @@
             }
         }
 
+        // 🛡️ دالة اتصال ذكية تكتشف متصفحات التطبيقات الخارجية (مثل فيسبوك) وتوجّه المستخدم بذكاء
         async function connectWallet() {
             const t = translations[currentLang];
+            
+            // كشف ما إذا كان المستخدم يفتح الرابط من متصفح تطبيق خارجي (مثل فيسبوك أو انستغرام)
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isInAppBrowser = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('Instagram') > -1) || (ua.indexOf('Twitter') > -1);
+
+            if (isInAppBrowser) {
+                const cleanUrl = window.location.href;
+                showStatus(
+                    currentLang === 'ar'
+                    ? `<b>⚠️ متصفح فيسبوك الخارجي لا يدعم الاتصال المباشر:</b><br>يرجى النقر على النقاط الثلاث (...) في الأعلى واختيار <b>"فتح في المتصفح الخارجي (Open in Browser)"</b> لتتصل المحفظة بسلاسة.`
+                    : `<b>⚠️ In-app browser detected:</b><br>Please tap the 3 dots (...) above and select <b>"Open in Browser"</b> to connect wallet properly.`,
+                    "error"
+                );
+                return;
+            }
+
             try {
                 const provider = window.phantom?.solana || window.solana;
                 if (provider && provider.isPhantom) {
