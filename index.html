@@ -6,7 +6,7 @@
     <title>ChainPump Protocol - Global Multi-Chain Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers.js v6 -->
+    <!-- Ethers.js v6 for Base Network -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -109,15 +109,6 @@
             <div class="mb-4 border-b border-slate-800/80 pb-3">
                 <h1 id="engineTitle" class="text-base font-bold text-white">Instant Token Deployment</h1>
                 <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Generate algorithmic liquidity pools and deploy seamlessly without errors.</p>
-            </div>
-
-            <!-- لوحة إرشادية لفتح الموقع من داخل متصفح Phantom -->
-            <div id="phantomGuideBox" class="hidden mb-4 p-3 bg-purple-950/60 border border-purple-500/50 rounded-xl text-center space-y-2">
-                <p class="text-xs text-purple-200 font-bold">👻 يرجى فتح الموقع من متصفح تطبيق Phantom:</p>
-                <p class="text-[11px] text-slate-300">انسخي رابط موقعك وافتحيه داخل متصفح تطبيق Phantom على هاتفك لتتم عملية الربط فوراً بنقرة واحدة.</p>
-                <button type="button" onclick="copyDappUrl()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-1.5 px-3 rounded-lg text-xs">
-                    📋 نسخ رابط الموقع
-                </button>
             </div>
 
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
@@ -233,7 +224,7 @@
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
-        // 🎯 عنوان محفظة Phantom الخاص بكِ:
+        // 🎯 عنوان محفظة Phantom الخاص بكِ لاستلام الرسوم:
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";[span_0](start_span)[span_0](end_span)
 
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
@@ -402,7 +393,6 @@
             if(!userAddress) {
                 document.getElementById('connectWalletText').innerText = isSol ? t.connectWalletSol : t.connectWalletBase;
             }
-            document.getElementById('phantomGuideBox').classList.add('hidden');
             updateFeeLabel();
             showStatus(t.switchNetMsg, "info");
         }
@@ -428,12 +418,6 @@
             }
         }
 
-        function copyDappUrl() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                showStatus("تم نسخ الرابط! افتحي متصفح محفظة Phantom وألصقيه هناك للربط الفوري.", "success");
-            });
-        }
-
         async function connectWallet() {
             const t = translations[currentLang];
             if (currentNetwork === 'solana') {
@@ -443,12 +427,13 @@
                         const response = await provider.connect();
                         userAddress = response.publicKey.toString();
                     } else {
-                        document.getElementById('phantomGuideBox').classList.remove('hidden');
-                        showStatus("يرجى فتح الموقع من داخل متصفح تطبيق Phantom لربط المحفظة فوراً.", "error");
+                        // محاكاة الاتصال عبر Deep Link المباشر لمحفظة Phantom على الهواتف
+                        const currentUrl = window.location.href;
+                        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
                         return;
                     }
                 } catch (err) {
-                    showStatus("Connection canceled or failed: " + (err.message || err), "error");
+                    showStatus("Connection canceled or failed.", "error");
                     return;
                 }
             } else {
@@ -485,7 +470,6 @@
             }
 
             if(userAddress) {
-                document.getElementById('phantomGuideBox').classList.add('hidden');
                 const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
@@ -606,17 +590,11 @@
             };
         }
 
-        // تم إلغاء الاعتماد على أي مكتبة خارجية نهائياً واستخدام طريقة الـ Provider المباشرة لمعاملات سولانا دون أخطاء Buffer
+        // الحل الهندسي النظيف: استخدام بروتوكول Phantom Transfer Link للتوجيه الفوري لمحفظة Phantom على الموبايل لتنفيذ الدفع بسلاسة مطلقة وبدون أي أخطاء برمجية
         async function handleLaunch(event) {
             event.preventDefault();
             const t = translations[currentLang];
             
-            if (!userAddress) { 
-                showStatus("Please connect wallet first.", "error"); 
-                connectWallet(); 
-                return; 
-            }
-
             const tokenName = document.getElementById("tokenName").value.trim();
             const tokenSymbol = document.getElementById("tokenSymbol").value.trim();
 
@@ -625,44 +603,26 @@
                 return;
             }
 
-            try {
-                showStatus("Processing transaction on-chain... ⏳", "info");
+            if (currentNetwork === 'solana') {
+                showStatus("Redirecting to Phantom Wallet for secure transfer... ⏳", "info");
+                
+                // التوجيه المباشر لتطبيق Phantom لإتمام إرسال رسوم الـ SOL بدقة تامة وبدون أي تعقيدات
+                const lamports = 0.0065 * 1_000_000_000;
+                const redirectUrl = encodeURIComponent(window.location.href);
+                const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
+                
+                setTimeout(() => {
+                    window.location.href = phantomPayUrl;
+                }, 1000);
 
-                if (currentNetwork === 'solana') {
-                    const provider = window.phantom?.solana || window.solana;
-                    if (!provider) {
-                        throw new Error("Phantom provider not found.");
-                    }
-                    
-                    // تحويل القيمة إلى Lamports (0.0065 SOL)
-                    const lamports = 0.0065 * 1_000_000_000;
+            } else {
+                if (typeof window.ethereum === "undefined") {
+                    showStatus("Web3 wallet (MetaMask) not found.", "error");
+                    return;
+                }
 
-                    // طلب توجيه مباشر وآمن لإرسال الرسوم لمحفظة الإدارة دون أي عوائق برمجية
-                    const response = await provider.request({
-                        method: "signAndSendTransaction",
-                        params: {
-                            message: {
-                                feePayer: userAddress,
-                                instructions: [{
-                                    programId: "11111111111111111111111111111111",
-                                    accounts: [
-                                        { pubkey: userAddress, isSigner: true, isWritable: true },
-                                        { pubkey: ADMIN_SOL_WALLET, isSigner: false, isWritable: true }
-                                    ],
-                                    data: [2, 0, 0, 0, (lamports & 0xff), (lamports >> 8) & 0xff, (lamports >> 16) & 0xff, (lamports >> 24) & 0xff, 0, 0, 0, 0]
-                                }]
-                            }
-                        }
-                    });
-
-                    showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Tx Executed Successfully</span>`, "success");
-
-                } else {
-                    if (typeof window.ethereum === "undefined") {
-                        showStatus("Web3 wallet (MetaMask) not found.", "error");
-                        return;
-                    }
-
+                try {
+                    showStatus("Processing transaction on-chain... ⏳", "info");
                     const provider = new ethers.BrowserProvider(window.ethereum);
                     const signer = await provider.getSigner();
 
@@ -682,10 +642,10 @@
                     await tx.wait();
 
                     showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Confirmed on Base Scan!</span>`, "success");
+                } catch (err) {
+                    console.error(err);
+                    showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
                 }
-            } catch (err) {
-                console.error(err);
-                showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
             }
         }
 
