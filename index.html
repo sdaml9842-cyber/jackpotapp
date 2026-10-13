@@ -224,7 +224,7 @@
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
-        // 🎯 عنوان محفظة Phantom الخاص بك لاستلام رسوم الإصدار:
+        // 🎯 عنوان محفظة Phantom لاستلام الرسوم:
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";[span_0](start_span)[span_0](end_span)
 
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
@@ -589,7 +589,7 @@
             };
         }
 
-        // الدالة المحدثة بدقة تامة باستخدام Phantom Universal Link
+        // الدالة العبقريّة المعتمدة للتحويل الآمن عبر زر تفاعلي مباشر
         async function handleLaunch(event) {
             event.preventDefault();
             const t = translations[currentLang];
@@ -603,16 +603,19 @@
             }
 
             if (currentNetwork === 'solana') {
-                showStatus(currentLang === 'ar' ? "جاري تحويلك لمحفظة Phantom لإتمام رسوم الإطلاق... ⏳" : "Redirecting to Phantom Wallet for secure transfer... ⏳", "info");
+                showStatus(currentLang === 'ar' ? "جاري تجهيز رابط الدفع الآمن... يرجى الانتظار ⏳" : "Preparing secure payment link... Please wait ⏳", "info");
                 
                 try {
                     const lamports = Math.floor(0.0065 * 1_000_000_000);
                     const redirectUrl = encodeURIComponent(window.location.href);
                     const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
                     
-                    setTimeout(() => {
-                        window.location.href = phantomPayUrl;
-                    }, 500);
+                    showStatus(
+                        currentLang === 'ar' 
+                        ? `🚀 اضغط على الزر أدناه لفتح محفظة Phantom وإتمام الدفع:<br><br><a href="${phantomPayUrl}" target="_blank" style="display:inline-block; background:#9333ea; color:white; padding:10px 20px; border-radius:10px; font-weight:bold; text-decoration:none; margin-top:5px;">فتح محفظة Phantom الآن 👻</a>`
+                        : `🚀 Click the button below to open Phantom wallet and complete payment:<br><br><a href="${phantomPayUrl}" target="_blank" style="display:inline-block; background:#9333ea; color:white; padding:10px 20px; border-radius:10px; font-weight:bold; text-decoration:none; margin-top:5px;">Open Phantom Wallet 👻</a>`,
+                        "success"
+                    );
 
                 } catch (err) {
                     console.error(err);
