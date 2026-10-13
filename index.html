@@ -225,7 +225,7 @@
         let brushColor = "#a855f7";
 
         // 🎯 عنوان محفظة Phantom لاستلام الرسوم:
-        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";[span_0](start_span)[span_0](end_span)
+        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
@@ -589,7 +589,7 @@
             };
         }
 
-        // الدالة العبقريّة المعتمدة للتحويل الآمن عبر زر تفاعلي مباشر
+        // الدالة المعدلة والمضمونة لاستجابة فورية عبر زر HTML مباشر
         async function handleLaunch(event) {
             event.preventDefault();
             const t = translations[currentLang];
@@ -603,24 +603,16 @@
             }
 
             if (currentNetwork === 'solana') {
-                showStatus(currentLang === 'ar' ? "جاري تجهيز رابط الدفع الآمن... يرجى الانتظار ⏳" : "Preparing secure payment link... Please wait ⏳", "info");
+                const lamports = Math.floor(0.0065 * 1_000_000_000);
+                const redirectUrl = encodeURIComponent(window.location.href);
+                const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
                 
-                try {
-                    const lamports = Math.floor(0.0065 * 1_000_000_000);
-                    const redirectUrl = encodeURIComponent(window.location.href);
-                    const phantomPayUrl = `https://phantom.app/ul/v1/transfer?recipient=${ADMIN_SOL_WALLET}&amount=${lamports}&spl=SOL&redirect_link=${redirectUrl}`;
-                    
-                    showStatus(
-                        currentLang === 'ar' 
-                        ? `🚀 اضغط على الزر أدناه لفتح محفظة Phantom وإتمام الدفع:<br><br><a href="${phantomPayUrl}" target="_blank" style="display:inline-block; background:#9333ea; color:white; padding:10px 20px; border-radius:10px; font-weight:bold; text-decoration:none; margin-top:5px;">فتح محفظة Phantom الآن 👻</a>`
-                        : `🚀 Click the button below to open Phantom wallet and complete payment:<br><br><a href="${phantomPayUrl}" target="_blank" style="display:inline-block; background:#9333ea; color:white; padding:10px 20px; border-radius:10px; font-weight:bold; text-decoration:none; margin-top:5px;">Open Phantom Wallet 👻</a>`,
-                        "success"
-                    );
-
-                } catch (err) {
-                    console.error(err);
-                    showStatus("Transaction redirection failed.", "error");
-                }
+                showStatus(
+                    currentLang === 'ar' 
+                    ? `<b>✅ جاهز للإطلاق!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">اضغط هنا لفتح محفظة Phantom ودفع الرسوم 👻</a>`
+                    : `<b>✅ Ready for launch!</b><br><br><a href="${phantomPayUrl}" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click here to open Phantom & pay fee 👻</a>`,
+                    "success"
+                );
 
             } else {
                 if (typeof window.ethereum === "undefined") {
