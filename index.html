@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Protocol - Global Multi-Chain Engine</title>
+    <title>ChainPump Protocol - Solana Master Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -30,9 +30,9 @@
         <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
                 <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                <span id="netLabelText">Network: <strong class="text-slate-200">Solana Phantom (SPL)</strong></span>
+                <span id="netLabelText">Network: <strong class="text-slate-200">Solana Masternet (SPL)</strong></span>
             </div>
-            <span class="text-purple-400 font-semibold" id="topSecText">🛡️ Global Institutional Engine</span>
+            <span class="text-purple-400 font-semibold" id="topSecText">🛡️ Solana High-Performance Engine</span>
         </div>
     </div>
 
@@ -46,9 +46,9 @@
                 <div>
                     <div class="flex items-center space-x-2 rtl:space-x-reverse">
                         <span class="font-extrabold text-base text-white tracking-tight">ChainPump</span>
-                        <span class="text-[10px] bg-purple-950 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-800">GLOBAL</span>
+                        <span class="text-[10px] bg-purple-950 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-800">SOLANA</span>
                     </div>
-                    <span class="block text-[10px] text-slate-500 font-semibold" id="headerSubText">Enterprise Token Engine</span>
+                    <span class="block text-[10px] text-slate-500 font-semibold" id="headerSubText">Instant Token Engine</span>
                 </div>
             </div>
             
@@ -56,11 +56,6 @@
                 <button type="button" onclick="toggleLanguage()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold px-2.5 py-2 rounded-xl text-xs" id="langBtn">
                     🌐 AR
                 </button>
-
-                <select id="networkSelector" onchange="switchProtocolNetwork()" class="bg-slate-900 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl px-2.5 py-2 focus:outline-none focus:border-purple-500">
-                    <option value="solana">Solana Phantom</option>
-                    <option value="base">Base Mainnet</option>
-                </select>
 
                 <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 rtl:space-x-reverse shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-purple-400"></span>
@@ -105,8 +100,8 @@
         <!-- Launch Card -->
         <div class="institutional-card rounded-2xl p-5 shadow-2xl">
             <div class="mb-4 border-b border-slate-800/80 pb-3">
-                <h1 id="engineTitle" class="text-base font-bold text-white">Instant Token Deployment</h1>
-                <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Generate algorithmic liquidity pools and deploy seamlessly without errors.</p>
+                <h1 id="engineTitle" class="text-base font-bold text-white">Instant Solana Token Deployment</h1>
+                <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Generate algorithmic SPL tokens and bonding curves instantly.</p>
             </div>
 
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
@@ -206,7 +201,7 @@
     </main>
 
     <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-4 text-[11px] text-slate-600">
-        <p>© 2026 ChainPump Global Master Protocol</p>
+        <p>© 2026 ChainPump Solana Master Protocol</p>
     </footer>
 
     <style>
@@ -218,12 +213,11 @@
     <script>
         let currentLang = 'en';
         let userAddress = "";
-        let currentNetwork = "solana";
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
+        // 🎯 عنوان محفظة Solana لاستلام الرسوم:
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
-        const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -240,7 +234,6 @@
                     }
                 }
             } catch (e) {}
-            updateFeeLabel();
         });
 
         let secretClicks = 0;
@@ -249,25 +242,23 @@
             if(secretClicks >= 5) {
                 secretClicks = 0;
                 let totalVisits = localStorage.getItem('chainpump_secret_visits') || 1;
-                alert(`🛡️ [Hidden Admin Panel]\nTotal Visitors: ${totalVisits}\nStatus: Engine Operational & Secure`);
+                alert(`🛡️ [Hidden Admin Panel]\nTotal Visitors: ${totalVisits}\nStatus: Solana Engine Operational & Secure`);
             }
         }
 
         const translations = {
             en: {
-                topSec: "🛡️ Global Institutional Engine",
-                netLabel: "Network:",
-                headerSub: "Enterprise Token Engine",
-                connectWalletSol: "Connect Phantom",
-                connectWalletBase: "Connect Base Wallet",
+                topSec: "🛡️ Solana High-Performance Engine",
+                headerSub: "Instant Token Engine",
+                connectWallet: "Connect Phantom",
                 revShare: "Protocol Revenue Share Program",
                 revBadge: "20% Instant Yield",
                 refCount: "Successful Launches",
                 refEarned: "Earned Rewards",
                 refInputDefault: "Connect wallet to generate referral link...",
                 copy: "Copy",
-                engineTitle: "Instant Token Deployment",
-                engineDesc: "Generate algorithmic liquidity pools and deploy seamlessly without errors.",
+                engineTitle: "Instant Solana Token Deployment",
+                engineDesc: "Generate algorithmic SPL tokens and bonding curves instantly.",
                 step1: "1. Data", step2: "2. Setup", step3: "3. Liquidity", step4: "4. Security",
                 nameLabel: "Token Name",
                 genName: "🎲 Generate Name",
@@ -287,25 +278,22 @@
                 supply: "Total Fixed Supply:",
                 feeProtocol: "Protocol Fee:",
                 submitBtn: "Connect Wallet & Launch Instantly 🚀",
-                switchNetMsg: "Network switched successfully.",
-                walletConnectedMsg: "Wallet connected securely & successfully!",
+                walletConnectedMsg: "Phantom wallet connected securely & successfully!",
                 copiedMsg: "Referral link copied successfully!",
-                launchSuccessMsg: "🎉 Token launched successfully! Contract created on Base."
+                launchSuccessMsg: "🎉 Token deployment URI triggered on Solana!"
             },
             ar: {
-                topSec: "🛡️ محرك مؤسسي عالمي",
-                netLabel: "الشبكة:",
-                headerSub: "منصة إطلاق الأصول الرقمية",
-                connectWalletSol: "ربط Phantom",
-                connectWalletBase: "ربط محفظة Base",
+                topSec: "🛡️ محرك سولانا فائق الأداء",
+                headerSub: "منصة إصدار الأصول الفورية",
+                connectWallet: "ربط Phantom",
                 revShare: "برنامج مشاركة عوائد البروتوكول",
                 revBadge: "عائد فوري 20%",
                 refCount: "الإحالات الناجحة",
                 refEarned: "العوائد المستحقة",
                 refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
                 copy: "نسخ",
-                engineTitle: "إصدار أصل رقمي فوري",
-                engineDesc: "توليد عقود السيولة الفورية والشراء بانسيابية مطلقة وبدون أخطاء.",
+                engineTitle: "إصدار أصل رقمي فوري على سولانا",
+                engineDesc: "توليد عملات SPL المنحنية والسيولة الفورية بانسيابية مطلقة.",
                 step1: "1. البيانات", step2: "2. التجهيز", step3: "3. السيولة", step4: "4. الأمان",
                 nameLabel: "اسم العملة / الأصل",
                 genName: "🎲 توليد اسم موثق",
@@ -325,10 +313,9 @@
                 supply: "إجمالي المعروض الثابت:",
                 feeProtocol: "رسوم الإصدار:",
                 submitBtn: "ربط المحفظة وإطلاق الأصل فوراً 🚀",
-                switchNetMsg: "تم تبديل الشبكة بنجاح.",
-                walletConnectedMsg: "تم ربط المحفظة بنجاح!",
+                walletConnectedMsg: "تم ربط محفظة Phantom بنجاح!",
                 copiedMsg: "تم نسخ رابط الشريك بنجاح!",
-                launchSuccessMsg: "🎉 تم إطلاق العملة وتوليد العقد بنجاح على شبكة Base!"
+                launchSuccessMsg: "🎉 تم تفعيل طلب الإصدار على شبكة سولانا بنجاح!"
             }
         };
 
@@ -343,7 +330,7 @@
             document.getElementById('topSecText').innerText = t.topSec;
             document.getElementById('headerSubText').innerText = t.headerSub;
             if(!userAddress) {
-                document.getElementById('connectWalletText').innerText = currentNetwork === 'solana' ? t.connectWalletSol : t.connectWalletBase;
+                document.getElementById('connectWalletText').innerText = t.connectWallet;
                 document.getElementById('referralLinkInput').value = t.refInputDefault;
             }
             document.getElementById('revShareTitle').innerText = t.revShare;
@@ -375,27 +362,6 @@
             document.getElementById('supplyLabel').innerText = t.supply;
             document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
             document.getElementById('submitBtn').innerText = t.submitBtn;
-
-            updateFeeLabel();
-        }
-
-        function switchProtocolNetwork() {
-            currentNetwork = document.getElementById('networkSelector').value;
-            const isSol = currentNetwork === 'solana';
-            const t = translations[currentLang];
-            
-            document.getElementById('netLabelText').innerHTML = isSol ? 'Network: <strong class="text-slate-200">Solana Phantom (SPL)</strong>' : 'Network: <strong class="text-slate-200">Base Mainnet (EVM)</strong>';
-            
-            if(!userAddress) {
-                document.getElementById('connectWalletText').innerText = isSol ? t.connectWalletSol : t.connectWalletBase;
-            }
-            updateFeeLabel();
-            showStatus(t.switchNetMsg, "info");
-        }
-
-        function updateFeeLabel() {
-            const isSol = currentNetwork === 'solana';
-            document.getElementById('feeLabel').innerText = isSol ? "0.0065 SOL" : "0.00025 ETH";
         }
 
         function handleFileSelected(input) {
@@ -414,65 +380,25 @@
             }
         }
 
-        // 🚀 دالة ربط فائقة السرعة ومتوافقة مع Mises وكل المحافظ بدون أي مكتبات ثقيلة
         async function connectWallet() {
             const t = translations[currentLang];
-            if (currentNetwork === 'solana') {
-                try {
-                    const provider = window.phantom?.solana || window.solana;
-                    if (provider && provider.isPhantom) {
-                        const response = await provider.connect();
-                        userAddress = response.publicKey.toString();
-                    } else {
-                        const currentUrl = window.location.href;
-                        window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
-                        return;
-                    }
-                } catch (err) {
-                    showStatus("Phantom connection canceled.", "error");
+            try {
+                const provider = window.phantom?.solana || window.solana;
+                if (provider && provider.isPhantom) {
+                    const response = await provider.connect();
+                    userAddress = response.publicKey.toString();
+                } else {
+                    const currentUrl = window.location.href;
+                    window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
                     return;
                 }
-            } else {
-                // الفحص الآمن لشبكة Base
-                const ethProvider = window.ethereum || (window.evmproviders ? window.evmproviders.provider : null);
-                if (!ethProvider) {
-                    showStatus(currentLang === 'ar' ? "لم يتم اكتشاف محفظة EVM نشطة. يرجى تفعيل إضافة MetaMask في المتصفح." : "No active EVM wallet detected.", "error");
-                    return;
-                }
-
-                try {
-                    const accounts = await ethProvider.request({ method: "eth_requestAccounts" });
-                    userAddress = accounts[0];
-
-                    // التحويل التلقائي لشبكة Base (ChainID: 8453 = 0x2105)
-                    try {
-                        await ethProvider.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x2105' }],
-                        });
-                    } catch (switchError) {
-                        if (switchError.code === 4902 || switchError.code === -32603) {
-                            await ethProvider.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: '0x2105',
-                                    chainName: 'Base Mainnet',
-                                    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                                    rpcUrls: ['https://mainnet.base.org'],
-                                    blockExplorerUrls: ['https://basescan.org']
-                                }]
-                            });
-                        }
-                    }
-                } catch (err) {
-                    console.error(err);
-                    showStatus(currentLang === 'ar' ? "فشل الاتصال بمحفظة Base." : "Base connection failed.", "error");
-                    return;
-                }
+            } catch (err) {
+                showStatus("Connection canceled or failed.", "error");
+                return;
             }
 
             if(userAddress) {
-                const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+                const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
                 document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
                 showStatus(t.walletConnectedMsg, "success");
@@ -592,8 +518,7 @@
             };
         }
 
-        // ⚡ التنفيذ المباشر الخالي من أخطاء الـ Ethers.js لضمان عمل Base بطلاقة
-        async function handleLaunch(event) {
+        function handleLaunch(event) {
             if (event) event.preventDefault();
             const t = translations[currentLang];
             
@@ -605,64 +530,20 @@
                 return;
             }
 
-            if (currentNetwork === 'solana') {
-                const amountSol = "0.0065";
-                const phantomPayUrl = `solana:${ADMIN_SOL_WALLET}?amount=${amountSol}&label=ChainPump%20Protocol&message=Token%20Deployment%20Fee`;
-                
-                showStatus(
-                    currentLang === 'ar' 
-                    ? `<b>✅ جاهز للإطلاق!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">اضغط هنا لفتح تطبيق Phantom ودفع الرسوم 👻</a>`
-                    : `<b>✅ Ready for launch!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click to open Phantom app & pay fee 👻</a>`,
-                    "success"
-                );
+            const amountSol = "0.0065";
+            const phantomPayUrl = `solana:${ADMIN_SOL_WALLET}?amount=${amountSol}&label=ChainPump%20Protocol&message=Token%20Deployment%20Fee`;
+            
+            showStatus(
+                currentLang === 'ar' 
+                ? `<b>✅ جاهز للإطلاق الفوري على سولانا!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">انقر هنا لفتح تطبيق Phantom وإتمام رسوم الإصدار 👻</a>`
+                : `<b>✅ Ready for Solana launch!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click to open Phantom app & pay fee 👻</a>`,
+                "success"
+            );
 
-                setTimeout(() => {
-                    const anchor = document.getElementById("phantomDirectAnchor");
-                    if (anchor) anchor.click();
-                }, 100);
-
-            } else {
-                const ethProvider = window.ethereum || (window.evmproviders ? window.evmproviders.provider : null);
-                if (!ethProvider) {
-                    showStatus(currentLang === 'ar' ? "يرجى ربط المحفظة أولاً." : "Please connect wallet first.", "error");
-                    return;
-                }
-
-                try {
-                    showStatus("Preparing Base transaction... ⏳", "info");
-
-                    // تجهيز البيانات العقدية (ABI Encoding يدوي مبسط لدالة deployNewToken(string,string))
-                    // دالة Keccak256 لـ deployNewToken(string,string) تبدأ بـ 0x933038d1 أو ما شابه، ولكننا سنستخدم الطريقة الآمنة عبر ethers إن وجد أو الـ Data المباشرة.
-                    // لتجنب أي مشاكل، قمنا بتبسيط الاستدعاء عبر واجهة مزود البيانات الخالص:
-                    
-                    const accounts = await ethProvider.request({ method: "eth_requestAccounts" });
-                    const account = accounts[0];
-
-                    // رسوم العقد 0.00025 ETH بالـ Wei (محولة بنظام Hexadecimal)
-                    const feeHex = "0x5821E560000"; // 0.00025 ETH
-
-                    // استخدام واجهة الـ ABI القياسية للإرسال
-                    // بما أن بعض متصفحات الـ Web3 تفضل الطريقة المباشرة، سنقوم ببناء المعاملة بإرسال القيمة والعنوان:
-                    const txParams = {
-                        from: account,
-                        to: BASE_FACTORY_ADDRESS,
-                        value: feeHex,
-                        // ملاحظة: البيانات هنا تمثل استدعاء دالة العقد مع الوسائط (اسم العملة والرمز)
-                        // لتسهيل الأمر واختباره فوراً، الإرسال المباشر للرسوم والعقد يعمل بانسيابية:
-                    };
-
-                    // تنفيذ المعاملة مباشرة عبر شبكة الميتاماسك أو Mises
-                    const txHash = await ethProvider.request({
-                        method: 'eth_sendTransaction',
-                        params: [txParams],
-                    });
-
-                    showStatus(`Transaction sent! <br><span class="font-mono text-[10px]">Hash: ${txHash}</span>`, "success");
-                } catch (err) {
-                    console.error(err);
-                    showStatus("Transaction failed: " + (err.message || "User denied transaction"), "error");
-                }
-            }
+            setTimeout(() => {
+                const anchor = document.getElementById("phantomDirectAnchor");
+                if (anchor) anchor.click();
+            }, 100);
         }
 
         function showStatus(message, type) {
