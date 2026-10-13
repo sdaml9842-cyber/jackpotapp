@@ -224,7 +224,7 @@
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
-        // 🎯 عنوان محفظة Phantom لاستلام الرسوم:
+        // 🎯 عنوان محفظة Solana لاستلام الرسوم:
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
@@ -418,6 +418,7 @@
             }
         }
 
+        // دالة ربط المحفظة المزدوجة والمحدثة بالكامل
         async function connectWallet() {
             const t = translations[currentLang];
             if (currentNetwork === 'solana') {
@@ -436,18 +437,22 @@
                     return;
                 }
             } else {
+                // قسم شبكة Base
                 if (typeof window.ethereum === "undefined") {
-                    showStatus("Web3 wallet (MetaMask) not found.", "error");
+                    showStatus(currentLang === 'ar' ? "يرجى تجربة فتح المنصة داخل متصفح MetaMask أو محفظة EVM." : "Web3 wallet (MetaMask) not found.", "error");
                     return;
                 }
                 try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x2105' }],
-                    });
-                } catch (switchError) {
-                    if (switchError.code === 4902) {
-                        try {
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    userAddress = accounts[0];
+
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x2105' }],
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902 || switchError.code === -32603) {
                             await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
                                 params: [{
@@ -458,14 +463,13 @@
                                     blockExplorerUrls: ['https://basescan.org']
                                 }]
                             });
-                        } catch (addError) {
-                            showStatus("Failed to add Base network.", "error");
-                            return;
                         }
                     }
+                } catch (err) {
+                    console.error(err);
+                    showStatus(currentLang === 'ar' ? "فشل الاتصال بمحفظة Base." : "Base wallet connection failed.", "error");
+                    return;
                 }
-                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                userAddress = accounts[0];
             }
 
             if(userAddress) {
@@ -589,7 +593,7 @@
             };
         }
 
-        // الدالة النهائية بعد تحديث بروتوكول Solana Pay القياسي لفتح تطبيق Phantom مباشرة
+        // الدالة النهائية الشاملة لإطلاق الأصول على Solana و Base
         function handleLaunch(event) {
             if (event) event.preventDefault();
             const t = translations[currentLang];
@@ -619,8 +623,9 @@
                 }, 100);
 
             } else {
+                // إطلاق شبكة Base عبر Ethers.js المباشر
                 if (typeof window.ethereum === "undefined") {
-                    showStatus("Web3 wallet (MetaMask) not found.", "error");
+                    showStatus(currentLang === 'ar' ? "يرجى استخدام متصفح يدعم Web3 (مثل MetaMask) لإكمال العملية على شبكة Base." : "Web3 wallet (MetaMask) not found.", "error");
                     return;
                 }
 
