@@ -232,7 +232,7 @@
         // 🎯 عنوان عقد الـ Factory على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
 
-        // 🕵️ نظام العداد الخفي الآمن (تسجيل الزيارات بصمت تام)
+        // 🕵️ نظام العداد الخفي الآمن
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 let visits = localStorage.getItem('chainpump_secret_visits') || 0;
@@ -251,7 +251,6 @@
             updateFeeLabel();
         });
 
-        // دالة سرية لا تظهر لأحد (تظهر لكِ فقط عند النقر 5 مرات على الهيدر في الأعلى)
         let secretClicks = 0;
         function revealSecretStats() {
             secretClicks++;
@@ -614,7 +613,8 @@
 
                 if (currentNetwork === 'solana') {
                     const provider = window.phantom?.solana || window.solana;
-                    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
+                    // تم تعديل الـ RPC لتجنب خطأ 403 Forbidden نهائياً
+                    const connection = new solanaWeb3.Connection("https://rpc.ankr.com/solana", "confirmed");
                     
                     const transaction = new solanaWeb3.Transaction().add(
                         solanaWeb3.SystemProgram.transfer({
