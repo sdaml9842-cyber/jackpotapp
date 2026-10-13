@@ -584,7 +584,7 @@
         }
 
         function showStatus(message, type) {
-            The box = document.getElementById("statusBox");
+            const box = document.getElementById("statusBox");
             box.classList.remove("hidden", "bg-purple-950/60", "border-purple-800", "text-purple-300", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
             box.classList.add(type === "success" ? "bg-emerald-950/60" : "bg-purple-950/60", "border-purple-800", "text-purple-300");
             box.innerHTML = message;
