@@ -230,7 +230,6 @@
         // 🎯 عنوان عقد الـ Factory الموثق على شبكة Base:
         const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
 
-        // 🎯 الـ ABI الخاص بالعقد لتنفيذ الدالة المباشرة:
         const BASE_FACTORY_ABI = [
             "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)"
         ];
@@ -445,14 +444,21 @@
                 if (typeof window.ethereum === "undefined") {
                     const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
                     const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
+                    
                     showStatus(
                         currentLang === 'ar' 
-                        ? `<b>⚠️ يرجى فتح الموقع داخل متصفح MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">فتح في MetaMask 🦊</a>`
-                        : `<b>⚠️ Please open in MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open in MetaMask 🦊</a>`,
-                        "error"
+                        ? `<b>🦊 جاهز للاتصال على Base!</b><br><br><a href="${mmDeepLink}" id="mmDirectAnchor" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">فتح التطبيق والاتصال المباشر عبر MetaMask 🚀</a>`
+                        : `<b>🦊 Ready for Base Connection!</b><br><br><a href="${mmDeepLink}" id="mmDirectAnchor" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open & Connect in MetaMask 🚀</a>`,
+                        "success"
                     );
+
+                    setTimeout(() => {
+                        const anchor = document.getElementById("mmDirectAnchor");
+                        if (anchor) anchor.click();
+                    }, 100);
                     return;
                 }
+
                 try {
                     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
                     userAddress = accounts[0];
