@@ -1,3 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChainPump Protocol - Global Multi-Chain Engine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ethers.js v6 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif; background-color: #080c14; color: #f1f5f9; -webkit-font-smoothing: antialiased; }
+        [dir="rtl"] body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; }
+        .institutional-card {
+            background: rgba(13, 20, 36, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
+        }
+        .step-active { border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.1); }
+        input, select, button { transition: all 0.2s ease; }
+        .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: transform 0.2s; }
+        .color-dot:hover { transform: scale(1.15); }
+        .color-dot.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
+
+    <!-- شريط الأمان المؤسسي -->
+    <div class="bg-slate-950 border-b border-slate-800/80 text-slate-400 text-[11px] py-2 px-4">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                <span id="netLabelText">Network: <strong class="text-slate-200">Solana Phantom (SPL)</strong></span>
+            </div>
+            <span class="text-purple-400 font-semibold" id="topSecText">🛡️ Global Institutional Engine</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50" onclick="revealSecretStats()">
+        <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center cursor-pointer">
+            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-base shadow-sm">
+                    👻
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                        <span class="font-extrabold text-base text-white tracking-tight">ChainPump</span>
+                        <span class="text-[10px] bg-purple-950 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-800">GLOBAL</span>
+                    </div>
+                    <span class="block text-[10px] text-slate-500 font-semibold" id="headerSubText">Enterprise Token Engine</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2 rtl:space-x-reverse" onclick="event.stopPropagation()">
+                <button type="button" onclick="toggleLanguage()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold px-2.5 py-2 rounded-xl text-xs" id="langBtn">
+                    🌐 AR
+                </button>
+
+                <select id="networkSelector" onchange="switchProtocolNetwork()" class="bg-slate-900 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl px-2.5 py-2 focus:outline-none focus:border-purple-500">
+                    <option value="solana">Solana Phantom</option>
+                    <option value="base">Base Mainnet</option>
+                </select>
+
+                <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3 py-2 rounded-xl transition-all text-xs flex items-center space-x-2 rtl:space-x-reverse shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                    <span id="connectWalletText">Connect Phantom</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow space-y-5">
+
+        <!-- Revenue Share -->
+        <div class="institutional-card rounded-2xl p-4 shadow-xl border border-slate-800">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                    <span class="text-base">💼</span>
+                    <h2 class="font-bold text-white text-xs" id="revShareTitle">Protocol Revenue Share Program</h2>
+                </div>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 font-bold px-2 py-0.5 rounded border border-purple-500/20" id="revShareBadge">20% Instant Yield</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 mb-0.5" id="refCountLabel">Successful Launches</span>
+                    <span id="refCountText" class="text-xs font-bold text-white font-mono">0 Referral</span>
+                </div>
+                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
+                    <span class="block text-[10px] text-slate-500 mb-0.5" id="refEarnedLabel">Earned Rewards</span>
+                    <span id="refEarnedText" class="text-xs font-bold text-purple-400 font-mono">0.0000 SOL</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <input type="text" id="referralLinkInput" readonly value="Connect wallet to generate referral link..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-purple-300 font-mono text-left ltr:text-left rtl:text-right focus:outline-none">
+                <button type="button" id="copyBtn" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold px-3.5 py-2 rounded-lg text-xs flex-shrink-0">
+                    Copy
+                </button>
+            </div>
+        </div>
+
+        <!-- Launch Card -->
+        <div class="institutional-card rounded-2xl p-5 shadow-2xl">
+            <div class="mb-4 border-b border-slate-800/80 pb-3">
+                <h1 id="engineTitle" class="text-base font-bold text-white">Instant Token Deployment</h1>
+                <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Generate algorithmic liquidity pools and deploy seamlessly without errors.</p>
+            </div>
+
+            <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
+                <div class="py-1.5 rounded-lg border step-active" id="step1">1. Data</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step2">2. Setup</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step3">3. Liquidity</div>
+                <div class="py-1.5 rounded-lg border border-slate-800 bg-slate-950 text-slate-500" id="step4">4. Security</div>
+            </div>
+
+            <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-3.5">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-bold text-slate-300" id="nameLabel">Token Name</label>
+                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-purple-400 hover:underline" id="genNameBtn">🎲 Generate Name</button>
+                    </div>
+                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="e.g. Phantom Sovereign AI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-slate-300" id="symbolLabel">Ticker Symbol</label>
+                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="e.g. SOV" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 uppercase focus:outline-none focus:border-purple-500">
+                </div>
+
+                <!-- Live Preview -->
+                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex items-center space-x-3 rtl:space-x-reverse">
+                    <div id="previewLogoContainer" class="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400 text-sm overflow-hidden flex-shrink-0">
+                        <span id="previewLogoText">👻</span>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 id="previewName" class="font-bold text-white text-xs">Digital Asset Name</h3>
+                        <p id="previewSymbol" class="text-[10px] text-slate-500 uppercase font-mono">SYMBOL</p>
+                    </div>
+                    <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold" id="readyBadge">Ready</span>
+                </div>
+
+                <!-- Logo Source -->
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-slate-300" id="logoSourceLabel">Visual Identity & Logo</label>
+                    <div class="grid grid-cols-3 gap-1.5 mb-2">
+                        <button type="button" onclick="switchLogoTab('ai')" id="tabAI" class="py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs">✨ AI Studio</button>
+                        <button type="button" onclick="switchLogoTab('upload')" id="tabUpload" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs" id="tabUploadText">📁 Upload File</button>
+                        <button type="button" onclick="switchLogoTab('canvas')" id="tabCanvas" class="py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs" id="tabCanvasText">🎨 Color Canvas</button>
+                    </div>
+
+                    <div id="panelAI" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
+                        <input type="text" id="aiPromptInput" placeholder="Enter logo prompt..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200">
+                        <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-2 rounded-lg text-xs">Generate Logo ✨</button>
+                    </div>
+
+                    <div id="panelUpload" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden text-center space-y-2">
+                        <input type="file" id="logoFile" accept="image/*" class="hidden" onchange="handleFileSelected(this)">
+                        <button type="button" onclick="document.getElementById('logoFile').click()" id="customUploadBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-300 border border-purple-500/30 font-bold py-2.5 rounded-lg text-xs flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                            <span>📁</span>
+                            <span id="uploadBtnText">Choose Image File...</span>
+                        </button>
+                        <span id="fileNameDisplay" class="block text-[11px] text-slate-400 font-mono">No file chosen</span>
+                    </div>
+
+                    <div id="panelCanvas" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl hidden space-y-2.5 text-center">
+                        <div class="flex justify-center items-center space-x-3 rtl:space-x-reverse py-1">
+                            <span class="text-[11px] text-slate-400 font-bold" id="brushColorText">Color:</span>
+                            <div onclick="setBrushColor('#a855f7', this)" class="color-dot active" style="background-color: #a855f7;" title="Phantom Purple"></div>
+                            <div onclick="setBrushColor('#10b981', this)" class="color-dot" style="background-color: #10b981;" title="Emerald Green"></div>
+                            <div onclick="setBrushColor('#3b82f6', this)" class="color-dot" style="background-color: #3b82f6;" title="Blue"></div>
+                            <div onclick="setBrushColor('#f59e0b', this)" class="color-dot" style="background-color: #f59e0b;" title="Gold"></div>
+                            <div onclick="setBrushColor('#ffffff', this)" class="color-dot" style="background-color: #ffffff;" title="White"></div>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <canvas id="logoCanvas" width="160" height="160" class="bg-slate-900 border border-slate-700 rounded-xl cursor-crosshair touch-none shadow-inner"></canvas>
+                        </div>
+                        <div class="flex space-x-2 rtl:space-x-reverse">
+                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-1.5 rounded-lg text-xs" id="clearBtn">Clear 🗑️</button>
+                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-1.5 rounded-lg text-xs" id="applyBtn">Apply ✨</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1.5 text-slate-400">
+                    <div class="flex justify-between">
+                        <span id="supplyLabel">Total Fixed Supply:</span>
+                        <span class="font-bold text-slate-200 font-mono">1,000,000,000</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span id="feeProtocolLabel">Protocol Fee:</span>
+                        <span id="feeLabel" class="font-bold text-purple-400 font-mono">0.0065 SOL</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-3.5 rounded-xl text-xs tracking-wide shadow-lg shadow-purple-900/30">
+                    Connect Wallet & Launch Instantly 🚀
+                </button>
+            </form>
+
+            <div id="statusBox" class="mt-3 hidden p-2.5 rounded-xl text-xs border"></div>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-4 text-[11px] text-slate-600">
+        <p>© 2026 ChainPump Global Master Protocol</p>
+    </footer>
+
+    <style>
+      [data-netlify-deploy-id], netlify-drawer, #netlify-badge, .netlify-badge {
+        display: none !important; opacity: 0 !important; pointer-events: none !important;
+      }
+    </style>
+
+    <script>
+        let currentLang = 'en';
+        let userAddress = "";
+        let currentNetwork = "solana";
+        let canvas, ctx, painting = false;
+        let brushColor = "#a855f7";
+
+        // 🎯 عنوان محفظة Solana لاستلام الرسوم:
+        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
+
+        // 🎯 عنوان عقد الـ Factory الموثق على شبكة Base:
+        const BASE_FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+
+        // 🎯 الـ ABI الخاص بالعقد لتنفيذ الدالة المباشرة:
+        const BASE_FACTORY_ABI = [
+            "function deployNewToken(string calldata name, string calldata symbol) external payable returns (address)"
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                let visits = localStorage.getItem('chainpump_secret_visits') || 0;
+                visits = parseInt(visits) + 1;
+                localStorage.setItem('chainpump_secret_visits', visits);
+
+                const urlParams = new URLSearchParams(window.location.search);
+                let refParam = urlParams.get('ref');
+                if (refParam) {
+                    refParam = refParam.split('&')[0].trim();
+                    if (refParam.length >= 32) {
+                        localStorage.setItem('chainpump_referrer', refParam);
+                    }
+                }
+            } catch (e) {}
+            updateFeeLabel();
+        });
+
+        let secretClicks = 0;
+        function revealSecretStats() {
+            secretClicks++;
+            if(secretClicks >= 5) {
+                secretClicks = 0;
+                let totalVisits = localStorage.getItem('chainpump_secret_visits') || 1;
+                alert(`🛡️ [Hidden Admin Panel]\nTotal Visitors: ${totalVisits}\nStatus: Engine Operational & Secure`);
+            }
+        }
+
+        const translations = {
+            en: {
+                topSec: "🛡️ Global Institutional Engine",
+                netLabel: "Network:",
+                headerSub: "Enterprise Token Engine",
+                connectWalletSol: "Connect Phantom",
+                connectWalletBase: "Connect Base Wallet",
+                revShare: "Protocol Revenue Share Program",
+                revBadge: "20% Instant Yield",
+                refCount: "Successful Launches",
+                refEarned: "Earned Rewards",
+                refInputDefault: "Connect wallet to generate referral link...",
+                copy: "Copy",
+                engineTitle: "Instant Token Deployment",
+                engineDesc: "Generate algorithmic liquidity pools and deploy seamlessly without errors.",
+                step1: "1. Data", step2: "2. Setup", step3: "3. Liquidity", step4: "4. Security",
+                nameLabel: "Token Name",
+                genName: "🎲 Generate Name",
+                symbolLabel: "Ticker Symbol",
+                ready: "Ready",
+                logoSource: "Visual Identity & Logo",
+                tabAI: "✨ AI Studio",
+                tabUpload: "📁 Upload File",
+                tabCanvas: "🎨 Color Canvas",
+                aiPromptPlaceholder: "Enter logo prompt...",
+                aiGenBtn: "Generate Logo ✨",
+                uploadBtn: "Choose Image File...",
+                noFile: "No file chosen",
+                brushColorText: "Color:",
+                clearBtn: "Clear 🗑️",
+                applyBtn: "Apply ✨",
+                supply: "Total Fixed Supply:",
+                feeProtocol: "Protocol Fee:",
+                submitBtn: "Connect Wallet & Launch Instantly 🚀",
+                switchNetMsg: "Network switched successfully.",
+                walletConnectedMsg: "Wallet connected securely & successfully!",
+                copiedMsg: "Referral link copied successfully!",
+                launchSuccessMsg: "🎉 Token launched successfully! Contract created on Base."
+            },
+            ar: {
+                topSec: "🛡️ محرك مؤسسي عالمي",
+                netLabel: "الشبكة:",
+                headerSub: "منصة إطلاق الأصول الرقمية",
+                connectWalletSol: "ربط Phantom",
+                connectWalletBase: "ربط محفظة Base",
+                revShare: "برنامج مشاركة عوائد البروتوكول",
+                revBadge: "عائد فوري 20%",
+                refCount: "الإحالات الناجحة",
+                refEarned: "العوائد المستحقة",
+                refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
+                copy: "نسخ",
+                engineTitle: "إصدار أصل رقمي فوري",
+                engineDesc: "توليد عقود السيولة الفورية والشراء بانسيابية مطلقة وبدون أخطاء.",
+                step1: "1. البيانات", step2: "2. التجهيز", step3: "3. السيولة", step4: "4. الأمان",
+                nameLabel: "اسم العملة / الأصل",
+                genName: "🎲 توليد اسم موثق",
+                symbolLabel: "الرمز المالي المقتضب",
+                ready: "جاهز",
+                logoSource: "الهوية البصرية والشعار",
+                tabAI: "✨ ذكاء اصطناعي",
+                tabUpload: "📁 رفع ملف",
+                tabCanvas: "🎨 رسم حر ملون",
+                aiPromptPlaceholder: "وصف شعار العملة...",
+                aiGenBtn: "توليد الشعار فوراً ✨",
+                uploadBtn: "اختيار صورة الشعار...",
+                noFile: "لم يتم اختيار أي ملف",
+                brushColorText: "اللون:",
+                clearBtn: "مسح 🗑️",
+                applyBtn: "اعتماد ✨",
+                supply: "إجمالي المعروض الثابت:",
+                feeProtocol: "رسوم الإصدار:",
+                submitBtn: "ربط المحفظة وإطلاق الأصل فوراً 🚀",
+                switchNetMsg: "تم تبديل الشبكة بنجاح.",
+                walletConnectedMsg: "تم ربط المحفظة بنجاح!",
+                copiedMsg: "تم نسخ رابط الشريك بنجاح!",
+                launchSuccessMsg: "🎉 تم إطلاق العملة وتوليد العقد بنجاح على شبكة Base!"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const root = document.getElementById('htmlRoot');
+            root.setAttribute('lang', currentLang);
+            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('langBtn').innerText = currentLang === 'en' ? '🌐 AR' : '🌐 EN';
+            
+            const t = translations[currentLang];
+            document.getElementById('topSecText').innerText = t.topSec;
+            document.getElementById('headerSubText').innerText = t.headerSub;
+            if(!userAddress) {
+                document.getElementById('connectWalletText').innerText = currentNetwork === 'solana' ? t.connectWalletSol : t.connectWalletBase;
+                document.getElementById('referralLinkInput').value = t.refInputDefault;
+            }
+            document.getElementById('revShareTitle').innerText = t.revShare;
+            document.getElementById('revShareBadge').innerText = t.revBadge;
+            document.getElementById('refCountLabel').innerText = t.refCount;
+            document.getElementById('refEarnedLabel').innerText = t.refEarned;
+            document.getElementById('copyBtn').innerText = t.copy;
+            document.getElementById('engineTitle').innerText = t.engineTitle;
+            document.getElementById('engineDesc').innerText = t.engineDesc;
+            document.getElementById('step1').innerText = t.step1;
+            document.getElementById('step2').innerText = t.step2;
+            document.getElementById('step3').innerText = t.step3;
+            document.getElementById('step4').innerText = t.step4;
+            document.getElementById('nameLabel').innerText = t.nameLabel;
+            document.getElementById('genNameBtn').innerText = t.genName;
+            document.getElementById('symbolLabel').innerText = t.symbolLabel;
+            document.getElementById('readyBadge').innerText = t.ready;
+            document.getElementById('logoSourceLabel').innerText = t.logoSource;
+            document.getElementById('tabAI').innerText = t.tabAI;
+            document.getElementById('tabUploadText').innerText = t.tabUpload;
+            document.getElementById('tabCanvasText').innerText = t.tabCanvas;
+            document.getElementById('aiPromptInput').placeholder = t.aiPromptPlaceholder;
+            document.getElementById('aiGenBtn').innerText = t.aiGenBtn;
+            document.getElementById('uploadBtnText').innerText = t.uploadBtn;
+            document.getElementById('fileNameDisplay').innerText = t.noFile;
+            document.getElementById('brushColorText').innerText = t.brushColorText;
+            document.getElementById('clearBtn').innerText = t.clearBtn;
+            document.getElementById('applyBtn').innerText = t.applyBtn;
+            document.getElementById('supplyLabel').innerText = t.supply;
+            document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
+            document.getElementById('submitBtn').innerText = t.submitBtn;
+
+            updateFeeLabel();
+        }
+
         function switchProtocolNetwork() {
             currentNetwork = document.getElementById('networkSelector').value;
             const isSol = currentNetwork === 'solana';
@@ -5,12 +396,32 @@
             
             document.getElementById('netLabelText').innerHTML = isSol ? 'Network: <strong class="text-slate-200">Solana Phantom (SPL)</strong>' : 'Network: <strong class="text-slate-200">Base Mainnet (EVM)</strong>';
             
-            // تحديث نص زر الاتصال بناءً على الشبكة المختارة فوراً
             if(!userAddress) {
                 document.getElementById('connectWalletText').innerText = isSol ? t.connectWalletSol : t.connectWalletBase;
             }
             updateFeeLabel();
             showStatus(t.switchNetMsg, "info");
+        }
+
+        function updateFeeLabel() {
+            const isSol = currentNetwork === 'solana';
+            document.getElementById('feeLabel').innerText = isSol ? "0.0065 SOL" : "0.00025 ETH";
+        }
+
+        function handleFileSelected(input) {
+            const t = translations[currentLang];
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                document.getElementById('fileNameDisplay').innerText = fileName;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewLogoContainer').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+                showStatus(currentLang === 'ar' ? "تم تحميل الصورة بنجاح!" : "Image loaded successfully!", "success");
+            } else {
+                document.getElementById('fileNameDisplay').innerText = t.noFile;
+            }
         }
 
         async function connectWallet() {
@@ -31,14 +442,13 @@
                     return;
                 }
             } else {
-                // الاتصال بـ Base عبر MetaMask أو متصفح يدعم EVM
                 if (typeof window.ethereum === "undefined") {
                     const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
                     const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
                     showStatus(
                         currentLang === 'ar' 
-                        ? `<b>⚠️ يرجى فتح الموقع داخل متصفح MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:10px; border-radius:10px; font-weight:bold; text-decoration:none;">فتح في MetaMask 🦊</a>`
-                        : `<b>⚠️ Please open in MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; text-align:center; background:#f59e0b; color:black; padding:10px; border-radius:10px; font-weight:bold; text-decoration:none;">Open in MetaMask 🦊</a>`,
+                        ? `<b>⚠️ يرجى فتح الموقع داخل متصفح MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">فتح في MetaMask 🦊</a>`
+                        : `<b>⚠️ Please open in MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open in MetaMask 🦊</a>`,
                         "error"
                     );
                     return;
@@ -50,7 +460,7 @@
                     try {
                         await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x2105' }], // 8453
+                            params: [{ chainId: '0x2105' }],
                         });
                     } catch (switchError) {
                         if (switchError.code === 4902 || switchError.code === -32603) {
@@ -80,3 +490,192 @@
                 showStatus(t.walletConnectedMsg, "success");
             }
         }
+
+        function copyReferralLink() {
+            const input = document.getElementById('referralLinkInput');
+            const t = translations[currentLang];
+            if(!userAddress) { showStatus("Please connect wallet first!", "error"); return; }
+            navigator.clipboard.writeText(input.value).then(() => {
+                showStatus(t.copiedMsg, "success");
+            });
+        }
+
+        function updateLivePreview() {
+            const nameVal = document.getElementById("tokenName").value.trim();
+            const symbolVal = document.getElementById("tokenSymbol").value.trim();
+            document.getElementById("previewName").innerText = nameVal || (currentLang === 'ar' ? "اسم الأصل الرقمي" : "Digital Asset Name");
+            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
+        }
+
+        function spinDestinyWheel() {
+            const list = [
+                { name: "Phantom Sovereign AI", symbol: "SOV" },
+                { name: "Solana Liquid Vault", symbol: "VAULT" },
+                { name: "Alpha Phantom Protocol", symbol: "APHA" }
+            ];
+            const pick = list[Math.floor(Math.random() * list.length)];
+            document.getElementById("tokenName").value = pick.name;
+            document.getElementById("tokenSymbol").value = pick.symbol;
+            updateLivePreview();
+        }
+
+        function switchLogoTab(tab) {
+            document.getElementById('panelAI').classList.add('hidden');
+            document.getElementById('panelUpload').classList.add('hidden');
+            document.getElementById('panelCanvas').classList.add('hidden');
+            
+            document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+            document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold text-xs";
+
+            if(tab === 'ai') {
+                document.getElementById('panelAI').classList.remove('hidden');
+                document.getElementById('tabAI').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else if(tab === 'upload') {
+                document.getElementById('panelUpload').classList.remove('hidden');
+                document.getElementById('tabUpload').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+            } else {
+                document.getElementById('panelCanvas').classList.remove('hidden');
+                document.getElementById('tabCanvas').className = "py-1.5 px-1 rounded-lg border border-purple-500 bg-purple-500/10 text-purple-400 font-bold text-xs";
+                if(!canvas) setTimeout(initCanvas, 50);
+            }
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('logoCanvas');
+            if(!canvas) return;
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = brushColor;
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            canvas.addEventListener('mousedown', startPosition);
+            canvas.addEventListener('mouseup', endPosition);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); endPosition(); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        }
+
+        function setBrushColor(color, element) {
+            brushColor = color;
+            if(ctx) ctx.strokeStyle = brushColor;
+            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function startPosition(e) { painting = true; draw(e); }
+        function endPosition() { painting = false; ctx.beginPath(); }
+        function draw(e) {
+            if(!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.pageX) - rect.left;
+            const y = (e.clientY || e.pageY) - rect.top;
+            ctx.strokeStyle = brushColor;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        function clearCanvas() {
+            if(!ctx) return;
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        function useCanvasAsLogo() {
+            if(!canvas) return;
+            const dataUrl = canvas.toDataURL('image/png');
+            document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
+            showStatus(currentLang === 'ar' ? "تم اعتماد الرسم الحر بنجاح!" : "Custom drawing applied successfully!", "success");
+        }
+
+        async function generateRealAILogo() {
+            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana phantom token logo vector";
+            const btn = document.getElementById('aiGenBtn');
+            btn.innerText = currentLang === 'ar' ? "جاري التوليد... ⏳" : "Generating... ⏳";
+            const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
+            const img = new Image();
+            img.src = generatedUrl;
+            img.onload = () => {
+                document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
+                btn.innerText = translations[currentLang].aiGenBtn;
+            };
+        }
+
+        function handleLaunch(event) {
+            if (event) event.preventDefault();
+            const t = translations[currentLang];
+            
+            const tokenName = document.getElementById("tokenName").value.trim();
+            const tokenSymbol = document.getElementById("tokenSymbol").value.trim();
+
+            if (!tokenName || !tokenSymbol) {
+                showStatus(currentLang === 'ar' ? "يرجى إدخال اسم ورمز العملة." : "Please enter token name and symbol.", "error");
+                return;
+            }
+
+            if (currentNetwork === 'solana') {
+                const amountSol = "0.0065";
+                const phantomPayUrl = `solana:${ADMIN_SOL_WALLET}?amount=${amountSol}&label=ChainPump%20Protocol&message=Token%20Deployment%20Fee`;
+                
+                showStatus(
+                    currentLang === 'ar' 
+                    ? `<b>✅ جاهز للإطلاق!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">اضغط هنا لفتح تطبيق Phantom ودفع الرسوم 👻</a>`
+                    : `<b>✅ Ready for launch!</b><br><br><a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Click to open Phantom app & pay fee 👻</a>`,
+                    "success"
+                );
+
+                setTimeout(() => {
+                    const anchor = document.getElementById("phantomDirectAnchor");
+                    if (anchor) anchor.click();
+                }, 100);
+
+            } else {
+                if (typeof window.ethereum === "undefined") {
+                    const cleanUrl = window.location.href.replace(/^https?:\/\//, '');
+                    const mmDeepLink = `https://metamask.app.link/dapp/${cleanUrl}`;
+                    showStatus(
+                        currentLang === 'ar' 
+                        ? `<b>⚠️ يتطلب فتح المنصة في متصفح MetaMask</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">افتح الموقع داخل تطبيق MetaMask 🦊</a>`
+                        : `<b>⚠️ MetaMask required</b><br><br><a href="${mmDeepLink}" style="display:block; width:100%; text-align:center; background:#f59e0b; color:black; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">Open in MetaMask app 🦊</a>`,
+                        "error"
+                    );
+                    return;
+                }
+
+                (async () => {
+                    try {
+                        showStatus("Processing Base transaction on-chain... ⏳", "info");
+                        const provider = new ethers.BrowserProvider(window.ethereum);
+                        const signer = await provider.getSigner();
+
+                        const factoryContract = new ethers.Contract(BASE_FACTORY_ADDRESS, BASE_FACTORY_ABI, signer);
+                        const feeInWei = ethers.parseEther("0.00025");
+
+                        const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, {
+                            value: feeInWei
+                        });
+
+                        showStatus(`Transaction sent! Waiting for confirmation... <br><span class="font-mono text-[10px]">Hash: ${tx.hash}</span>`, "info");
+                        await tx.wait();
+
+                        showStatus(t.launchSuccessMsg + `<br><span class="font-mono text-[10px]">Confirmed on Base Scan!</span>`, "success");
+                    } catch (err) {
+                        console.error(err);
+                        showStatus("Transaction failed or canceled by user: " + (err.reason || err.message), "error");
+                    }
+                })();
+            }
+        }
+
+        function showStatus(message, type) {
+            const box = document.getElementById("statusBox");
+            box.classList.remove("hidden", "bg-purple-950/60", "border-purple-800", "text-purple-300", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300", "bg-blue-950/60", "border-blue-800", "text-blue-300");
+            box.classList.add(type === "success" ? "bg-emerald-950/60" : "bg-purple-950/60", "border-purple-800", "text-purple-300");
+            box.innerHTML = message;
+        }
+    </script>
+</body>
+</html>
