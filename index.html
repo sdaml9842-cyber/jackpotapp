@@ -25,19 +25,19 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <!-- 🛑 شاشة الحظر الصارم (تغطي الشاشة بالكامل وتمنع استخدام فيسبوك نهائياً) -->
+    <!-- نافذة إرشادية فورية تظهر حصراً داخل فيسبوك -->
     <div id="strictBlockerModal" class="hidden fixed inset-0 bg-[#080c14] z-[999999] flex flex-col items-center justify-center p-6 text-center">
         <div class="bg-slate-900 border border-red-500/50 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
             <div class="w-14 h-14 bg-red-950 border border-red-500/50 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">🚫</div>
-            <h2 class="text-white font-extrabold text-base">متصفح فيسبوك يحظر المحافظ والعملات!</h2>
+            <h2 class="text-white font-extrabold text-base">متصفح فيسبوك يحظر المحافظ!</h2>
             <p class="text-slate-400 text-xs leading-relaxed">
-                لا يمكن إتمام الاتصال بمحفظة Phantom أو إطلاق العملات من داخل متصفح فيسبوك المغلق. يرجى فتح الرابط في متصفح خارجي حصراً.
+                لا يمكن إتمام الاتصال بمحفظة Phantom من داخل فيسبوك. يرجى فتح الرابط في متصفح خارجي حصراً.
             </p>
             <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-right text-[11px] text-slate-300 space-y-1.5">
-                <p>1️⃣ اضغط على <b>النقاط الثلاث (...)</b> في الزاوية.</p>
-                <p>2️⃣ اختر <b>"فتح في متصفح كروم" (Open in Chrome)</b> أو فانتوم.</p>
+                <p>1️⃣ اضغط على <b>النقاط الثلاث (...)</b> في الأعلى.</p>
+                <p>2️⃣ اختر <b>"فتح في المتصفح" (Open in Browser)</b>.</p>
             </div>
-            <button onclick="copyLinkForUser()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg shadow-purple-900/40">
+            <button onclick="copyLinkForUser()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg shadow-purple-900/40">
                 نسخ الرابط للمشاركة والفتح 📋
             </button>
         </div>
@@ -238,7 +238,6 @@
 
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
-        // فحص صارم يمنع فتح المنصة تماماً من داخل متصفحات السوشيال ميديا المغلقة
         window.addEventListener('DOMContentLoaded', () => {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             const isAppBrowser = /FBAN|FBAV|Instagram|FB_IAB|FBLite|Twitter|LinkedInApp|Telegram/i.test(ua);
@@ -270,7 +269,6 @@
             });
         }
 
-        // اللوحة السرية لإظهار عدد الزوار (النقر 5 مرات على الأيقونة 👻)
         let secretClicks = 0;
         function revealSecretStats() {
             secretClicks++;
