@@ -25,19 +25,20 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <!-- نافذة الإجبار القصوى في حال بقاء المستخدم داخل فيسبوك -->
-    <div id="forcedEscapeOverlay" class="hidden fixed inset-0 bg-[#080c14] z-[999999] flex flex-col items-center justify-center p-6 text-center">
-        <div class="bg-slate-900 border border-purple-500/60 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
-            <div class="w-14 h-14 bg-purple-950 border border-purple-500/60 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner animate-bounce">🚀</div>
-            <h2 class="text-white font-extrabold text-base">يجب فتح المنصة في متصفح خارجي</h2>
+    <!-- 🛑 شاشة الحظر الصارم (تغطي الشاشة بالكامل وتمنع استخدام فيسبوك نهائياً) -->
+    <div id="strictBlockerModal" class="hidden fixed inset-0 bg-[#080c14] z-[999999] flex flex-col items-center justify-center p-6 text-center">
+        <div class="bg-slate-900 border border-red-500/50 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
+            <div class="w-14 h-14 bg-red-950 border border-red-500/50 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">🚫</div>
+            <h2 class="text-white font-extrabold text-base">متصفح فيسبوك يحظر المحافظ والعملات!</h2>
             <p class="text-slate-400 text-xs leading-relaxed">
-                متصفحات التواصل الاجتماعي تحظر ربط المحافظ. انقر على الزر أدناه للفتح الفوري في متصفحك الأساسي:
+                لا يمكن إتمام الاتصال بمحفظة Phantom أو إطلاق العملات من داخل متصفح فيسبوك المغلق. يرجى فتح الرابط في متصفح خارجي حصراً.
             </p>
-            <button onclick="forceOpenBrowser()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg shadow-purple-900/40">
-                فتح في متصفح كروم / فانتوم الآن 🌐
-            </button>
-            <button onclick="copyLinkOnly()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs border border-slate-700">
-                نسخ الرابط 📋
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-right text-[11px] text-slate-300 space-y-1.5">
+                <p>1️⃣ اضغط على <b>النقاط الثلاث (...)</b> في الزاوية.</p>
+                <p>2️⃣ اختر <b>"فتح في متصفح كروم" (Open in Chrome)</b> أو فانتوم.</p>
+            </div>
+            <button onclick="copyLinkForUser()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg shadow-purple-900/40">
+                نسخ الرابط للمشاركة والفتح 📋
             </button>
         </div>
     </div>
@@ -237,13 +238,13 @@
 
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
-        // رصد ذكي شامل لأي متصفح داخل تطبيق (فيسبوك، انستغرام، تليجرام، تويتر)
+        // فحص صارم يمنع فتح المنصة تماماً من داخل متصفحات السوشيال ميديا المغلقة
         window.addEventListener('DOMContentLoaded', () => {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             const isAppBrowser = /FBAN|FBAV|Instagram|FB_IAB|FBLite|Twitter|LinkedInApp|Telegram/i.test(ua);
             
             if (isAppBrowser) {
-                document.getElementById('forcedEscapeOverlay').classList.remove('hidden');
+                document.getElementById('strictBlockerModal').classList.remove('hidden');
             }
 
             try {
@@ -261,19 +262,11 @@
             } catch (e) {}
         });
 
-        // محاولة إجبار المتصفح الخارجي ببروتوكول الـ Intent أو الـ Location
-        function forceOpenBrowser() {
-            const currentUrl = window.location.href;
-            if (/android/i.test(navigator.userAgent)) {
-                window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
-            } else {
-                window.open(currentUrl, '_system');
-            }
-        }
-
-        function copyLinkOnly() {
+        function copyLinkForUser() {
             navigator.clipboard.writeText(window.location.href).then(() => {
-                alert("✅ تم نسخ الرابط! افتح متصفح كروم أو فانتوم والصقه هناك.");
+                alert("✅ تم نسخ الرابط بنجاح! افتح متصفح كروم أو فانتوم والصقه هناك.");
+            }).catch(() => {
+                alert("يرجى نسخ الرابط يدويًا وفتحه في متصفح خارجي.");
             });
         }
 
