@@ -28,7 +28,10 @@
         .animate-ticker {
             display: flex;
             width: max-content;
-            animation: marquee 60s linear infinite;
+            animation: marquee 140s linear infinite; /* سرعة بطيئة جداً ومريحة للقراءة */
+        }
+        .animate-ticker:hover {
+            animation-play-state: paused; /* يتوقف عند التمريض لسهولة القراءة */
         }
     </style>
 </head>
@@ -63,10 +66,10 @@
         </div>
     </div>
 
-    <!-- شريط التداول الحي الموسع (يعرض أكثر من 90 عملة حية ومتنوعة بدون تكرار) -->
+    <!-- شريط التداول الحي الموسع بالسرعة الجديدة البطيئة والمريحة -->
     <div class="bg-slate-900/90 border-b border-slate-800/80 py-2 overflow-hidden">
         <div class="animate-ticker space-x-8 rtl:space-x-reverse text-[11px] font-mono text-slate-300" id="liveTickerContainer">
-            <!-- يتم توليد أكثر من 90 عملة حقيقية هنا برمجياً -->
+            <!-- يتم توليد العملات الحقيقية هنا برمجياً -->
         </div>
     </div>
 
@@ -139,7 +142,7 @@
                     <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign Token Deployment</h1>
                     <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.</p>
                 </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.5 PRO</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.6 PRO</span>
             </div>
 
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
@@ -258,7 +261,6 @@
 
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
-        // قائمة ضخمة وموسعة جداً تضم أكثر من 95 عملة سولانا حقيقية ونشطة في السوق
         const massiveSolanaTokens = [
             "BONK", "WIF", "BOME", "POPCAT", "SLERF", "MEW", "MYRO", "SILLY", "PONKE", "SAMO",
             "CHONKY", "MANEKI", "WEN", "NOP", "GIGA", "RETARDIO", "SHIT", "PEPER", "TOST", "SCAM",
@@ -307,7 +309,6 @@
                 });
             }
 
-            // توليد الشريط الحي الموسع بجميع العملات الحقيقية وبدون أي تكرار ممل
             populateMassiveTicker();
         });
 
@@ -316,14 +317,10 @@
             if (!container) return;
             container.innerHTML = "";
 
-            // خلط العملات عشوائياً لضمان تنوع هائل وضخم
             let shuffled = [...massiveSolanaTokens].sort(() => 0.5 - Math.random());
-            
-            // دمج القائمة لتكوين شريط طويل جداً يتحرك بانسيابية تامة
             let fullList = [...shuffled, ...shuffled];
 
             fullList.forEach(token => {
-                const isBuy = Math.random() > 0.3;
                 const priceChange = (Math.random() * 95 - 15).toFixed(1);
                 const isPositive = parseFloat(priceChange) >= 0;
                 const emoji = isPositive ? "🟢" : "🔻";
