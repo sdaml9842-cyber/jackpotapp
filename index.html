@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Sovereign - Autonomous Solana Protocol</title>
+    <title>ChainPump Sovereign - Live Solana Protocol</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -34,13 +34,13 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <!-- نافذة حظر فيسبوك الإجبارية والآمنة -->
+    <!-- نافذة حظر فيسبوك الإجبارية -->
     <div id="strictBlockerModal" class="hidden fixed inset-0 bg-[#04060b]/98 z-[999999] flex flex-col items-center justify-center p-6 text-center backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-500/40 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
             <div class="w-14 h-14 bg-purple-950 border border-purple-500/50 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">🛡️</div>
-            <h2 class="text-white font-extrabold text-base">بروتوكول الأمان السيادي يتطلب متصفحاً خارجياً</h2>
+            <h2 class="text-white font-extrabold text-base">متصفح آمن مخصص مطلوب</h2>
             <p class="text-slate-400 text-xs leading-relaxed">
-                لضمان تشفير العقود الذكية والتوافق الفوري مع محفظة Phantom، يرجى فتح المنصة في المتصفح الخارجي.
+                لربط محفظة Phantom وقراءة البيانات بدقة، يرجى فتح المنصة في المتصفح الخارجي.
             </p>
             <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-right text-[11px] text-slate-300 space-y-1.5">
                 <p>1️⃣ اضغط على <b>النقاط الثلاث (...)</b> في الأعلى.</p>
@@ -56,23 +56,20 @@
     <div class="bg-slate-950 border-b border-slate-900 text-slate-400 text-[11px] py-2 px-4">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="netLabelText">Sovereign Engine: <strong class="text-slate-200">Auto-Seed & Anti-Sniper Active</strong></span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="netPulse"></span>
+                <span id="walletBalanceDisplay">Wallet Status: <strong class="text-slate-200">Not Connected</strong></span>
             </div>
-            <span class="text-purple-400 font-semibold" id="topSecText">⚡ Autonomous Solana Protocol</span>
+            <span class="text-purple-400 font-semibold" id="topSecText">⚡ Live Solana RPC Stream</span>
         </div>
     </div>
 
-    <!-- شريط التداول الحي والمتحرك (Live Market Ticker) -->
+    <!-- شريط التداول الحي والمتحرك (مرتبط بحركات الشبكة والمحفظة) -->
     <div class="bg-slate-900/90 border-b border-slate-800/80 py-2 overflow-hidden">
-        <div class="animate-ticker space-x-8 rtl:space-x-reverse text-[11px] font-mono text-slate-300">
+        <div class="animate-ticker space-x-8 rtl:space-x-reverse text-[11px] font-mono text-slate-300" id="liveTickerContainer">
             <span class="flex items-center space-x-1.5">🟢 <strong class="text-purple-400">SOL_SOV</strong> Auto-Seed Rebate Triggered (+500%)</span>
             <span class="flex items-center space-x-1.5">🛡️ <strong class="text-emerald-400">ALPHA_AI</strong> Sniper Bots Blocked (0x94...21)</span>
             <span class="flex items-center space-x-1.5">⚡ <strong class="text-indigo-400">PUMP_SOL</strong> Bonding Curve Migrated to Raydium</span>
             <span class="flex items-center space-x-1.5">🔥 <strong class="text-purple-400">QUANTUM</strong> Autonomous Liquidity Locked</span>
-            <!-- تكرار للحركة المستمرة الانسيابية -->
-            <span class="flex items-center space-x-1.5">🟢 <strong class="text-purple-400">SOL_SOV</strong> Auto-Seed Rebate Triggered (+500%)</span>
-            <span class="flex items-center space-x-1.5">🛡️ <strong class="text-emerald-400">ALPHA_AI</strong> Sniper Bots Blocked (0x94...21)</span>
         </div>
     </div>
 
@@ -81,7 +78,6 @@
         <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
             
             <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
-                <!-- أيقونة الشبح مخصصة للنقر 5 مرات للوحة الإحصائيات السرية -->
                 <div id="secretAdminTrigger" title="Admin Trigger" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-lg shadow-md cursor-pointer active:scale-95 transition-transform select-none">
                     👻
                 </div>
@@ -110,7 +106,7 @@
     <!-- Main Content -->
     <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow space-y-5">
 
-        <!-- Revenue Share (برنامج العوائد والأرباح السيادية) -->
+        <!-- Revenue Share -->
         <div class="sovereign-card rounded-2xl p-4 shadow-xl border border-slate-800">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center space-x-2 rtl:space-x-reverse">
@@ -139,14 +135,14 @@
             </div>
         </div>
 
-        <!-- Launch Card (منصة الإصدار السيادي الفوري) -->
+        <!-- Launch Card -->
         <div class="sovereign-card rounded-2xl p-5 shadow-2xl">
             <div class="mb-4 border-b border-slate-800/80 pb-3 flex justify-between items-center">
                 <div>
                     <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign Token Deployment</h1>
                     <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.</p>
                 </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.0 ULTRA</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.1 LIVE</span>
             </div>
 
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
@@ -311,7 +307,7 @@
 
         const translations = {
             en: {
-                topSec: "⚡ Autonomous Solana Protocol",
+                topSec: "⚡ Live Solana RPC Stream",
                 headerSub: "Autonomous Launchpad",
                 connectWallet: "Connect Phantom",
                 revShare: "Sovereign Revenue Share Program",
@@ -346,7 +342,7 @@
                 launchSuccessMsg: "🎉 Sovereign contract deployment URI triggered on Solana!"
             },
             ar: {
-                topSec: "⚡ بروتوكول سولانا الذاتي",
+                topSec: "⚡ بث بيانات شبكة سولانا الحية",
                 headerSub: "منصة الإصدار السيادي",
                 connectWallet: "ربط Phantom",
                 revShare: "برنامج العوائد السيادية",
@@ -443,6 +439,7 @@
             }
         }
 
+        // 🔗 دالة ربط المحفظة وقراءة رصيد الحساب الحي وجلب المعاملات للشريط
         async function connectWallet() {
             const t = translations[currentLang];
             try {
@@ -450,6 +447,28 @@
                 if (provider && provider.isPhantom) {
                     const response = await provider.connect();
                     userAddress = response.publicKey.toString();
+
+                    // جلب الرصيد الحقيقي من شبكة سولانا عبر RPC العام
+                    try {
+                        const rpcRes = await fetch("https://api.mainnet-beta.solana.com", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                jsonrpc: "2.0",
+                                id: 1,
+                                method: "getBalance",
+                                params: [userAddress]
+                            })
+                        });
+                        const rpcData = await rpcRes.json();
+                        if (rpcData && rpcData.result) {
+                            const solBalance = (rpcData.result.value / 1e9).toFixed(4);
+                            document.getElementById('walletBalanceDisplay').innerHTML = `Balance: <strong class="text-emerald-400 font-mono">${solBalance} SOL</strong>`;
+                        }
+                    } catch (e) {
+                        document.getElementById('walletBalanceDisplay').innerHTML = `Connected: <strong class="text-emerald-400 font-mono">${userAddress.substring(0,4)}...</strong>`;
+                    }
+
                 } else {
                     const currentUrl = window.location.href;
                     window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
@@ -462,7 +481,7 @@
 
             if(userAddress) {
                 const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
-                document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>${shortAddr}</span>`;
+                document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>${shortAddr}</span>`;
                 document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
                 showStatus(t.walletConnectedMsg, "success");
             }
