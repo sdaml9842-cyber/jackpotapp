@@ -28,7 +28,7 @@
         .animate-ticker {
             display: flex;
             width: max-content;
-            animation: marquee 300s linear infinite; /* سرعة بطيئة جداً ومريحة بهدوء تام */
+            animation: marquee 300s linear infinite;
         }
     </style>
 </head>
@@ -65,9 +65,7 @@
 
     <!-- شريط التداول الحي -->
     <div class="bg-slate-900/90 border-b border-slate-800/80 py-2 overflow-hidden">
-        <div class="animate-ticker space-x-8 rtl:space-x-reverse text-[11px] font-mono text-slate-300" id="liveTickerContainer">
-            <!-- يتم توليد العملات هنا برمجياً -->
-        </div>
+        <div class="animate-ticker space-x-8 rtl:space-x-reverse text-[11px] font-mono text-slate-300" id="liveTickerContainer"></div>
     </div>
 
     <!-- Header المؤسسي الفاخر -->
@@ -103,24 +101,30 @@
     <!-- Main Content -->
     <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow space-y-5">
 
-        <!-- Revenue Share -->
-        <div class="sovereign-card rounded-2xl p-4 shadow-xl border border-slate-800">
-            <div class="flex justify-between items-center mb-3">
+        <!-- Revenue Share (بصياغة مهندسة ورسمية تدعم السحب بدون حد أدنى) -->
+        <div class="sovereign-card rounded-2xl p-4 shadow-xl border border-slate-800 space-y-3">
+            <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2 rtl:space-x-reverse">
                     <span class="text-base">💼</span>
                     <h2 class="font-bold text-white text-xs" id="revShareTitle">Sovereign Revenue Share Program</h2>
                 </div>
-                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded border border-emerald-500/20" id="revShareBadge">20% Instant Yield</span>
+                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/20" id="revShareBadge">Zero Minimum Payout • Instant Yield</span>
             </div>
+
+            <p class="text-[11px] text-slate-400 leading-relaxed" id="revShareDesc">
+                Earn instant commission from every deployment via your referral link. <strong>No minimum withdrawal limit</strong> — claim your rewards directly to your wallet anytime.
+            </p>
             
-            <div class="grid grid-cols-2 gap-2 mb-3">
+            <div class="grid grid-cols-2 gap-2">
                 <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
                     <span class="block text-[10px] text-slate-500 mb-0.5" id="refCountLabel">Successful Launches</span>
                     <span id="refCountText" class="text-xs font-bold text-white font-mono">0 Referral</span>
                 </div>
-                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl">
-                    <span class="block text-[10px] text-slate-500 mb-0.5" id="refEarnedLabel">Earned Rewards</span>
-                    <span id="refEarnedText" class="text-xs font-bold text-purple-400 font-mono">0.0000 SOL</span>
+                <div class="bg-slate-950 border border-slate-800/80 p-2.5 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <span class="block text-[10px] text-slate-500 mb-0.5" id="refEarnedLabel">Available Balance</span>
+                        <span id="refEarnedText" class="text-xs font-bold text-purple-400 font-mono">0.0000 SOL</span>
+                    </div>
                 </div>
             </div>
 
@@ -139,7 +143,7 @@
                     <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign Token Deployment</h1>
                     <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.</p>
                 </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.8 OPEN</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.9 PRO</span>
             </div>
 
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
@@ -177,7 +181,7 @@
                     <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold" id="readyBadge">Secured</span>
                 </div>
 
-                <!-- Visual Identity & Logo (Open Layout Design) -->
+                <!-- Visual Identity & Logo (Open Studio) -->
                 <div class="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 space-y-3">
                     <label class="block text-xs font-bold text-slate-300" id="logoSourceLabel">Visual Identity & Logo (Open Studio)</label>
                     
@@ -201,7 +205,7 @@
                         <span id="fileNameDisplay" class="block text-[10px] text-slate-500 font-mono text-center">No file chosen</span>
                     </div>
 
-                    <!-- 3. Color Canvas Section (Open Display) -->
+                    <!-- 3. Color Canvas Section -->
                     <div class="space-y-2 pt-1">
                         <div class="flex justify-between items-center">
                             <span class="text-[11px] text-slate-400 font-semibold" id="brushColorText">🎨 Color Canvas:</span>
@@ -351,9 +355,10 @@
                 headerSub: "Autonomous Launchpad",
                 connectWallet: "Connect Phantom",
                 revShare: "Sovereign Revenue Share Program",
-                revBadge: "20% Instant Yield",
+                revBadge: "Zero Minimum Payout • Instant Yield",
+                revShareDesc: "Earn instant commission from every deployment via your referral link. <strong>No minimum withdrawal limit</strong> — claim your rewards directly to your wallet anytime.",
                 refCount: "Successful Launches",
-                refEarned: "Earned Rewards",
+                refEarned: "Available Balance",
                 refInputDefault: "Connect wallet to generate referral link...",
                 copy: "Copy",
                 engineTitle: "Sovereign Token Deployment",
@@ -381,10 +386,11 @@
                 topSec: "⚡ بث بيانات شبكة سولانا الحية",
                 headerSub: "منصة الإصدار السيادي",
                 connectWallet: "ربط Phantom",
-                revShare: "برنامج العوائد السيادية",
-                revBadge: "عائد فوري 20%",
+                revShare: "برنامج العوائد السيادية للإحالات",
+                revBadge: "بدون حد أدنى للسحب • عائد فوري",
+                revShareDesc: "احصل على أرباح فورية من كل عملية إصدار تتم عبر رابط الشراكة الخاص بك. <strong>لا يوجد أي حد أدنى للسحب</strong> — اسحب مستحقاتك إلى محفظتك مباشرة وفي أي وقت.",
                 refCount: "الإحالات الناجحة",
-                refEarned: "العوائد المستحقة",
+                refEarned: "الرصيد المتاح للسحب",
                 refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
                 copy: "نسخ",
                 engineTitle: "إصدار العملات السيادية",
@@ -426,6 +432,7 @@
             }
             document.getElementById('revShareTitle').innerText = t.revShare;
             document.getElementById('revShareBadge').innerText = t.revBadge;
+            document.getElementById('revShareDesc').innerHTML = t.revShareDesc;
             document.getElementById('refCountLabel').innerText = t.refCount;
             document.getElementById('refEarnedLabel').innerText = t.refEarned;
             document.getElementById('copyBtn').innerText = t.copy;
