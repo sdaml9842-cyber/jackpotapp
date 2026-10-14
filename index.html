@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <!-- شريط التداول الحي والمتحرك (مرتبط بحركات الشبكة والمحفظة) -->
+    <!-- شريط التداول الحي والمتحرك -->
     <div class="bg-slate-900/90 border-b border-slate-800/80 py-2 overflow-hidden">
         <div class="animate-ticker space-x-8 rtl:space-x-reverse text-[11px] font-mono text-slate-300" id="liveTickerContainer">
             <span class="flex items-center space-x-1.5">🟢 <strong class="text-purple-400">SOL_SOV</strong> Auto-Seed Rebate Triggered (+500%)</span>
@@ -142,7 +142,7 @@
                     <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign Token Deployment</h1>
                     <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.</p>
                 </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.1 LIVE</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v3.2 SECURE</span>
             </div>
 
             <div class="grid grid-cols-4 gap-1 mb-5 text-center text-[10px] font-bold">
@@ -439,7 +439,7 @@
             }
         }
 
-        // 🔗 دالة ربط المحفظة وقراءة رصيد الحساب الحي وجلب المعاملات للشريط
+        // 🔗 دالة ربط المحفظة وقراءة رصيد الحساب الحقيقي بشكل آمن تماماً
         async function connectWallet() {
             const t = translations[currentLang];
             try {
@@ -448,7 +448,7 @@
                     const response = await provider.connect();
                     userAddress = response.publicKey.toString();
 
-                    // جلب الرصيد الحقيقي من شبكة سولانا عبر RPC العام
+                    // طلب آمن لجلب الرصيد الحقيقي من شبكة سولانا مع معالجة الاستثناءات (Fault-Tolerant)
                     try {
                         const rpcRes = await fetch("https://api.mainnet-beta.solana.com", {
                             method: "POST",
@@ -461,12 +461,16 @@
                             })
                         });
                         const rpcData = await rpcRes.json();
-                        if (rpcData && rpcData.result) {
+                        if (rpcData && rpcData.result && typeof rpcData.result.value === 'number') {
                             const solBalance = (rpcData.result.value / 1e9).toFixed(4);
                             document.getElementById('walletBalanceDisplay').innerHTML = `Balance: <strong class="text-emerald-400 font-mono">${solBalance} SOL</strong>`;
+                        } else {
+                            throw new Error("Invalid balance response");
                         }
-                    } catch (e) {
-                        document.getElementById('walletBalanceDisplay').innerHTML = `Connected: <strong class="text-emerald-400 font-mono">${userAddress.substring(0,4)}...</strong>`;
+                    } catch (netErr) {
+                        // بديل آمن وفوري في حال قيود الشبكة لضمان عدم توقف الواجهة
+                        const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
+                        document.getElementById('walletBalanceDisplay').innerHTML = `Connected: <strong class="text-emerald-400 font-mono">${shortAddr}</strong>`;
                     }
 
                 } else {
