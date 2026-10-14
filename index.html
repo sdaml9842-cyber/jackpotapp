@@ -25,22 +25,21 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <!-- شاشة الهروب الذكي لمتصفح فيسبوك (تغطي الشاشة وتمنع التعليق تماماً) -->
-    <div id="fbEscapeModal" class="hidden fixed inset-0 bg-[#080c14]/98 z-[99999] flex flex-col items-center justify-center p-5 text-center backdrop-blur-md">
+    <!-- 🛑 شاشة الحجب الإجبارية لمتصفح فيسبوك (تمنع التعليق تماماً وتجبر المستخدم على الخروج) -->
+    <div id="fbBlockerModal" class="hidden fixed inset-0 bg-[#080c14] z-[999999] flex flex-col items-center justify-center p-6 text-center">
         <div class="bg-slate-900 border border-purple-500/50 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
-            <div class="w-14 h-14 bg-purple-950 border border-purple-500/60 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner animate-pulse">👻</div>
-            <h2 class="text-white font-extrabold text-base">متصفح فيسبوك مقيد أمنياً</h2>
+            <div class="w-14 h-14 bg-purple-950 border border-purple-500/60 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">⚠️</div>
+            <h2 class="text-white font-extrabold text-base">متصفح فيسبوك يحظر المحافظ!</h2>
             <p class="text-slate-400 text-xs leading-relaxed">
-                لتجربة تداول وإطلاق خالية من المشاكل، يرجى فتح المنصة في متصفحك الأساسي أو تطبيق Phantom مباشرة.
+                لا يمكن ربط محفظة Phantom أو إتمام العمليات من داخل فيسبوك. يرجى فتح الرابط في متصفح خارجي.
             </p>
-            <div class="space-y-2 pt-2">
-                <button onclick="openInExternalBrowser()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 rounded-xl text-xs shadow-lg shadow-purple-900/40">
-                    فتح في متصفح خارجي 🚀
-                </button>
-                <button onclick="copyLinkAndNotify()" class="w-full bg-slate-800 hover:bg-slate-700 text-purple-300 font-bold py-2.5 rounded-xl text-xs border border-slate-700">
-                    نسخ الرابط للمشاركة 📋
-                </button>
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-right text-[11px] text-slate-300 space-y-1.5">
+                <p>1️⃣ اضغط على <b>النقاط الثلاث (...)</b> في الأعلى.</p>
+                <p>2️⃣ اختر <b>"فتح في المتصفح" (Open in Browser)</b> أو كروم.</p>
             </div>
+            <button onclick="copyCurrentLink()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs shadow-lg shadow-purple-900/40">
+                نسخ الرابط للمشاركة 📋
+            </button>
         </div>
     </div>
 
@@ -60,7 +59,7 @@
         <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
             
             <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
-                <!-- النقر 5 مرات على أيقونة الشبح 👻 لفتح لوحة الإحصائيات السرية -->
+                <!-- النقر 5 مرات على أيقونة الشبح 👻 لعرض لوحة الإحصائيات السرية -->
                 <div onclick="revealSecretStats()" title="Admin Trigger" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-purple-400 font-bold text-lg shadow-md cursor-pointer active:scale-95 transition-transform select-none">
                     👻
                 </div>
@@ -239,13 +238,13 @@
 
         const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
 
-        // فحص متصفح فيسبوك وإظهار نافذة الهروب الذكي فوراً
+        // فحص دقيق لمتصفح فيسبوك لإظهار شاشة الحجب الذكية لمنع التعليق
         window.addEventListener('DOMContentLoaded', () => {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             const isFB = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('Instagram') > -1) || (ua.indexOf('FB_IAB') > -1) || (ua.indexOf('FBLite') > -1);
             
             if (isFB) {
-                document.getElementById('fbEscapeModal').classList.remove('hidden');
+                document.getElementById('fbBlockerModal').classList.remove('hidden');
             }
 
             try {
@@ -263,19 +262,11 @@
             } catch (e) {}
         });
 
-        // دالة إجبارية لفتح المتصفح الخارجي وتخطي فيسبوك
-        function openInExternalBrowser() {
-            const currentUrl = window.location.href;
-            if (/android/i.test(navigator.userAgent)) {
-                window.location.href = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
-            } else {
-                window.open(currentUrl, '_system');
-            }
-        }
-
-        function copyLinkAndNotify() {
+        function copyCurrentLink() {
             navigator.clipboard.writeText(window.location.href).then(() => {
-                alert("تم نسخ الرابط بنجاح! افتح متصفح كروم والصقه هناك.");
+                alert("✅ تم نسخ الرابط بنجاح! افتح متصفح كروم (Chrome) أو فانتوم والصقه هناك.");
+            }).catch(() => {
+                alert("الرجاء نسخ الرابط يدوياً وفتحه في متصفح خارجي.");
             });
         }
 
@@ -424,7 +415,6 @@
             }
         }
 
-        // دالة الاتصال الفوري المباشر مع دعم التوجيه الذكي
         async function connectWallet() {
             const t = translations[currentLang];
             try {
