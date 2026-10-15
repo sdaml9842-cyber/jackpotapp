@@ -3,213 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpha Decay (ADL) - Control Panel</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: #1e293b;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 1px solid #334155;
-        }
-        h2 { text-align: center; color: #38bdf8; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
-        .card {
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #334155;
-        }
-        label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 5px; }
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid #475569;
-            background: #1e293b;
-            color: #fff;
-            font-size: 15px;
-            box-sizing: border-box;
-        }
-        input:focus { border-color: #38bdf8; outline: none; }
-        button {
-            background: #38bdf8;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            transition: 0.2s;
-        }
-        button:hover { background: #0ea5e9; }
-        .btn-green { background: #22c55e; color: #fff; }
-        .btn-green:hover { background: #16a34a; }
-        .btn-orange { background: #f59e0b; color: #fff; }
-        .btn-orange:hover { background: #d97706; }
-        #status {
-            background: #0f172a;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #38bdf8;
-            word-break: break-all;
-            border: 1px dashed #334155;
-            min-height: 40px;
-        }
-        .wallet-info { font-size: 13px; color: #34d399; margin-bottom: 15px; text-align: center; }
-    </style>
+    <title>لوحة تحكم عقد تسونامي بوت</title>
+    <!-- استخدام Tailwind CSS للتصميم السريع والأنيق -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- مكتبة Ethers.js للتفاعل مع البلوكشين -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col items-center justify-center p-4">
 
-<div class="container">
-    <h2>Alpha Decay (ADL)</h2>
-    <div class="subtitle">لوحة التحكم التفاعلية لمحرك التسونامي</div>
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6">
+        
+        <!-- رأس الصفحة -->
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+            <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                ⚡ لوحة تحكم التوكن الذكي
+            </h1>
+            <button id="connectBtn" onclick="connectWallet()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-4 py-2 rounded-xl transition text-sm">
+                ربط المحفظة
+            </button>
+        </div>
 
-    <div class="wallet-info" id="walletStatus">المحفظة غير متصلة</div>
-    <button onclick="connectWallet()" class="btn-green">ربط محفظة MetaMask 🦊</button>
+        <!-- حالة المحفظة -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60 text-sm space-y-1">
+            <p class="text-slate-400">حالة الاتصال: <span id="walletStatus" class="text-red-400 font-medium">غير متصل</span></p>
+            <p class="text-slate-400 truncate">المحفظة: <span id="walletAddress" class="text-slate-200">-</span></p>
+        </div>
 
-    <div class="card">
-        <label>عنوان العقد الذكي (Contract Address):</label>
-        <input type="text" id="contractAddress" value="0x30A7333DaeB318eE3ecdE5710EBC34d76c656426" placeholder="0x...">
+        <!-- إدخال عنوان العقد -->
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-slate-300">عنوان العقد المنشور (Contract Address):</label>
+            <input type="text" id="contractAddress" placeholder="0x..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 text-slate-200">
+            <button onclick="loadContractData()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-medium py-2 rounded-xl transition text-sm">
+                تحميل بيانات العقد والتحقق من الروتر
+            </button>
+        </div>
+
+        <!-- بيانات وعتبات العقد -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                <p class="text-xs text-slate-400">رصيد صندوق المكافآت (Bounty Pool)</p>
+                <p id="bountyBalance" class="text-lg font-bold text-amber-400 mt-1">0.00 BNB</p>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                <p class="text-xs text-slate-400">عتبة التسونامي الحالية</p>
+                <p id="currentThreshold" class="text-lg font-bold text-emerald-400 mt-1">0.00 BNB</p>
+            </div>
+        </div>
+
+        <!-- خانة عرض والتحقق من عنوان الروتر المسجل في العقد -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+            <p class="text-xs text-slate-400">عنوان الروتر المسجل في العقد حالياً:</p>
+            <p id="routerAddressDisplay" class="text-xs font-mono text-cyan-400 break-all">-</p>
+        </div>
+
+        <!-- أزرار التفاعل والإجراءات -->
+        <div class="space-y-3 pt-2">
+            <div class="flex gap-2">
+                <input type="number" id="fundAmount" value="0.003" step="0.001" class="w-1/3 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-center text-slate-200">
+                <button onclick="fundContract()" class="w-2/3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-xl transition text-sm">
+                    تمويل العقد بـ BNB (إرسال مباشر)
+                </button>
+            </div>
+            <button onclick="triggerUpkeep()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl transition text-sm">
+                تشغيل دالة التسونامي (Perform Upkeep)
+            </button>
+        </div>
+
     </div>
 
-    <div class="card">
-        <label>كمية الـ ETH:</label>
-        <input type="text" id="ethAmount" value="0.0001" placeholder="0.0001">
-        <button onclick="buyTokens()">شراء توكنات (تغذية المسبح تلقائياً) 🚀</button>
-    </div>
+    <!-- كود الجافاسكريبت للربط والعمليات -->
+    <script>
+        let provider, signer, contract;
 
-    <div class="card">
-        <label>كمية التوكنات للبيع (ADL):</label>
-        <input type="text" id="tokenAmount" value="1000" placeholder="1000">
-        <button onclick="sellTokens()" class="btn-orange">بيع واسترداد الـ ETH 🔄</button>
-    </div>
+        // الـ ABI المحدث يضم دالة pancakeRouter للتحقق الفوري
+        const abi = [
+            "function bountyPool() external view returns (uint256)",
+            "function getCurrentThreshold() external view returns (uint256)",
+            "function pancakeRouter() external view returns (address)",
+            "function performUpkeep(bytes calldata performData) external",
+            "receive() external payable"
+        ];
 
-    <div class="card">
-        <button onclick="depositDirectBounty()" style="background: #8b5cf6; color: #fff;">ضخ ETH مباشر للمسبح 100% ⚡</button>
-        <button onclick="triggerTsunamiManual()" style="background: #ef4444; color: #fff;">تشغيل مهارة التسونامي يدوياً 🔥</button>
-    </div>
-
-    <div class="card">
-        <label>حالة العمليات:</label>
-        <div id="status">جاهز للاستخدام...</div>
-    </div>
-</div>
-
-<script>
-    let provider, signer, contract;
-
-    // ABI محسن ودقيق متوافق تماماً مع Ethers.js
-    const abi = [
-        "function swapETHForTokens() payable",
-        "function swapTokensForETH(uint256 tokenAmount)",
-        "function triggerTsunami()",
-        "receive() payable"
-    ];
-
-    async function connectWallet() {
-        if (typeof window.ethereum !== 'undefined') {
-            try {
-                await ethereum.request({ method: 'eth_requestAccounts' });
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                const address = await signer.getAddress();
-                document.getElementById("walletStatus").innerText = "متصل: " + address.substring(0, 6) + "..." + address.substring(38);
-                document.getElementById("status").innerText = "تم ربط المحفظة بنجاح!";
-            } catch (error) {
-                document.getElementById("status").innerText = "❌ فشل الربط: " + error.message;
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = await provider.getSigner();
+                    const address = await signer.getAddress();
+                    
+                    document.getElementById('walletStatus').innerText = "متصل بنجاح";
+                    document.getElementById('walletStatus').className = "text-emerald-400 font-medium";
+                    document.getElementById('walletAddress').innerText = address;
+                    document.getElementById('connectBtn').innerText = "متصل";
+                } catch (error) {
+                    alert("فشل الاتصال بالمحفظة: " + error.message);
+                }
+            } else {
+                alert("يرجى تثبيت محفظة متوافقة مثل MetaMask أو Binance Web3 Wallet");
             }
-        } else {
-            alert("يرجى تثبيت متصفح يدعم MetaMask أو استخدام متصفح محفظة Web3!");
         }
-    }
 
-    function getContract() {
-        const addr = document.getElementById("contractAddress").value.trim();
-        if (!addr) { alert("الرجاء إدخال عنوان العقد أولاً!"); return null; }
-        return new ethers.Contract(addr, abi, signer);
-    }
+        async function loadContractData() {
+            const addr = document.getElementById('contractAddress').value.trim();
+            if (!ethers.isAddress(addr)) {
+                alert("يرجى إدخال عنوان عقد صحيح!");
+                return;
+            }
+            if (!provider) {
+                alert("يرجى ربط المحفظة أولاً!");
+                return;
+            }
 
-    async function buyTokens() {
-        try {
-            const c = getContract();
-            if (!c) return;
-            const ethVal = document.getElementById("ethAmount").value;
-            document.getElementById("status").innerText = "⏳ جاري تنفيذ الشراء وتغذية المسبح...";
-            
-            const tx = await c.swapETHForTokens({ value: ethers.utils.parseEther(ethVal) });
-            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
-            await tx.wait();
-            document.getElementById("status").innerText = "✅ تمت عملية الشراء وتفعيل مسبح التسونامي بنجاح!";
-        } catch (err) {
-            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
+            try {
+                contract = new ethers.Contract(addr, abi, signer);
+                
+                // جلب البيانات مباشرة من البلوكشين
+                const pool = await contract.bountyPool();
+                const threshold = await contract.getCurrentThreshold();
+                const router = await contract.pancakeRouter();
+
+                document.getElementById('bountyBalance').innerText = ethers.formatEther(pool) + " BNB";
+                document.getElementById('currentThreshold').innerText = ethers.formatEther(threshold) + " BNB";
+                document.getElementById('routerAddressDisplay').innerText = router;
+            } catch (error) {
+                alert("حدث خطأ أثناء قراءة بيانات العقد: " + error.message);
+            }
         }
-    }
 
-    async function sellTokens() {
-        try {
-            const c = getContract();
-            if (!c) return;
-            const tokenVal = document.getElementById("tokenAmount").value;
-            const parsedTokens = ethers.utils.parseUnits(tokenVal, 18);
-            
-            document.getElementById("status").innerText = "⏳ جاري بيع التوكنات لاسترداد الـ ETH...";
-            const tx = await c.swapTokensForETH(parsedTokens);
-            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
-            await tx.wait();
-            document.getElementById("status").innerText = "✅ تم البيع بنجاح واسترداد الـ ETH!";
-        } catch (err) {
-            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
+        async function fundContract() {
+            const addr = document.getElementById('contractAddress').value.trim();
+            const amount = document.getElementById('fundAmount').value;
+            if (!contract || !ethers.isAddress(addr)) {
+                alert("يرجى تحميل العقد أولاً!");
+                return;
+            }
+
+            try {
+                const tx = await signer.sendTransaction({
+                    to: addr,
+                    value: ethers.parseEther(amount)
+                });
+                alert("جاري ارسال معاملة التمويل...");
+                await tx.wait();
+                alert("تم تمويل العقد بنجاح وتمت تعبئة صندوق المكافآت!");
+                loadContractData();
+            } catch (error) {
+                alert("فشلت عملية التمويل: " + error.message);
+            }
         }
-    }
 
-    async function depositDirectBounty() {
-        try {
-            const addr = document.getElementById("contractAddress").value.trim();
-            if (!addr) { alert("أدخل عنوان العقد أولاً!"); return; }
-            const ethVal = document.getElementById("ethAmount").value;
-            
-            document.getElementById("status").innerText = "⏳ جاري ضخ الـ ETH مباشرة للمسبح...";
-            const tx = await signer.sendTransaction({
-                to: addr,
-                value: ethers.utils.parseEther(ethVal)
-            });
-            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
-            await tx.wait();
-            document.getElementById("status").innerText = "⚡ تم ضخ الـ ETH بالكامل لتغذية المسبح!";
-        } catch (err) {
-            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
+        async function triggerUpkeep() {
+            if (!contract) {
+                alert("يرجى تحميل العقد أولاً!");
+                return;
+            }
+
+            try {
+                const tx = await contract.performUpkeep("0x");
+                alert("جاري تنفيذ التسونامي...");
+                await tx.wait();
+                alert("تم تنفيذ موجة التسونامي بنجاح!");
+                loadContractData();
+            } catch (error) {
+                alert("فشل التنفيذ (قد لا تكون الشروط مكتملة بعد): " + error.message);
+            }
         }
-    }
-
-    async function triggerTsunamiManual() {
-        try {
-            const c = getContract();
-            if (!c) return;
-            document.getElementById("status").innerText = "⏳ جاري استدعاء دالة التسونامي اليدوية...";
-            const tx = await c.triggerTsunami();
-            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
-            await tx.wait();
-            document.getElementById("status").innerText = "🔥 تم تشغيل التسونامي بنجاح واستلام المكافأة!";
-        } catch (err) {
-            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>
