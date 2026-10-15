@@ -1,740 +1,215 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" id="htmlRoot">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Sovereign - Solana Master Launchpad</title>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-
+    <title>Alpha Decay (ADL) - Control Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif; background-color: #04060b; color: #f1f5f9; -webkit-font-smoothing: antialiased; }
-        [dir="rtl"] body { font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif; }
-        .sovereign-card {
-            background: rgba(8, 13, 24, 0.96);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.95);
-        }
-        .claim-card {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 78, 59, 0.2) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15);
-        }
-        .trust-badge {
-            background: rgba(16, 185, 129, 0.06);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-        }
-        input, select, button { transition: all 0.2s ease; }
-        .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: transform 0.2s; }
-        .color-dot:hover { transform: scale(1.15); }
-        .color-dot.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 15px rgba(168,85,247,0.8); }
-        @keyframes marquee {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
-        }
-        .animate-ticker {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
             display: flex;
-            width: max-content;
-            animation: marquee 240s linear infinite;
+            justify-content: center;
         }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #334155;
+        }
+        h2 { text-align: center; color: #38bdf8; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+        .card {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #334155;
+        }
+        label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 5px; }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: #fff;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        input:focus { border-color: #38bdf8; outline: none; }
+        button {
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+        button:hover { background: #0ea5e9; }
+        .btn-green { background: #22c55e; color: #fff; }
+        .btn-green:hover { background: #16a34a; }
+        .btn-orange { background: #f59e0b; color: #fff; }
+        .btn-orange:hover { background: #d97706; }
+        #status {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #38bdf8;
+            word-break: break-all;
+            border: 1px dashed #334155;
+            min-height: 40px;
+        }
+        .wallet-info { font-size: 13px; color: #34d399; margin-bottom: 15px; text-align: center; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
+<body>
 
-    <!-- نافذة حظر متصفحات التطبيقات (In-App Block Modal) -->
-    <div id="strictBlockerModal" class="hidden fixed inset-0 bg-[#04060b]/98 z-[999999] flex flex-col items-center justify-center p-6 text-center backdrop-blur-md">
-        <div class="bg-slate-900 border border-purple-500/40 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
-            <div class="w-14 h-14 bg-purple-950 border border-purple-500/50 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">🛡️</div>
-            <h2 class="text-white font-extrabold text-base">متصفح آمن مخصص مطلوب</h2>
-            <p class="text-slate-400 text-xs leading-relaxed">
-                لربط محفظة Phantom وقراءة البيانات بدقة، يرجى فتح المنصة في المتصفح الخارجي.
-            </p>
-            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-right text-[11px] text-slate-300 space-y-1.5">
-                <p>1️⃣ اضغط على <b>النقاط الثلاث (...)</b> في الأعلى.</p>
-                <p>2️⃣ اختر <b>"فتح في المتصفح" (Open in Browser)</b>.</p>
-            </div>
-            <button onclick="copyLinkForUser()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg shadow-purple-900/40">
-                نسخ الرابط للمشاركة والفتح 📋
-            </button>
-        </div>
+<div class="container">
+    <h2>Alpha Decay (ADL)</h2>
+    <div class="subtitle">لوحة التحكم التفاعلية لمحرك التسونامي</div>
+
+    <div class="wallet-info" id="walletStatus">المحفظة غير متصلة</div>
+    <button onclick="connectWallet()" class="btn-green">ربط محفظة MetaMask 🦊</button>
+
+    <div class="card">
+        <label>عنوان العقد الذكي (Contract Address):</label>
+        <input type="text" id="contractAddress" placeholder="0x...">
     </div>
 
-    <!-- شريط الأمان ومراقبة شبكة سولانا الحية -->
-    <div class="bg-slate-950 border-b border-slate-900 text-slate-400 text-[11px] py-2 px-4">
-        <div class="max-w-2xl mx-auto flex justify-between items-center font-mono">
-            <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="solanaTpsDisplay">Solana Mainnet: <strong class="text-emerald-400 font-bold">2,840 TPS</strong></span>
-            </div>
-            <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                <span class="text-purple-400 font-semibold" id="walletBalanceDisplay">Wallet: Not Connected</span>
-            </div>
-        </div>
+    <div class="card">
+        <label>كمية الـ ETH:</label>
+        <input type="text" id="ethAmount" value="0.001" placeholder="0.001">
+        <button onclick="buyTokens()">شراء توكنات (تغذية المسبح تلقائياً) 🚀</button>
     </div>
 
-    <!-- شريط الصفقات والعملات الحي -->
-    <div class="bg-slate-900/90 border-b border-slate-800/80 py-2 overflow-hidden">
-        <div class="animate-ticker space-x-8 rtl:space-x-reverse text-[11px] font-mono text-slate-300" id="liveTickerContainer"></div>
+    <div class="card">
+        <label>كمية التوكنات للبيع (ADL):</label>
+        <input type="text" id="tokenAmount" placeholder="1000">
+        <button onclick="sellTokens()" class="btn-orange">بيع واسترداد الـ ETH 🔄</button>
     </div>
 
-    <!-- Header المؤسسي الاحترافي -->
-    <header class="border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <div class="flex items-center space-x-2.5 rtl:space-x-reverse">
-                <div id="secretAdminTrigger" title="Admin Trigger" class="w-10 h-10 rounded-xl bg-slate-900 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold text-lg shadow-md cursor-pointer active:scale-95 transition-transform select-none">
-                    👻
-                </div>
-                <div>
-                    <div class="flex items-center space-x-1.5 rtl:space-x-reverse">
-                        <span class="font-extrabold text-sm text-white tracking-tight">ChainPump</span>
-                        <span class="text-[9px] bg-purple-950 text-purple-300 font-bold px-1.5 py-0.5 rounded border border-purple-800">SOVEREIGN</span>
-                    </div>
-                    <span class="block text-[9px] text-slate-500 font-semibold" id="headerSubText">Autonomous Launchpad Protocol</span>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <button type="button" onclick="toggleLanguage()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl text-xs" id="langBtn">
-                    🌐 AR
-                </button>
+    <div class="card">
+        <button onclick="depositDirectBounty()" style="background: #8b5cf6; color: #fff;">ضخ ETH مباشر للمسبح 100% ⚡</button>
+        <button onclick="triggerTsunamiManual()" style="background: #ef4444; color: #fff;">تشغيل مهارة التسونامي يدوياً 🔥</button>
+    </div>
 
-                <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3 py-1.5 rounded-xl transition-all text-xs flex items-center space-x-1.5 rtl:space-x-reverse shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                    <span id="connectWalletText">Connect Phantom</span>
-                </button>
-            </div>
-        </div>
-    </header>
+    <div class="card">
+        <label>حالة العمليات:</label>
+        <div id="status">جاهز للاستخدام...</div>
+    </div>
+</div>
 
-    <!-- Main Content -->
-    <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow space-y-5">
+<script>
+    let provider, signer, contract;
 
-        <!-- بطاقات الثقة والأمان الثلاثية -->
-        <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
-            <div class="trust-badge rounded-xl p-2 text-emerald-400 font-bold flex flex-col items-center justify-center space-y-1">
-                <span>🔥 LP Auto-Burnt</span>
-                <span class="text-[9px] text-slate-400 font-normal">100% Permanently Burnt</span>
-            </div>
-            <div class="trust-badge rounded-xl p-2 text-emerald-400 font-bold flex flex-col items-center justify-center space-y-1">
-                <span>🔒 Authority Revoked</span>
-                <span class="text-[9px] text-slate-400 font-normal">Mint & Freeze Disabled</span>
-            </div>
-            <div class="trust-badge rounded-xl p-2 text-emerald-400 font-bold flex flex-col items-center justify-center space-y-1">
-                <span>🛡️ Anti-Sniper Shield</span>
-                <span class="text-[9px] text-slate-400 font-normal">Fair Launch Engine</span>
-            </div>
-        </div>
+    // ABI العقد المبسط لتفعيل الدوال الأساسية
+    const abi = [
+        "function swapETHForTokens() external payable",
+        "function swapTokensForETH(uint256 tokenAmount) external",
+        "function triggerTsunami() external",
+        "receive() external payable"
+    ];
 
-        <!-- 💰 قسم الإحالات المحسّن -->
-        <div class="claim-card rounded-2xl p-4.5 shadow-xl space-y-3.5">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                    <span class="text-lg">⚡</span>
-                    <div>
-                        <h2 class="font-extrabold text-white text-xs tracking-tight" id="revShareTitle">Sovereign Referral Yield Engine</h2>
-                        <span class="text-[10px] text-emerald-400 font-semibold" id="revShareSubtitle">Instant On-Chain Settlement</span>
-                    </div>
-                </div>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider animate-pulse" id="revShareBadge">Zero Minimum Withdrawal</span>
-            </div>
-
-            <p class="text-[11px] text-slate-300 leading-relaxed" id="revShareDesc">
-                Get rewarded with <strong>20% instant commission</strong> for every token deployment. No threshold, no lockups — withdraw accumulated SOL directly to your Phantom wallet at any time.
-            </p>
-            
-            <div class="grid grid-cols-2 gap-2.5">
-                <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col justify-between">
-                    <span class="block text-[10px] text-slate-400 mb-1" id="refCountLabel">Total Ref Launches</span>
-                    <span id="refCountText" class="text-sm font-black text-white font-mono">0 Launches</span>
-                </div>
-                
-                <div class="bg-slate-950/80 border border-emerald-500/30 p-3 rounded-xl flex items-center justify-between shadow-inner">
-                    <div>
-                        <span class="block text-[10px] text-slate-400 mb-0.5" id="refEarnedLabel">Claimable Balance</span>
-                        <span id="refEarnedText" class="text-sm font-black text-emerald-400 font-mono">0.0000 SOL</span>
-                    </div>
-                    <button type="button" onclick="claimRewards()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs px-3 py-2 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center space-x-1 rtl:space-x-reverse active:scale-95 transition-all">
-                        <span>Instant Claim</span> <span>⚡</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <input type="text" id="referralLinkInput" readonly value="Connect wallet to generate referral link..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-purple-300 font-mono text-left ltr:text-left rtl:text-right focus:outline-none">
-                <button type="button" id="copyBtn" onclick="copyReferralLink()" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs flex-shrink-0 shadow-md">
-                    Copy Link
-                </button>
-            </div>
-        </div>
-
-        <!-- Launch Card (بطاقة الإصدار السيادي) -->
-        <div class="sovereign-card rounded-2xl p-5 shadow-2xl space-y-4">
-            <div class="border-b border-slate-800/80 pb-3 flex justify-between items-center">
-                <div>
-                    <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign Token Deployment</h1>
-                    <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.</p>
-                </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v4.2 SECURE</span>
-            </div>
-
-            <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-4">
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-bold text-slate-300" id="nameLabel">Token Name</label>
-                        <button type="button" onclick="spinDestinyWheel()" class="text-[11px] text-purple-400 hover:underline flex items-center space-x-1" id="genNameBtn">
-                            <span>🎲</span> <span>Generate Sovereign Name</span>
-                        </button>
-                    </div>
-                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="e.g. Solana Sovereign AI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold mb-1 text-slate-300" id="symbolLabel">Ticker Symbol</label>
-                    <input type="text" id="tokenSymbol" oninput="updateLivePreview()" required placeholder="e.g. SOV" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 uppercase focus:outline-none focus:border-purple-500">
-                </div>
-
-                <!-- Live Preview -->
-                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex items-center space-x-3 rtl:space-x-reverse">
-                    <div id="previewLogoContainer" class="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400 text-sm overflow-hidden flex-shrink-0">
-                        <span id="previewLogoText">👻</span>
-                    </div>
-                    <div class="flex-grow">
-                        <h3 id="previewName" class="font-bold text-white text-xs">Digital Asset Name</h3>
-                        <p id="previewSymbol" class="text-[10px] text-slate-500 uppercase font-mono">SYMBOL</p>
-                    </div>
-                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold" id="readyBadge">Secured</span>
-                </div>
-
-                <!-- Visual Identity & Logo -->
-                <div class="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 space-y-3">
-                    <label class="block text-xs font-bold text-slate-300" id="logoSourceLabel">Visual Identity & Logo (Open Studio)</label>
-                    
-                    <div class="space-y-1.5">
-                        <span class="text-[11px] text-purple-400 font-semibold block">✨ AI Studio Prompt</span>
-                        <div class="flex space-x-2 rtl:space-x-reverse">
-                            <input type="text" id="aiPromptInput" placeholder="Enter sovereign logo prompt..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
-                            <button type="button" id="aiGenBtn" onclick="generateRealAILogo()" class="bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold px-3 py-2 rounded-xl text-xs flex-shrink-0">Generate ✨</button>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <span class="text-[11px] text-slate-400 font-semibold block">📁 File Upload</span>
-                        <input type="file" id="logoFile" accept="image/*" class="hidden" onchange="handleFileSelected(this)">
-                        <button type="button" onclick="document.getElementById('logoFile').click()" class="w-full bg-slate-900 hover:bg-slate-800 text-purple-300 border border-slate-700 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                            <span>📁</span>
-                            <span id="uploadBtnText">Choose Image File...</span>
-                        </button>
-                        <span id="fileNameDisplay" class="block text-[10px] text-slate-500 font-mono text-center">No file chosen</span>
-                    </div>
-
-                    <div class="space-y-2 pt-1">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[11px] text-slate-400 font-semibold" id="brushColorText">🎨 Color Canvas:</span>
-                            <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                                <div onclick="setBrushColor('#a855f7', this)" class="color-dot active" style="background-color: #a855f7;" title="Purple"></div>
-                                <div onclick="setBrushColor('#10b981', this)" class="color-dot" style="background-color: #10b981;" title="Green"></div>
-                                <div onclick="setBrushColor('#3b82f6', this)" class="color-dot" style="background-color: #3b82f6;" title="Blue"></div>
-                                <div onclick="setBrushColor('#f59e0b', this)" class="color-dot" style="background-color: #f59e0b;" title="Gold"></div>
-                                <div onclick="setBrushColor('#ffffff', this)" class="color-dot" style="background-color: #ffffff;" title="White"></div>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-center bg-slate-900 border border-slate-800 rounded-xl p-2">
-                            <canvas id="logoCanvas" width="160" height="140" class="bg-[#04060b] border border-slate-700 rounded-lg cursor-crosshair touch-none shadow-inner"></canvas>
-                        </div>
-                        
-                        <div class="flex space-x-2 rtl:space-x-reverse">
-                            <button type="button" onclick="clearCanvas()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-2 rounded-xl text-xs" id="clearBtn">Clear 🗑️</button>
-                            <button type="button" onclick="useCanvasAsLogo()" class="w-1/2 bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 font-bold py-2 rounded-xl text-xs" id="applyBtn">Apply ✨</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1.5 text-slate-400 font-mono">
-                    <div class="flex justify-between">
-                        <span id="supplyLabel" class="font-sans">Total Fixed Supply:</span>
-                        <span class="font-bold text-slate-200">1,000,000,000 SPL</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span id="feeProtocolLabel" class="font-sans">Autonomous Protocol Fee (Includes Auto-Seed):</span>
-                        <span id="feeLabel" class="font-bold text-purple-400">0.01 SOL</span>
-                    </div>
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-3.5 rounded-xl text-xs tracking-wide shadow-lg shadow-purple-900/30">
-                    Connect Wallet & Deploy Sovereign Contract 🚀
-                </button>
-            </form>
-
-            <div id="statusBox" class="mt-3 hidden p-3 rounded-xl text-xs border space-y-2"></div>
-        </div>
-    </main>
-
-    <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-4 text-[11px] text-slate-600">
-        <p>© 2026 ChainPump Sovereign Protocol — Powered by Autonomous Solana Engine</p>
-    </footer>
-
-    <script>
-        let currentLang = 'en';
-        let userAddress = "";
-        let canvas, ctx, painting = false;
-        let brushColor = "#a855f7";
-
-        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
-
-        const massiveSolanaTokens = [
-            "BONK", "WIF", "BOME", "POPCAT", "SLERF", "MEW", "MYRO", "SILLY", "PONKE", "SAMO",
-            "CHONKY", "MANEKI", "WEN", "NOP", "GIGA", "RETARDIO", "SHIT", "PEPER", "TOST", "SCAM",
-            "SOLZ", "GOAT", "LUCE", "PNUT", "MOODENG", "SUNDOG", "MICHI", "NEIRO", "KOMA", "ZEREBRO"
-        ];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isAppBrowser = /FBAN|FBAV|Instagram|FB_IAB|FBLite|Twitter|LinkedInApp|Telegram/i.test(ua);
-            
-            if (isAppBrowser) {
-                document.getElementById('strictBlockerModal').classList.remove('hidden');
-            }
-
+    async function connectWallet() {
+        if (typeof window.ethereum !== 'undefined') {
             try {
-                let v = parseInt(localStorage.getItem('cp_visitor_exact') || "0") + 1;
-                localStorage.setItem('cp_visitor_exact', v);
-
-                const urlParams = new URLSearchParams(window.location.search);
-                let refParam = urlParams.get('ref');
-                if (refParam) {
-                    refParam = refParam.split('&')[0].trim();
-                    if (refParam.length >= 32) {
-                        localStorage.setItem('chainpump_referrer', refParam);
-                    }
-                }
-            } catch (e) {}
-
-            let secretClicks = 0;
-            const triggerEl = document.getElementById('secretAdminTrigger');
-            if(triggerEl) {
-                triggerEl.addEventListener('click', () => {
-                    secretClicks++;
-                    if(secretClicks >= 5) {
-                        secretClicks = 0;
-                        let total = localStorage.getItem('cp_visitor_exact') || "1";
-                        alert(`🔒 [Sovereign Admin Console]\n\n📊 Total Verified Visitors: ${total}\n⚡ Autonomous Engine: Operational & Secure`);
-                    }
-                });
+                await ethereum.request({ method: 'eth_requestAccounts' });
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                const address = await signer.getAddress();
+                document.getElementById("walletStatus").innerText = "متصل: " + address.substring(0, 6) + "..." + address.substring(38);
+                document.getElementById("status").innerText = "تم ربط المحفظة بنجاح!";
+            } catch (error) {
+                document.getElementById("status").innerText = "❌ فشل الربط: " + error.message;
             }
-
-            populateMassiveTicker();
-            setTimeout(initCanvas, 100);
-        });
-
-        function populateMassiveTicker() {
-            const container = document.getElementById('liveTickerContainer');
-            if (!container) return;
-            container.innerHTML = "";
-
-            let shuffled = [...massiveSolanaTokens].sort(() => 0.5 - Math.random());
-            let fullList = [...shuffled, ...shuffled];
-
-            fullList.forEach(token => {
-                const priceChange = (Math.random() * 95 - 15).toFixed(1);
-                const isPositive = parseFloat(priceChange) >= 0;
-                const emoji = isPositive ? "🟢" : "🔻";
-                const colorClass = isPositive ? "text-emerald-400" : "text-rose-400";
-                const vol = Math.floor(Math.random() * 150 + 10);
-
-                const span = document.createElement('span');
-                span.className = "flex items-center space-x-1.5 inline-block mx-4 font-mono";
-                span.innerHTML = `${emoji} <strong class="text-white">${token}</strong> <span class="${colorClass}">${isPositive ? '+' : ''}${priceChange}%</span> <span class="text-slate-500 text-[10px]">$${vol}K Vol</span>`;
-                container.appendChild(span);
-            });
+        } else {
+            alert("يرجى تثبيت متصفح يدعم MetaMask أو استخدام متصفح محفظة Web3!");
         }
+    }
 
-        function copyLinkForUser() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                alert("✅ تم نسخ الرابط بنجاح! افتح متصفح كروم أو فانتوم والصقه هناك.");
-            }).catch(() => {
-                alert("يرجى نسخ الرابط يدويًا وفتحه في متصفح خارجي.");
-            });
-        }
+    function getContract() {
+        const addr = document.getElementById("contractAddress").value.trim();
+        if (!addr) { alert("الرجاء إدخال عنوان العقد أولاً!"); return null; }
+        return new ethers.Contract(addr, abi, signer);
+    }
 
-        const translations = {
-            en: {
-                topSec: "⚡ Live Solana Mainnet Stream",
-                headerSub: "Autonomous Launchpad Protocol",
-                connectWallet: "Connect Phantom",
-                revShare: "Sovereign Referral Yield Engine",
-                revShareSubtitle: "Instant On-Chain Settlement",
-                revBadge: "Zero Minimum Withdrawal",
-                revShareDesc: "Get rewarded with <strong>20% instant commission</strong> for every token deployment. No threshold, no lockups — withdraw accumulated SOL directly to your Phantom wallet at any time.",
-                refCount: "Total Ref Launches",
-                refEarned: "Claimable Balance",
-                refInputDefault: "Connect wallet to generate referral link...",
-                copy: "Copy Link",
-                engineTitle: "Sovereign Token Deployment",
-                engineDesc: "Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.",
-                step1: "1. Data", step2: "2. Setup", step3: "3. Liquidity", step4: "4. Security",
-                nameLabel: "Token Name",
-                genName: "🎲 Generate Sovereign Name",
-                symbolLabel: "Ticker Symbol",
-                ready: "Secured",
-                logoSource: "Visual Identity & Logo (Open Studio)",
-                aiPromptPlaceholder: "Enter sovereign logo prompt...",
-                uploadBtn: "Choose Image File...",
-                noFile: "No file chosen",
-                brushColorText: "🎨 Color Canvas:",
-                clearBtn: "Clear 🗑️",
-                applyBtn: "Apply ✨",
-                supply: "Total Fixed Supply:",
-                feeProtocol: "Autonomous Protocol Fee (Includes Auto-Seed):",
-                submitBtn: "Connect Wallet & Deploy Sovereign Contract 🚀",
-                walletConnectedMsg: "Phantom wallet connected securely & successfully!",
-                copiedMsg: "Referral link copied successfully!",
-                launchSuccessMsg: "🎉 Sovereign contract deployment URI triggered on Solana!"
-            },
-            ar: {
-                topSec: "⚡ بث بيانات شبكة سولانا الحية",
-                headerSub: "بروتوكول الإصدار السيادي",
-                connectWallet: "ربط Phantom",
-                revShare: "محرك عوائد الإحالة السيادي",
-                revShareSubtitle: "تسوية فورية عبر البلوكشين",
-                revBadge: "بدون حد أدنى للسحب",
-                revShareDesc: "احصل على **عمولة فورية 20%** عن كل عملية إصدار تتم عبر رابطك. لا توجد شروط أو قيود احتجاز — اسحب أرباحك من عملات SOL إلى محفظة Phantom مباشرة وفي أي وقت.",
-                refCount: "إجمالي عمليات الإحالة",
-                refEarned: "الرصيد المتاح للسحب",
-                refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
-                copy: "نسخ الرابط",
-                engineTitle: "إصدار العملات السيادية",
-                engineDesc: "إنشاء أصول SPL مع دعم السيولة العكسية التلقائية ودرع الحماية.",
-                step1: "1. البيانات", step2: "2. التجهيز", step3: "3. السيولة", step4: "4. الأمان",
-                nameLabel: "اسم العملة / الأصل",
-                genName: "🎲 توليد اسم سيادي",
-                symbolLabel: "الرمز المالي المقتضب",
-                ready: "آمن",
-                logoSource: "الهوية البصرية والشعار (استديو مفتوح)",
-                aiPromptPlaceholder: "وصف شعار العملة السيادية...",
-                uploadBtn: "اختيار صورة الشعار...",
-                noFile: "لم يتم اختيار أي ملف",
-                brushColorText: "🎨 لوحة الرسم الحر:",
-                clearBtn: "مسح 🗑️",
-                applyBtn: "اعتماد ✨",
-                supply: "إجمالي المعروض الثابت:",
-                feeProtocol: "رسوم البروتوكول (تشمل السيولة العكسية):",
-                submitBtn: "ربط المحفظة ونشر العقد السيادي 🚀",
-                walletConnectedMsg: "تم ربط محفظة Phantom بأمان ونجاح!",
-                copiedMsg: "تم نسخ رابط الشريك بنجاح!",
-                launchSuccessMsg: "🎉 تم تفعيل عقد الإصدار السيادي على شبكة سولانا بنجاح!"
-            }
-        };
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'ar' : 'en';
-            const root = document.getElementById('htmlRoot');
-            root.setAttribute('lang', currentLang);
-            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-            document.getElementById('langBtn').innerText = currentLang === 'en' ? '🌐 AR' : '🌐 EN';
+    async function buyTokens() {
+        try {
+            const c = getContract();
+            if (!c) return;
+            const ethVal = document.getElementById("ethAmount").value;
+            document.getElementById("status").innerText = "⏳ جاري تنفيذ الشراء وتغذية المسبح...";
             
-            const t = translations[currentLang];
-            document.getElementById('topSecText').innerText = t.topSec;
-            document.getElementById('headerSubText').innerText = t.headerSub;
-            if(!userAddress) {
-                document.getElementById('connectWalletText').innerText = t.connectWallet;
-                document.getElementById('referralLinkInput').value = t.refInputDefault;
-            }
-            document.getElementById('revShareTitle').innerText = t.revShare;
-            document.getElementById('revShareSubtitle').innerText = t.revShareSubtitle;
-            document.getElementById('revShareBadge').innerText = t.revBadge;
-            document.getElementById('revShareDesc').innerHTML = t.revShareDesc;
-            document.getElementById('refCountLabel').innerText = t.refCount;
-            document.getElementById('refEarnedLabel').innerText = t.refEarned;
-            document.getElementById('copyBtn').innerText = t.copy;
-            document.getElementById('engineTitle').innerText = t.engineTitle;
-            document.getElementById('engineDesc').innerText = t.engineDesc;
-            document.getElementById('step1').innerText = t.step1;
-            document.getElementById('step2').innerText = t.step2;
-            document.getElementById('step3').innerText = t.step3;
-            document.getElementById('step4').innerText = t.step4;
-            document.getElementById('nameLabel').innerText = t.nameLabel;
-            document.getElementById('genNameBtn').innerHTML = `<span>🎲</span> <span>${t.genName.replace('🎲 ', '')}</span>`;
-            document.getElementById('symbolLabel').innerText = t.symbolLabel;
-            document.getElementById('readyBadge').innerText = t.ready;
-            document.getElementById('logoSourceLabel').innerText = t.logoSource;
-            document.getElementById('aiPromptInput').placeholder = t.aiPromptPlaceholder;
-            document.getElementById('uploadBtnText').innerText = t.uploadBtn;
-            document.getElementById('fileNameDisplay').innerText = t.noFile;
-            document.getElementById('brushColorText').innerText = t.brushColorText;
-            document.getElementById('clearBtn').innerText = t.clearBtn;
-            document.getElementById('applyBtn').innerText = t.applyBtn;
-            document.getElementById('supplyLabel').innerText = t.supply;
-            document.getElementById('feeProtocolLabel').innerText = t.feeProtocol;
-            document.getElementById('submitBtn').innerText = t.submitBtn;
+            const tx = await c.swapETHForTokens({ value: ethers.utils.parseEther(ethVal) });
+            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
+            await tx.wait();
+            document.getElementById("status").innerText = "✅ تمت عملية الشراء وتفعيل مسبح التسونامي بنجاح!";
+        } catch (err) {
+            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
         }
+    }
 
-        function handleFileSelected(input) {
-            const t = translations[currentLang];
-            if (input.files && input.files[0]) {
-                const fileName = input.files[0].name;
-                document.getElementById('fileNameDisplay').innerText = fileName;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewLogoContainer').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">`;
-                }
-                reader.readAsDataURL(input.files[0]);
-                showStatus(currentLang === 'ar' ? "تم تحميل الصورة بنجاح!" : "Image loaded successfully!", "success");
-            } else {
-                document.getElementById('fileNameDisplay').innerText = t.noFile;
-            }
+    async function sellTokens() {
+        try {
+            const c = getContract();
+            if (!c) return;
+            const tokenVal = document.getElementById("tokenAmount").value;
+            const parsedTokens = ethers.utils.parseUnits(tokenVal, 18);
+            
+            document.getElementById("status").innerText = "⏳ جاري بيع التوكنات لاسترداد الـ ETH...";
+            const tx = await c.swapTokensForETH(parsedTokens);
+            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
+            await tx.wait();
+            document.getElementById("status").innerText = "✅ تم البيع بنجاح واسترداد الـ ETH!";
+        } catch (err) {
+            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
         }
+    }
 
-        async function connectWallet() {
-            const t = translations[currentLang];
-            try {
-                const provider = window.phantom?.solana || window.solana;
-                if (provider && provider.isPhantom) {
-                    const response = await provider.connect();
-                    userAddress = response.publicKey.toString();
-
-                    try {
-                        const rpcRes = await fetch("https://api.mainnet-beta.solana.com", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                jsonrpc: "2.0",
-                                id: 1,
-                                method: "getBalance",
-                                params: [userAddress]
-                            })
-                        });
-                        const rpcData = await rpcRes.json();
-                        if (rpcData && rpcData.result && typeof rpcData.result.value === 'number') {
-                            const solBalance = (rpcData.result.value / 1e9).toFixed(4);
-                            document.getElementById('walletBalanceDisplay').innerHTML = `Balance: <strong class="text-emerald-400 font-mono">${solBalance} SOL</strong>`;
-                        }
-                    } catch (netErr) {
-                        const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
-                        document.getElementById('walletBalanceDisplay').innerHTML = `Connected: <strong class="text-emerald-400 font-mono">${shortAddr}</strong>`;
-                    }
-
-                } else {
-                    const currentUrl = window.location.href;
-                    window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
-                    return;
-                }
-            } catch (err) {
-                showStatus("Connection canceled or failed.", "error");
-                return;
-            }
-
-            if(userAddress) {
-                const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
-                document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>${shortAddr}</span>`;
-                document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
-                showStatus(t.walletConnectedMsg, "success");
-            }
-        }
-
-        function copyReferralLink() {
-            const input = document.getElementById('referralLinkInput');
-            const t = translations[currentLang];
-            if(!userAddress) { showStatus("Please connect wallet first!", "error"); return; }
-            navigator.clipboard.writeText(input.value).then(() => {
-                showStatus(t.copiedMsg, "success");
+    async function depositDirectBounty() {
+        try {
+            const addr = document.getElementById("contractAddress").value.trim();
+            if (!addr) { alert("أدخل عنوان العقد أولاً!"); return; }
+            const ethVal = document.getElementById("ethAmount").value;
+            
+            document.getElementById("status").innerText = "⏳ جاري ضخ الـ ETH مباشرة للمسبح...";
+            const tx = await signer.sendTransaction({
+                to: addr,
+                value: ethers.utils.parseEther(ethVal)
             });
+            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
+            await tx.wait();
+            document.getElementById("status").innerText = "⚡ تم ضخ الـ ETH بالكامل لتغذية المسبح!";
+        } catch (err) {
+            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
         }
+    }
 
-        function claimRewards() {
-            if(!userAddress) {
-                showStatus(currentLang === 'ar' ? "يرجى ربط محفظة Phantom أولاً لمشاهدة رصيد العوائد السحابي." : "Please connect Phantom wallet first to view claimable balance.", "error");
-                return;
-            }
-            showStatus(currentLang === 'ar' ? "الرصيد القابل للسحب حالياً هو 0.0000 SOL. سيتم تحويل أي عوائد ناتجة عن روابطك فورياً ومباشرة إلى محفظتك المربوطة!" : "Current claimable balance is 0.0000 SOL. Any referral rewards will be credited instantly to your connected wallet!", "success");
+    async function triggerTsunamiManual() {
+        try {
+            const c = getContract();
+            if (!c) return;
+            document.getElementById("status").innerText = "⏳ جاري استدعاء دالة التسونامي اليدوية...";
+            const tx = await c.triggerTsunami();
+            document.getElementById("status").innerText = "⏳ بانتظار التأكيد... Tx: " + tx.hash;
+            await tx.wait();
+            document.getElementById("status").innerText = "🔥 تم تشغيل التسونامي بنجاح واستلام المكافأة!";
+        } catch (err) {
+            document.getElementById("status").innerText = "❌ خطأ: " + (err.reason || err.message);
         }
+    }
+</script>
 
-        function updateLivePreview() {
-            const nameVal = document.getElementById("tokenName").value.trim();
-            const symbolVal = document.getElementById("tokenSymbol").value.trim();
-            document.getElementById("previewName").innerText = nameVal || (currentLang === 'ar' ? "اسم الأصل الرقمي" : "Digital Asset Name");
-            document.getElementById("previewSymbol").innerText = symbolVal ? symbolVal.toUpperCase() : "SYMBOL";
-        }
-
-        function spinDestinyWheel() {
-            const list = [
-                { name: "Solana Sovereign Prime", symbol: "PRIME" },
-                { name: "Quantum Autonomous Vault", symbol: "QVLT" },
-                { name: "Alpha Sovereign AI", symbol: "SOVAI" }
-            ];
-            const pick = list[Math.floor(Math.random() * list.length)];
-            document.getElementById("tokenName").value = pick.name;
-            document.getElementById("tokenSymbol").value = pick.symbol;
-            updateLivePreview();
-        }
-
-        function initCanvas() {
-            canvas = document.getElementById('logoCanvas');
-            if(!canvas) return;
-            ctx = canvas.getContext('2d');
-            ctx.strokeStyle = brushColor;
-            ctx.lineWidth = 4;
-            ctx.lineCap = 'round';
-            ctx.fillStyle = '#04060b';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            canvas.addEventListener('mousedown', startPosition);
-            canvas.addEventListener('mouseup', endPosition);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e.touches[0]); });
-            canvas.addEventListener('touchend', (e) => { e.preventDefault(); endPosition(); });
-            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
-        }
-
-        function setBrushColor(color, element) {
-            brushColor = color;
-            if(ctx) ctx.strokeStyle = brushColor;
-            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function startPosition(e) { painting = true; draw(e); }
-        function endPosition() { painting = false; ctx.beginPath(); }
-        function draw(e) {
-            if(!painting) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.pageX) - rect.left;
-            const y = (e.clientY || e.pageY) - rect.top;
-            ctx.strokeStyle = brushColor;
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        }
-        function clearCanvas() {
-            if(!ctx) return;
-            ctx.fillStyle = '#04060b';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        function useCanvasAsLogo() {
-            if(!canvas) return;
-            const dataUrl = canvas.toDataURL('image/png');
-            document.getElementById('previewLogoContainer').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-lg">`;
-            showStatus(currentLang === 'ar' ? "تم اعتماد الشعار السيادي بنجاح!" : "Sovereign logo applied successfully!", "success");
-        }
-
-        async function generateRealAILogo() {
-            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana sovereign token logo vector minimal dark";
-            const btn = document.getElementById('aiGenBtn');
-            btn.innerText = currentLang === 'ar' ? "جاري التوليد... ⏳" : "Generating... ⏳";
-            const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
-            const img = new Image();
-            img.src = generatedUrl;
-            img.onload = () => {
-                document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
-                btn.innerText = currentLang === 'ar' ? "اعتماد ✨" : "Generate ✨";
-            };
-        }
-
-        function generateRealisticSolanaAddress() {
-            const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-            let result = "";
-            for (let i = 0; i < 44; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        function handleLaunch(event) {
-            if (event) event.preventDefault();
-            
-            const tokenName = document.getElementById("tokenName").value.trim();
-            const tokenSymbol = document.getElementById("tokenSymbol").value.trim();
-
-            if (!tokenName || !tokenSymbol) {
-                showStatus(currentLang === 'ar' ? "يرجى إدخال اسم ورمز العملة." : "Please enter token name and symbol.", "error");
-                return;
-            }
-
-            const mockMintAddress = generateRealisticSolanaAddress();
-            const amountSol = "0.01"; // تم التحديث إلى القيمة الجديدة المقترحة
-            const phantomPayUrl = `solana:${ADMIN_SOL_WALLET}?amount=${amountSol}&label=ChainPump%20Sovereign&message=AutoSeed%20Deployment%20Fee`;
-            const solscanTxUrl = `https://solscan.io/tx/pending_${mockMintAddress}`;
-            
-            showStatus(
-                currentLang === 'ar' 
-                ? `
-                    <div class="space-y-3 text-right">
-                        <div class="flex items-center space-x-2 rtl:space-x-reverse text-emerald-400 font-bold text-xs">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                            <span>جاري معالجة العقد الذكي في طابور البلوكشين (Mempool)...</span>
-                        </div>
-
-                        <div class="bg-slate-900 p-3.5 rounded-xl border border-purple-500/30 font-mono text-[11px] text-slate-300 space-y-2">
-                            <div><span class="text-purple-400 font-bold">Generated Mint Hash:</span></div>
-                            <div class="bg-slate-950 p-2 rounded text-[10px] break-all text-emerald-300 select-all border border-slate-800">${mockMintAddress}</div>
-                            
-                            <div class="space-y-1 pt-1 text-[10px] text-slate-400 border-t border-slate-800">
-                                <p id="step1" class="text-emerald-400">✓ Initializing SPL Mint Account...</p>
-                                <p id="step2" class="animate-pulse text-amber-400">⏳ Waiting for Validator Signature & Fee Confirmation...</p>
-                            </div>
-
-                            <div class="pt-1 flex justify-between items-center text-[10px]">
-                                <span class="text-purple-300">حالة الشبكة:</span>
-                                <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">تتبع حالة الـ Mempool ↗</a>
-                            </div>
-                        </div>
-
-                        <a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">
-                            انقر هنا لتأكيد رسوم النشر (0.01 SOL) في محفظة Phantom 👻
-                        </a>
-                    </div>
-                  `
-                : `
-                    <div class="space-y-3 text-left">
-                        <div class="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                            <span>Processing Smart Contract in Mempool Queue...</span>
-                        </div>
-
-                        <div class="bg-slate-900 p-3.5 rounded-xl border border-purple-500/30 font-mono text-[11px] text-slate-300 space-y-2">
-                            <div><span class="text-purple-400 font-bold">Generated Mint Hash:</span></div>
-                            <div class="bg-slate-950 p-2 rounded text-[10px] break-all text-emerald-300 select-all border border-slate-800">${mockMintAddress}</div>
-                            
-                            <div class="space-y-1 pt-1 text-[10px] text-slate-400 border-t border-slate-800">
-                                <p id="step1" class="text-emerald-400">✓ Initializing SPL Mint Account...</p>
-                                <p id="step2" class="animate-pulse text-amber-400">⏳ Waiting for Validator Signature & Fee Confirmation...</p>
-                            </div>
-
-                            <div class="pt-1 flex justify-between items-center text-[10px]">
-                                <span class="text-purple-300">Network Status:</span>
-                                <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">Track Mempool Status ↗</a>
-                            </div>
-                        </div>
-
-                        <a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">
-                            Click to confirm deployment fee (0.01 SOL) in Phantom 👻
-                        </a>
-                    </div>
-                  `,
-                "success"
-            );
-
-            setTimeout(() => {
-                const s2 = document.getElementById('step2');
-                if(s2) { s2.className = "text-emerald-400"; s2.innerText = currentLang === 'ar' ? "✓ تم توقيع العقد وبانتظار تأكيد عمال التدقيق (Validators)" : "✓ Contract signed, awaiting validator consensus"; }
-            }, 3000);
-
-            setTimeout(() => {
-                const anchor = document.getElementById("phantomDirectAnchor");
-                if (anchor) anchor.click();
-            }, 100);
-        }
-
-        function showStatus(message, type) {
-            const box = document.getElementById("statusBox");
-            box.classList.remove("hidden", "bg-purple-950/60", "border-purple-800", "text-purple-300", "bg-emerald-950/60", "border-emerald-800", "text-emerald-300");
-            box.classList.add(type === "success" ? "bg-emerald-950/60" : "bg-purple-950/60", "border-purple-800", "text-purple-300");
-            box.innerHTML = message;
-        }
-    </script>
 </body>
 </html>
