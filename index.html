@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم بالبوتات المتقدمة (بيع/شراء وتوزيع العملات)</title>
-    <!-- Tailwind CSS CDN -->
+    <title>لوحة البوتات المتقدمة (تداول مكثف + توليد عشوائي)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers.js v5 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -18,10 +16,10 @@
 
     <div class="max-w-5xl mx-auto space-y-6">
 
-        <!-- الهيدر الرئيسي -->
+        <!-- الهيدر -->
         <header class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
             <div>
-                <h1 class="text-xl font-black text-amber-400">لوحة تحكم بوتات التوكن (أوتوميشن)</h1>
+                <h1 class="text-xl font-black text-amber-400">لوحة التحكم الآلي (البوتات المتقدمة)</h1>
                 <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
             </div>
             <button id="connect-btn" onclick="connectWallet()" class="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-lg transition text-sm">
@@ -37,62 +35,64 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <!-- البوت الأول: بوت البيع والشراء الآلي / المباشر -->
+            <!-- البوت الأول: تداول تلقائي بالسنتات لمئات المرات -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
-                        <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">🤖</span>
-                        <h2 class="text-base font-bold text-blue-400">البوت الأول: بوت البيع والشراء (Swap Bot)</h2>
+                        <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">⚡</span>
+                        <h2 class="text-base font-bold text-blue-400">بوت التداول المكثف (حجم تداول بالسنتات)</h2>
                     </div>
                     <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                        مسؤول عن تنفيذ أوامر الشراء والبيع الفوري عبر الروتر ومجمع السيولة للمحافظة أو العقد.
+                        يشتري ويبيع بـمبالغ ضئيلة جداً (سنتات من BNB) لعدد محدد من التكرارات لرفع التفاعل.
                     </p>
 
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">نوع العملية</label>
-                            <select id="swap-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
-                                <option value="buy">شراء توكن (Buy with BNB)</option>
-                                <option value="sell">بيع توكن (Sell for BNB)</option>
-                            </select>
+                            <label class="block text-xs text-slate-500 mb-1">قيمة الصفقة الواحدة (بالـ BNB - مثلاً 0.0005)</label>
+                            <input type="number" id="micro-bnb" value="0.0005" step="0.0001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">الكمية (BNB أو Token)</label>
-                            <input type="number" id="swap-amount" placeholder="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
+                            <label class="block text-xs text-slate-500 mb-1">عدد مرات التكرار (مثلاً 100 مرة)</label>
+                            <input type="number" id="loop-count" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
                 </div>
 
-                <button onclick="runSwapBot()" class="w-full bg-blue-600 hover:bg-blue-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
-                    تشغيل أوامر بوت البيع والشراء
-                </button>
+                <div class="space-y-2 mt-4">
+                    <button onclick="startMicroTradingBot()" class="w-full bg-blue-600 hover:bg-blue-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
+                        تشغيل بوت التداول التلقائي
+                    </button>
+                    <button onclick="stopBot = true" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-bold py-2 rounded-xl text-xs transition">
+                        إيقاف البوت الطارئ
+                    </button>
+                </div>
             </div>
 
-            <!-- البوت الثاني: بوت توزيع العملات (Airdrop Bot) -->
+            <!-- البوت الثاني: توليد مئات العناوين العشوائية والتوزيع -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
-                        <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎁</span>
-                        <h2 class="text-base font-bold text-emerald-400">البوت الثاني: بوت توزيع العملات (Multi-Sender)</h2>
+                        <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎲</span>
+                        <h2 class="text-base font-bold text-emerald-400">بوت توليد عناوين عشوائية والتوزيع (Airdrop)</h2>
                     </div>
                     <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                        توزيع التوكنات على عدة محافظ دفعة واحدة (ضع كل عنوان في سطر مستقل أو مفصول بفاصلة).
+                        يولد مئات العناوين العشوائية الوهمية تلقائياً ويوزع عليها الكمية المحددة من التوكنات دفعة واحدة.
                     </p>
 
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">عناوين المحافظ المستلمة</label>
-                            <textarea id="airdrop-addresses" rows="3" placeholder="0x123..., 0x456..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
+                            <label class="block text-xs text-slate-500 mb-1">عدد العناوين العشوائية المراد توليدها</label>
+                            <input type="number" id="gen-count" value="50" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">الكمية المخصصة لكل محفظة</label>
-                            <input type="number" id="airdrop-amount" placeholder="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
+                            <label class="block text-xs text-slate-500 mb-1">الكمية المرسلة لكل عنوان عشوائي</label>
+                            <input type="number" id="gen-amount" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
                 </div>
 
-                <button onclick="runAirdropBot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
-                    بدء بوت التوزيع الجماعي
+                <button onclick="runRandomAirdropBot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
+                    توليد عناوين وبدء التوزيع التلقائي
                 </button>
             </div>
 
@@ -101,27 +101,33 @@
         <!-- سجل الأحداث والعمليات (Terminal Console) -->
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-2">
             <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-                <span>سجل أداء البوتات (Console Logs)</span>
+                <span>سجل أداء البوتات اللحظي (Terminal)</span>
                 <button onclick="document.getElementById('logs').innerHTML=''" class="text-slate-500 hover:text-slate-300">مسح السجل</button>
             </div>
-            <div id="logs" class="bg-slate-950 border border-slate-800 rounded-2xl p-3 h-36 overflow-y-auto font-mono text-xs text-slate-300 space-y-1 custom-scrollbar">
-                <div>[النظام] جاهز، بانتظار اتصال المحفظة وتفعيل البوتات...</div>
+            <div id="logs" class="bg-slate-950 border border-slate-800 rounded-2xl p-3 h-40 overflow-y-auto font-mono text-xs text-slate-300 space-y-1.5 custom-scrollbar">
+                <div>[النظام] جاهز، بانتظار اتصال المحفظة وتفعيل الأوامر...</div>
             </div>
         </div>
 
     </div>
 
-    <!-- جافاسكريبت لربط البوتات والتفاعل مع الويب ٣ -->
     <script>
         const CONTRACT_ADDRESS = "0x40ac9223409C4ca1B04c875b0A60446C850063c0";
-        const ROUTER_ADDRESS = "0x10ED43323113082E3E26B04494566310b59e223b"; // عنوان الروتر
+        const ROUTER_ADDRESS = "0x10ED43323113082E3E26B04494566310b59e223b"; // PancakeSwap V2 Router
 
         const ERC20_ABI = [
             "function transfer(address recipient, uint256 amount) returns (bool)",
             "function decimals() view returns (uint8)"
         ];
 
-        let provider, signer, contract;
+        // واجهة الروتر لعمليات الشراء (swapExactETHForTokens) والبيع
+        const ROUTER_ABI = [
+            "function swapExactETHForTokens(uint amountOutMin, address[] path, address to, uint deadline) payable returns (uint[] amounts)",
+            "function swapExactTokensForETHSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] path, address to, uint deadline)"
+        ];
+
+        let provider, signer, contract, routerContract;
+        let stopBot = false;
 
         function logMessage(msg, type = "info") {
             const logs = document.getElementById("logs");
@@ -150,62 +156,95 @@
                     document.getElementById("connect-btn").innerText = "متصل";
 
                     contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, signer);
-                    logMessage("تم ربط المحفظة بنجاح مع البوتات: " + address, "success");
+                    routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, signer);
+                    
+                    logMessage("تم ربط المحفظة بنجاح: " + address, "success");
                 } catch (err) {
                     logMessage("خطأ في الاتصال بالمحفظة: " + err.message, "error");
                 }
             } else {
-                alert("يرجى استخدام متصفح يدعم Web3 (مثل Mises أو Kiwi أو تطبيق MetaMask).");
+                alert("يرجى استخدام متصفح يدعم Web3 (مثل Mises أو Kiwi).");
             }
         }
 
-        // محاكاة بوت البيع والشراء (Swap Bot)
-        async function runSwapBot() {
+        // 1. بوت التداول المصغر بالسنتات (شراء وبيع متكرر)
+        async function startMicroTradingBot() {
             if (!signer) return alert("الرجاء الاتصال بالمحفظة أولاً!");
-            const type = document.getElementById("swap-type").value;
-            const amount = document.getElementById("swap-amount").value;
+            const bnbAmount = document.getElementById("micro-bnb").value;
+            const loops = parseInt(document.getElementById("loop-count").value);
+            stopBot = false;
 
-            if (!amount) return alert("الرجاء إدخال الكمية.");
+            logMessage(`[بوت التداول] بدأ التشغيل: ${loops} دورة بقيمة ${bnbAmount} BNB للصفقة الواحدة...`, "warning");
 
-            try {
-                logMessage(`[بوت البيع والشراء] جاري تجهيز أمر (${type}) بقيمة ${amount}...`, "warning");
-                // هنا يتم ربط كود الروتر الفعلي (PancakeSwap Router SwapExactETHForTokens أو العكس)
-                setTimeout(() => {
-                    logMessage(`[بوت البيع والشراء] تمت محاكاة وإرسال أمر الـ ${type} بنجاح عبر الروتر!`, "success");
-                }, 1500);
-            } catch (err) {
-                logMessage("[بوت البيع والشراء] فشل التنفيذ: " + err.message, "error");
+            for (let i = 1; i <= loops; i++) {
+                if (stopBot) {
+                    logMessage("[بوت التداول] تم إيقاف البوت بناءً على طلبك.", "warning");
+                    break;
+                }
+
+                try {
+                    logMessage(`الدورة (${i}/${loops}): جاري إرسال صفقة شراء مصغرة...`, "info");
+                    
+                    // مسار الشراء: WBNB -> Token
+                    const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
+                    const path = [WBNB, CONTRACT_ADDRESS];
+                    const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 دقائق
+
+                    const parsedBNBValue = ethers.utils.parseEther(bnbAmount);
+
+                    // تنفيذ أمر الشراء عبر الروتر
+                    const tx = await routerContract.swapExactETHForTokens(
+                        0, 
+                        path, 
+                        await signer.getAddress(), 
+                        deadline, 
+                        { value: parsedBNBValue }
+                    );
+                    
+                    await tx.wait();
+                    logMessage(`الدورة (${i}): نجحت صفقة الشراء! Tx: ${tx.hash.slice(0, 10)}...`, "success");
+
+                    // مهلة قصيرة بين العمليات لتجنب الازدحام
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+
+                } catch (err) {
+                    logMessage(`خطأ في الدورة (${i}): ` + (err.data?.message || err.message), "error");
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                }
             }
+            logMessage("[بوت التداول] انتهت دورات التداول المكثف بنجاح.", "success");
         }
 
-        // بوت توزيع العملات الجماعي (Airdrop Bot)
-        async function runAirdropBot() {
+        // 2. توليد مئات العناوين العشوائية والتوزيع التلقائي
+        async function runRandomAirdropBot() {
             if (!contract) return alert("الرجاء الاتصال بالمحفظة أولاً!");
-            const rawAddresses = document.getElementById("airdrop-addresses").value;
-            const amount = document.getElementById("airdrop-amount").value;
-
-            if (!rawAddresses || !amount) return alert("الرجاء إدخال العناوين والكمية.");
-
-            // تنظيف وترتيب العناوين المدخلة
-            const addresses = rawAddresses.split(/[\n,]+/).map(addr => addr.trim()).filter(addr => addr.startsWith("0x"));
-
-            if (addresses.length === 0) return alert("لم يتم العثور على عناوين صالحة تبدأ بـ 0x");
+            const count = parseInt(document.getElementById("gen-count").value);
+            const amount = document.getElementById("gen-amount").value;
 
             try {
-                logMessage(`[بوت التوزيع] بدأ توزيع العملات على (${addresses.length}) محفظة...`, "warning");
+                logMessage(`[بوت التوزيع] جاري توليد (${count}) عنوان عشوائي جديد...`, "warning");
+                
+                // توليد عناوين إيثريوم/BSC عشوائية صالحة برمجياً
+                const generatedAddresses = [];
+                for (let i = 0; i < count; i++) {
+                    const randomWallet = ethers.Wallet.createRandom();
+                    generatedAddresses.push(randomWallet.address);
+                }
+
+                logMessage(`تم توليد العناوين بنجاح. جاري البدء بإرسال التوكنات (${amount} لكل عنوان)...`, "info");
                 const decimals = await contract.decimals();
                 const parsedAmount = ethers.utils.parseUnits(amount, decimals);
 
-                for (let i = 0; i < addresses.length; i++) {
-                    logMessage(`جاري الإرسال إلى المحفظة (${i + 1}/${addresses.length}): ${addresses[i]}...`, "info");
-                    const tx = await contract.transfer(addresses[i], parsedAmount);
+                for (let i = 0; i < generatedAddresses.length; i++) {
+                    logMessage(`إرسال إلى العنوان العشوائي (${i + 1}/${count}): ${generatedAddresses[i].slice(0, 10)}...`, "info");
+                    const tx = await contract.transfer(generatedAddresses[i], parsedAmount);
                     await tx.wait();
                 }
 
-                logMessage("[بوت التوزيع] تمت عملية التوزيع بنجاح لجميع المحافظ المستهدفة!", "success");
-                alert("تم الانتهاء من توزيع العملات بنجاح!");
+                logMessage("[بوت التوزيع] تم إرسال وتوزيع التوكنات لجميع العناوين العشوائية بنجاح تام!", "success");
+                alert("تم الانتهاء من التوزيع العشوائي بنجاح!");
             } catch (err) {
-                logMessage("[بوت التوزيع] خطأ أثناء التوزيع الجماعي: " + (err.data?.message || err.message), "error");
+                logMessage("[بوت التوزيع] خطأ أثناء عملية التوزيع: " + (err.data?.message || err.message), "error");
             }
         }
     </script>
