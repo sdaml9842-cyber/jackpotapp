@@ -17,9 +17,6 @@
         .btn-success:hover { background: #15803d; }
         .btn-warning { background: #d97706; }
         .btn-warning:hover { background: #b45309; }
-        .btn-danger { background: #dc2626; }
-        .btn-purple { background: #9333ea; }
-        .btn-purple:hover { background: #7e22ce; }
     </style>
 </head>
 <body>
@@ -49,24 +46,9 @@
         <button onclick="refreshData()" style="background: #334155;">تحديث البيانات 🔄</button>
     </div>
 
-    <!-- 3. محاكي بوت التداول والنشاط المباشر -->
-    <div class="card" style="border: 1px solid #9333ea;">
-        <h2 style="color: #c084fc;">🤖 محاكي بوت التداول (Auto Volume Bot)</h2>
-        <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0;">يقوم هذا الخيار بإجراء عمليات شراء بسنتات معدودة تلقائياً لتوليد حركة على الشارت وتنشيط العداد وجذب رادارات البوتات.</p>
-        
-        <label>مبلغ الشراء في كل صفقة (BNB):</label>
-        <input type="number" id="botBuyAmount" step="0.0001" value="0.0001" />
-
-        <label style="margin-top: 10px; display: block;">المهلة بين الصفقات (بالثواني):</label>
-        <input type="number" id="botInterval" value="30" />
-
-        <button id="startBotBtn" onclick="toggleVolumeBot()" class="btn-purple">تشغيل البوت التلقائي 🚀</button>
-        <div id="botLog" class="status" style="margin-top: 10px; font-size: 0.8rem; display: none;">حالة البوت: متوقف</div>
-    </div>
-
-    <!-- 4. إدارة اللعبة والحد الأقصى -->
+    <!-- 3. إدارة اللعبة والحد الأقصى -->
     <div class="card">
-        <h2>4. إدارة اللعبة والحد الأقصى</h2>
+        <h2>3. إدارة اللعبة والحد الأقصى</h2>
         
         <label>تمويل صندوق الجائزة (إرسال مباشر بـ BNB):</label>
         <input type="number" id="fundAmount" step="0.0001" placeholder="مثلاً: 0.001" />
@@ -74,9 +56,9 @@
 
         <hr style="border-color: #334155; margin: 20px 0;">
 
-        <label>تعديل الحد الأقصى للتوكنز في الصفقة الواحدة:</label>
+        <label>تعديل الحد الأقصى للتوكنز في الصفقة الواحدة (Max Tx):</label>
         <input type="number" id="newMaxTx" value="10000" placeholder="مثلاً: 10000" />
-        <button onclick="updateMaxTx()" style="background: #0d9488;">تحديث الحد الأقصى (Max Tx) ⚙️</button>
+        <button onclick="updateMaxTx()" style="background: #0d9488;">تحديث الحد الأقصى ⚙️</button>
 
         <hr style="border-color: #334155; margin: 20px 0;">
 
@@ -93,36 +75,23 @@
             "function decimals() view returns (uint8)"
         ];
 
-        const routerAddress = "0x10ED43C718714eb63d5a577B7b43951cd694730f"; // PancakeSwap Router V2 (BNB Chain)
-        const routerAbi = [
-            "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)",
-            "function WETH() external pure returns (address)"
-        ];
-
-        let provider, signer, contract, routerContract;
-        let botTimer = null;
-        let isBotRunning = false;
+        let provider, signer, contract;
 
         async function connectWallet() {
-            let ethProvider = window.ethereum;
-
-            if (window.binancew3) {
-                ethProvider = window.binancew3;
-            }
+            let ethProvider = window.ethereum || window.binancew3;
 
             if (ethProvider) {
                 try {
                     provider = new ethers.providers.Web3Provider(ethProvider, "any");
                     await ethProvider.request({ method: "eth_requestAccounts" });
 
-                    // التحويل التلقائي لشبكة BNB Smart Chain (Chain ID: 56 / Hex: 0x38)
                     try {
                         await ethProvider.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: '0x38' }],
                         });
                     } catch (switchError) {
-                        console.log("يرجى التأكد من اختيار شبكة BNB Smart Chain في المحفظة");
+                        console.log("يرجى التأكد من اختيار شبكة BNB Smart Chain");
                     }
 
                     signer = provider.getSigner();
@@ -131,7 +100,6 @@
                     document.getElementById("walletAddr").style.display = "block";
                     document.getElementById("connectBtn").innerText = "تم الربط بنجاح ✅";
                     
-                    routerContract = new ethers.Contract(routerAddress, routerAbi, signer);
                     initContract();
                 } catch (err) {
                     alert("فشل ربط المحفظة: " + (err.message || err));
@@ -180,66 +148,6 @@
                 }
             } catch (err) {
                 console.error("خطأ تحديث البيانات:", err);
-            }
-        }
-
-        async function toggleVolumeBot() {
-            if (!contract || !routerContract || !signer) return alert("يرجى ضغط 'ربط المحفظة' أولاً");
-            
-            const btn = document.getElementById("startBotBtn");
-            const log = document.getElementById("botLog");
-            log.style.display = "block";
-
-            if (isBotRunning) {
-                clearInterval(botTimer);
-                isBotRunning = false;
-                btn.innerText = "تشغيل البوت التلقائي 🚀";
-                btn.className = "btn-purple";
-                log.innerText = "حالة البوت: متوقف 🔴";
-            } else {
-                const amount = document.getElementById("botBuyAmount").value;
-                const interval = parseInt(document.getElementById("botInterval").value);
-
-                if (!amount || amount <= 0) return alert("أدخلي مبلغ شراء صحيح");
-                if (!interval || interval < 5) return alert("المهلة يجب أن تكون 5 ثوانٍ على الأقل");
-
-                isBotRunning = true;
-                btn.innerText = "إيقاف البوت ⏹️";
-                btn.className = "btn-danger";
-                log.innerText = "البوت يعمل الآن.. جاري تنفيذ الصفقات أوتوماتيكياً 🟢";
-
-                executeAutoBuy(amount);
-
-                botTimer = setInterval(() => {
-                    executeAutoBuy(amount);
-                }, interval * 1000);
-            }
-        }
-
-        async function executeAutoBuy(bnbAmount) {
-            const log = document.getElementById("botLog");
-            try {
-                const tokenAddr = contract.address;
-                const weth = await routerContract.WETH();
-                const path = [weth, tokenAddr];
-                const myAddr = await signer.getAddress();
-                const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
-
-                log.innerText = "جاري تنفيذ صفقة شراء جديدة بـ " + bnbAmount + " BNB...";
-
-                const tx = await routerContract.swapExactETHForTokens(
-                    0,
-                    path,
-                    myAddr,
-                    deadline,
-                    { value: ethers.utils.parseEther(bnbAmount) }
-                );
-
-                await tx.wait();
-                log.innerText = "تمت صفقة الشراء بنجاح! الشارت يتحدث والعداد يتجدد 🔄";
-                refreshData();
-            } catch (err) {
-                log.innerText = "فشلت الصفقة أو توقف البوت: " + (err.reason || err.message);
             }
         }
 
