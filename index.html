@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم والتداول | YAS King of the Hill</title>
+    <title>لوحة التحكم والاستعادة | YAS King of the Hill</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; max-width: 600px; margin: 0 auto; }
@@ -13,20 +13,15 @@
         button:hover { background: #0369a1; }
         input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; box-sizing: border-box; margin-top: 5px; }
         .status { padding: 10px; border-radius: 6px; background: #334155; margin-bottom: 10px; font-size: 0.9rem; word-break: break-all; }
-        .btn-success { background: #16a34a; }
-        .btn-success:hover { background: #15803d; }
-        .btn-warning { background: #d97706; }
-        .btn-warning:hover { background: #b45309; }
         .btn-danger { background: #dc2626; }
         .btn-danger:hover { background: #b91c1c; }
-        .btn-purple { background: #9333ea; }
-        .btn-purple:hover { background: #7e22ce; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-warning { background: #d97706; }
+        .btn-warning:hover { background: #b45309; }
     </style>
 </head>
 <body>
 
-    <h1 style="text-align: center; color: #f59e0b; font-size: 1.5rem;">👑 لوحة تحكم وتداول YAS الدقيقة</h1>
+    <h1 style="text-align: center; color: #f59e0b; font-size: 1.5rem;">👑 لوحة استعادة الأصول والتصفية</h1>
 
     <!-- 1. ربط المحفظة والعقد -->
     <div class="card">
@@ -39,83 +34,25 @@
         <button onclick="initContract()" style="background: #475569;">تحميل بيانات العقد 🔄</button>
     </div>
 
-    <!-- 2. حالة اللعبة وسحب الجائزة -->
-    <div class="card">
-        <h2>2. حالة اللعبة وسحب الجائزة</h2>
+    <!-- 2. حالة الأرصدة وأزرار الاستعادة -->
+    <div class="card" style="border: 1px solid #dc2626;">
+        <h2 style="color: #f87171;">2. سحب واستعادة الأصول من العقد</h2>
         <div class="status">
-            <b>صندوق الجائزة الحالي:</b> <span id="jackpotBalance">0</span> BNB<br>
-            <b>حالة التداول:</b> <span id="tradingStatus">غير معروف</span><br>
-            <b>الناجي الأخير (الملك):</b> <span id="lastBuyerAddr">-</span><br>
-            <b>الوقت المتبقي:</b> <span id="timer">-</span>
+            <b>رصيد صندوق الجائزة / العقد الحالي:</b> <span id="jackpotBalance">0</span> BNB<br>
         </div>
-        <button onclick="refreshData()" style="background: #334155;">تحديث البيانات 🔄</button>
-        <button onclick="claimJackpot()" class="btn-warning" style="margin-top: 10px;">🏆 سحب صندوق الجائزة (Claim Jackpot)</button>
-    </div>
-
-    <!-- 3. وحدة التداول والدقة العالية -->
-    <div class="card" style="border: 1px solid #9333ea;">
-        <h2 style="color: #c084fc;">⚡ أداة التداول الآلي الدقيق (Volume Bot)</h2>
+        <button onclick="refreshData()" style="background: #334155;">تحديث الرصيد 🔄</button>
         
-        <label>مبلغ الشراء في كل عملية (BNB):</label>
-        <input type="number" id="tradeBnbAmount" step="0.0001" value="0.0001" />
-
-        <div class="grid-2" style="margin-top: 10px;">
-            <button onclick="executeBuy()" class="btn-success">شراء يدوي 🛒</button>
-            <button onclick="executeSell()" class="btn-danger">بيع يدوي 💰</button>
-        </div>
-
-        <hr style="border-color: #334155; margin: 15px 0;">
-
-        <label>المهلة بين الصفقات الآلية (بالثواني):</label>
-        <input type="number" id="autoInterval" value="20" />
-        
-        <button id="autoBotBtn" onclick="toggleAutoTrader()" class="btn-purple">تشغيل البوت التلقائي الدقيق 🚀</button>
-        <div id="botLog" class="status" style="margin-top: 10px; font-size: 0.8rem; display: none;">حالة البوت: متوقف</div>
-    </div>
-
-    <!-- 4. إدارة اللعبة والحد الأقصى -->
-    <div class="card">
-        <h2>4. إدارة اللعبة والحد الأقصى</h2>
-        
-        <label>تمويل صندوق الجائزة (إرسال مباشر بـ BNB):</label>
-        <input type="number" id="fundAmount" step="0.0001" placeholder="مثلاً: 0.001" />
-        <button onclick="sendDirectFund()" class="btn-warning">إرسال تمويل للجائزة 💰</button>
-
-        <hr style="border-color: #334155; margin: 20px 0;">
-
-        <label>تعديل الحد الأقصى للتوكنز في الصفقة (Max Tx):</label>
-        <input type="number" id="newMaxTx" value="10000" placeholder="مثلاً: 10000" />
-        <button onclick="updateMaxTx()" style="background: #0d9488;">تحديث الحد الأقصى ⚙️</button>
-
-        <hr style="border-color: #334155; margin: 20px 0;">
-
-        <button id="enableTradeBtn" onclick="enableTrading()" class="btn-success">تفعيل التداول وبدء العداد 🚀</button>
+        <!-- زر السحب المباشر -->
+        <button onclick="forceClaimOrWithdraw()" class="btn-danger" style="margin-top: 15px;">🚨 سحب واسترداد كامل رصيد الـ BNB للمحفظة</button>
     </div>
 
     <script>
         const abi = [
-            "function tradingEnabled() view returns (bool)",
-            "function lastBuyer() view returns (address)",
-            "function countdownEndTime() view returns (uint256)",
-            "function enableTrading() external",
-            "function setMaxTxAmount(uint256 newMax) external",
-            "function decimals() view returns (uint8)",
-            "function balanceOf(address owner) view returns (uint256)",
-            "function approve(address spender, uint256 amount) external returns (bool)",
-            "function allowance(address owner, address spender) view returns (uint256)",
-            "function claimJackpot() external"
+            "function claimJackpot() external",
+            "function decimals() view returns (uint8)"
         ];
 
-        const routerAddress = "0x10ED43C718714eb63d5a577B7b43951cd694730f";
-        const routerAbi = [
-            "function swapExactETHForTokensSupportingFeeOnTransferTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable",
-            "function swapExactTokensForETHSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external",
-            "function WETH() external pure returns (address)"
-        ];
-
-        let provider, signer, contract, routerContract;
-        let autoBotTimer = null;
-        let isAutoRunning = false;
+        let provider, signer, contract;
 
         async function connectWallet() {
             let ethProvider = window.ethereum || window.binancew3;
@@ -138,7 +75,6 @@
                     document.getElementById("walletAddr").style.display = "block";
                     document.getElementById("connectBtn").innerText = "متصل بنجاح ✅";
                     
-                    routerContract = new ethers.Contract(routerAddress, routerAbi, signer);
                     initContract();
                 } catch (err) {
                     alert("خطأ الاتصال: " + (err.message || err));
@@ -163,212 +99,21 @@
                 const addr = contract.address;
                 const balance = await provider.getBalance(addr);
                 document.getElementById("jackpotBalance").innerText = ethers.utils.formatEther(balance);
-
-                const isTrading = await contract.tradingEnabled();
-                document.getElementById("tradingStatus").innerText = isTrading ? "شغال (Active) 🟢" : "مغلق 🔴";
-
-                const buyer = await contract.lastBuyer();
-                document.getElementById("lastBuyerAddr").innerText = buyer === "0x0000000000000000000000000000000000000000" ? "لا يوجد" : buyer;
-
-                const endTime = await contract.countdownEndTime();
-                const now = Math.floor(Date.now() / 1000);
-                const diff = endTime.toNumber() - now;
-                
-                if (diff <= 0) {
-                    document.getElementById("timer").innerText = "انتهى الوقت! الجائزة جاهزة للسحب 🏆";
-                } else {
-                    const mins = Math.floor(diff / 60);
-                    const secs = diff % 60;
-                    document.getElementById("timer").innerText = `${mins} دقيقة و ${secs} ثانية`;
-                }
             } catch (err) { console.error(err); }
         }
 
-        async function executeBuy() {
-            if (!contract || !routerContract || !signer) return alert(" اربطي المحفظة أولاً");
-            const bnbAmount = document.getElementById("tradeBnbAmount").value;
+        async function forceClaimOrWithdraw() {
+            if (!contract || !signer) return alert("يرجى ربط المحفظة أولاً");
             try {
-                const tokenAddr = contract.address;
-                const weth = await routerContract.WETH();
-                const path = [weth, tokenAddr];
-                const myAddr = await signer.getAddress();
-                const deadline = Math.floor(Date.now() / 1000) + 300;
-
-                const tx = await routerContract.swapExactETHForTokensSupportingFeeOnTransferTokens(
-                    0, path, myAddr, deadline,
-                    { value: ethers.utils.parseEther(bnbAmount), gasLimit: 350000 }
-                );
+                // محاولة استدعاء دالة المطالبة بالجائزة مباشرة
+                const tx = await contract.claimJackpot({ gasLimit: 250000 });
+                alert("جاري تنفيذ طلب السحب واستعادة الأموال...");
                 await tx.wait();
-                alert("تم الشراء بنجاح وتحديث الشارت! 🚀");
+                alert("تم سحب واستعادة كامل الرصيد إلى محفظتك بنجاح! 🎉");
                 refreshData();
             } catch (err) {
-                alert("خطأ بالشراء: " + (err.reason || err.message));
+                alert("تعذر السحب المباشر: تأكدي من أنك المتصلة بصفتك المالك أو الملك، أو قومي بإزالة السيولة من PancakeSwap مباشرة. التفاصيل: " + (err.reason || err.message));
             }
-        }
-
-        async function executeSell() {
-            if (!contract || !routerContract || !signer) return alert(" اربطي المحفظة أولاً");
-            try {
-                const myAddr = await signer.getAddress();
-                const tokenAddr = contract.address;
-                const balance = await contract.balanceOf(myAddr);
-
-                if (balance.eq(0)) return alert("لا تملكين توكنز لبيعها!");
-
-                const amountToSell = balance.div(2);
-
-                const currentAllowance = await contract.allowance(myAddr, routerAddress);
-                if (currentAllowance.lt(amountToSell)) {
-                    const appTx = await contract.approve(routerAddress, ethers.constants.MaxUint256);
-                    await appTx.wait();
-                }
-
-                const weth = await routerContract.WETH();
-                const path = [tokenAddr, weth];
-                const deadline = Math.floor(Date.now() / 1000) + 300;
-
-                const sellTx = await routerContract.swapExactTokensForETHSupportingFeeOnTransferTokens(
-                    amountToSell, 0, path, myAddr, deadline, { gasLimit: 350000 }
-                );
-                await sellTx.wait();
-                alert("تم البيع بنجاح! 💰");
-                refreshData();
-            } catch (err) {
-                alert("خطأ بالبيع: " + (err.reason || err.message));
-            }
-        }
-
-        async function toggleAutoTrader() {
-            if (!contract || !routerContract || !signer) return alert("اربطي المحفظة أولاً");
-
-            const btn = document.getElementById("autoBotBtn");
-            const log = document.getElementById("botLog");
-            log.style.display = "block";
-
-            if (isAutoRunning) {
-                clearInterval(autoBotTimer);
-                isAutoRunning = false;
-                btn.innerText = "تشغيل البوت التلقائي الدقيق 🚀";
-                btn.className = "btn-purple";
-                log.innerText = "حالة البوت: متوقف 🔴";
-            } else {
-                const interval = parseInt(document.getElementById("autoInterval").value);
-                isAutoRunning = true;
-                btn.innerText = "إيقاف البوت ⏹️";
-                btn.className = "btn-danger";
-
-                let isBuyTurn = true;
-                autoBotTimer = setInterval(async () => {
-                    if (isBuyTurn) {
-                        log.innerText = "جاري تنفيذ صفقة شراء آلية...";
-                        await executeBuySilent();
-                    } else {
-                        log.innerText = "جاري تنفيذ صفقة بيع آلية...";
-                        await executeSellSilent();
-                    }
-                    isBuyTurn = !isBuyTurn;
-                }, interval * 1000);
-            }
-        }
-
-        async function executeBuySilent() {
-            try {
-                const bnbAmount = document.getElementById("tradeBnbAmount").value || "0.0001";
-                const tokenAddr = contract.address;
-                const weth = await routerContract.WETH();
-                const path = [weth, tokenAddr];
-                const myAddr = await signer.getAddress();
-                const deadline = Math.floor(Date.now() / 1000) + 300;
-
-                const tx = await routerContract.swapExactETHForTokensSupportingFeeOnTransferTokens(
-                    0, path, myAddr, deadline,
-                    { value: ethers.utils.parseEther(bnbAmount), gasLimit: 350000 }
-                );
-                await tx.wait();
-                document.getElementById("botLog").innerText = "تم الشراء وتجديد العداد بنجاح! 🟢";
-                refreshData();
-            } catch (e) {
-                document.getElementById("botLog").innerText = "فشلت خطوة الشراء: " + (e.reason || "تأكدي من السيولة والغاز");
-            }
-        }
-
-        async function executeSellSilent() {
-            try {
-                const myAddr = await signer.getAddress();
-                const tokenAddr = contract.address;
-                const balance = await contract.balanceOf(myAddr);
-                if (balance.gt(0)) {
-                    const amountToSell = balance.div(3);
-                    const currentAllowance = await contract.allowance(myAddr, routerAddress);
-                    if (currentAllowance.lt(amountToSell)) {
-                        const appTx = await contract.approve(routerAddress, ethers.constants.MaxUint256);
-                        await appTx.wait();
-                    }
-
-                    const weth = await routerContract.WETH();
-                    const path = [tokenAddr, weth];
-                    const deadline = Math.floor(Date.now() / 1000) + 300;
-
-                    const sellTx = await routerContract.swapExactTokensForETHSupportingFeeOnTransferTokens(
-                        amountToSell, 0, path, myAddr, deadline, { gasLimit: 350000 }
-                    );
-                    await sellTx.wait();
-                    document.getElementById("botLog").innerText = "تم البيع واستعادة السيولة بنجاح! 💰";
-                    refreshData();
-                }
-            } catch (e) {
-                document.getElementById("botLog").innerText = "تخطي البيع: رصيد التوكنز غير كافٍ";
-            }
-        }
-
-        async function claimJackpot() {
-            if (!contract || !signer) return alert("اربطي المحفظة أولاً");
-            try {
-                const tx = await contract.claimJackpot({ gasLimit: 200000 });
-                alert("جاري سحب الجائزة للمحفظة...");
-                await tx.wait();
-                alert("تم سحب الجائزة بنجاح إلى محفظتك! 🎉");
-                refreshData();
-            } catch (err) {
-                alert("لا يمكن السحب الآن: " + (err.reason || err.message));
-            }
-        }
-
-        async function sendDirectFund() {
-            const amount = document.getElementById("fundAmount").value;
-            const addr = document.getElementById("contractAddress").value.trim();
-            if (!addr || !ethers.utils.isAddress(addr) || !amount) return alert("بيانات غير مكتملة");
-            try {
-                const tx = await signer.sendTransaction({ to: addr, value: ethers.utils.parseEther(amount) });
-                alert("جاري التمويل...");
-                await tx.wait();
-                alert("تم تمويل الجائزة بنجاح! 🎉");
-                refreshData();
-            } catch (err) { alert("خطأ: " + err.message); }
-        }
-
-        async function updateMaxTx() {
-            const val = document.getElementById("newMaxTx").value;
-            if (!val) return;
-            try {
-                const dec = await contract.decimals();
-                const parsedVal = ethers.utils.parseUnits(val, dec);
-                const tx = await contract.setMaxTxAmount(parsedVal);
-                alert("جاري تحديث الحد الأقصى...");
-                await tx.wait();
-                alert("تم التحديث بنجاح! ✅");
-            } catch (err) { alert("خطأ: " + err.message); }
-        }
-
-        async function enableTrading() {
-            if (!contract) return;
-            try {
-                const tx = await contract.enableTrading();
-                alert("جاري التفعيل...");
-                await tx.wait();
-                alert("تم فتح التداول بنجاح! 🚀");
-                refreshData();
-            } catch (err) { alert("خطأ: " + err.message); }
         }
     </script>
 </body>
