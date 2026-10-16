@@ -1,31 +1,252 @@
-function initBotEngine() {
-    let pk = document.getElementById("bot-private-key").value.trim();
-    if (!pk) {
-        alert("الرجاء إدخال المفتاح الخاص (Private Key) للمحفظة.");
-        return;
-    }
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الأتمتة الكاملة (النسخة النهائية المصححة بدقة)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- استخدام رابط بديل وموثوق لمكتبة Ethers.js لضمان التحميل الفوري -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #090d16; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-6 font-sans custom-scrollbar">
 
-    if (!pk.startsWith("0x")) {
-        pk = "0x" + pk;
-    }
+    <div class="max-w-5xl mx-auto space-y-6">
 
-    try {
-        provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
-        botWallet = new ethers.Wallet(pk, provider);
-        
-        // معالجة العنوان برمجياً ليكون مطابقاً لمعايير الـ Checksum النظامية
-        safeAddress = ethers.utils.getAddress(botWallet.address);
+        <!-- الهيدر -->
+        <header class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
+            <div>
+                <h1 class="text-xl font-black text-amber-400">لوحة الأتمتة الكاملة (Auto-Bot Engine Pro)</h1>
+                <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
+            </div>
+            <div class="text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400" id="engine-status">
+                ● وضع الأتمتة: بانتظار إدخال المفتاح
+            </div>
+        </header>
 
-        contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, botWallet);
-        routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, botWallet);
+        <!-- إعدادات محفظة البوت الخلفية -->
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4">
+            <h2 class="text-sm font-bold text-amber-400">⚙️ إعدادات محفظة التشغيل التلقائي (Private Key)</h2>
+            <p class="text-xs text-slate-400">أدخل المفتاح الخاص (Private Key) لمحفظة البوت المخصصة لتنفيذ المعاملات في الخلفية تلقائياً:</p>
+            <div class="flex gap-2">
+                <input type="password" id="bot-private-key" placeholder="أدخل Private Key هنا (0x...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
+                <button onclick="initBotEngine()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-xl text-xs transition">
+                    تشغيل المحرك
+                </button>
+            </div>
+        </div>
 
-        document.getElementById("engine-status").innerText = `● متصل: ${safeAddress.slice(0, 6)}...`;
-        document.getElementById("engine-status").className = "text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400";
-        
-        logMessage("تم تشغيل محرك الأتمتة بنجاح للمحفظة: " + safeAddress, "success");
-        alert("تم ربط المحفظة بنجاح!");
-    } catch (err) {
-        logMessage("خطأ في المفتاح الخاص: " + err.message, "error");
-        alert("خطأ في المفتاح الخاص: " + err.message);
-    }
-}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- البوت الأول: التداول المكثف التلقائي -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
+                        <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">⚡</span>
+                        <h2 class="text-base font-bold text-blue-400">1. بوت الشراء والبيع التلقائي</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">قيمة الصفقة بالـ BNB</label>
+                            <input type="number" id="micro-bnb" value="0.00001" step="0.00001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">عدد الدورات التلقائية</label>
+                            <input type="number" id="loop-count" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2 mt-4">
+                    <button onclick="startAutoVolumeBot()" class="w-full bg-blue-600 hover:bg-blue-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
+                        بدء الأتمتة المكثفة (بدون تأكيد)
+                    </button>
+                    <button onclick="stopBotFlag = true" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-bold py-2 rounded-xl text-xs transition">
+                        إيقاف طارئ
+                    </button>
+                </div>
+            </div>
+
+            <!-- البوت الثاني: توليد عناوين عشوائية وتوزيع تلقائي -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
+                        <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎲</span>
+                        <h2 class="text-base font-bold text-emerald-400">2. توليد عناوين والتوزيع الذاتي</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">عدد العناوين الوهمية المراد توليدها</label>
+                            <input type="number" id="gen-count" value="5" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">الكمية المرسلة لكل عنوان</label>
+                            <input type="number" id="gen-amount" value="1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startAutoAirdropBot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
+                    بدء التوزيع التلقائي بالكامل
+                </button>
+            </div>
+
+        </div>
+
+        <!-- سجل الأداء (Terminal Console) -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-2">
+            <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+                <span>سجل الأتمتة المباشر (Terminal)</span>
+                <button onclick="document.getElementById('logs').innerHTML=''" class="text-slate-500 hover:text-slate-300">مسح السجل</button>
+            </div>
+            <div id="logs" class="bg-slate-950 border border-slate-800 rounded-2xl p-3 h-44 overflow-y-auto font-mono text-xs text-slate-300 space-y-1.5 custom-scrollbar">
+                <div>[النظام] يرجى إدخال مفتاح البوت (Private Key) وتشغيل المحرك للبدء...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const CONTRACT_ADDRESS = "0x40ac9223409C4ca1B04c875b0A60446C850063c0";
+        const ROUTER_ADDRESS = "0x10ED43323113082E3E26B04494566310b59e223b";
+        const BSC_RPC = "https://bsc-dataseed.binance.org/";
+
+        const ERC20_ABI = [
+            "function transfer(address recipient, uint256 amount) returns (bool)",
+            "function decimals() view returns (uint8)"
+        ];
+
+        const ROUTER_ABI = [
+            "function swapExactETHForTokens(uint amountOutMin, address[] path, address to, uint deadline) payable returns (uint[] amounts)"
+        ];
+
+        let provider, botWallet, contract, routerContract, safeAddress;
+        let stopBotFlag = false;
+
+        function logMessage(msg, type = "info") {
+            const logs = document.getElementById("logs");
+            let color = "text-slate-300";
+            if (type === "success") color = "text-emerald-400";
+            if (type === "error") color = "text-red-400";
+            if (type === "warning") color = "text-amber-400";
+
+            logs.innerHTML += `<div class="${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function initBotEngine() {
+            let pk = document.getElementById("bot-private-key").value.trim();
+            if (!pk) {
+                alert("الرجاء إدخال المفتاح الخاص (Private Key) للمحفظة.");
+                return;
+            }
+
+            if (!pk.startsWith("0x")) {
+                pk = "0x" + pk;
+            }
+
+            try {
+                // التحقق من تحميل مكتبة ethers أولاً
+                if (typeof ethers === 'undefined') {
+                    throw new Error("لم يتم تحميل مكتبة Ethers.js، تأكد من اتصال الإنترنت أو تحديث المتصفح.");
+                }
+
+                provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
+                botWallet = new ethers.Wallet(pk, provider);
+                
+                safeAddress = ethers.utils.getAddress(botWallet.address);
+
+                contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, botWallet);
+                routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, botWallet);
+
+                document.getElementById("engine-status").innerText = `● متصل: ${safeAddress.slice(0, 6)}...`;
+                document.getElementById("engine-status").className = "text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400";
+                
+                logMessage("تم تشغيل محرك الأتمتة بنجاح للمحفظة: " + safeAddress, "success");
+                alert("تم ربط المحفظة بنجاح!");
+            } catch (err) {
+                logMessage("خطأ في المفتاح الخاص أو التهيئة: " + err.message, "error");
+                alert("خطأ: " + err.message);
+            }
+        }
+
+        function generateSafeRandomAddress() {
+            const randomWallet = ethers.Wallet.createRandom();
+            return ethers.utils.getAddress(randomWallet.address);
+        }
+
+        async function startAutoVolumeBot() {
+            if (!botWallet) return alert("قم بتشغيل المحرك وإدخال المفتاح الخاص أولاً!");
+            const bnbAmount = document.getElementById("micro-bnb").value;
+            const loops = parseInt(document.getElementById("loop-count").value);
+            stopBotFlag = false;
+
+            logMessage(`[بدء البوت] تنفيذ ${loops} عملية تلقائية بقيمة ${bnbAmount} BNB...`, "warning");
+
+            for (let i = 1; i <= loops; i++) {
+                if (stopBotFlag) {
+                    logMessage("[إيقاف] تم إيقاف البوت بواسطة المستخدم.", "warning");
+                    break;
+                }
+
+                try {
+                    logMessage(`الدورة (${i}/${loops}): إرسال معاملة شراء تلقائية...`, "info");
+                    
+                    const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
+                    const path = [WBNB, CONTRACT_ADDRESS];
+                    const deadline = Math.floor(Date.now() / 1000) + 300;
+                    const parsedValue = ethers.utils.parseEther(bnbAmount);
+
+                    const tx = await routerContract.swapExactETHForTokens(
+                        0, path, safeAddress, deadline, 
+                        { value: parsedValue, gasLimit: 250000 }
+                    );
+
+                    logMessage(`الدورة (${i}): تم الإرسال، Tx: ${tx.hash.slice(0, 12)}...`, "success");
+                    await tx.wait();
+
+                    await new Promise(r => setTimeout(r, 3000));
+
+                } catch (err) {
+                    logMessage(`خطأ في الدورة (${i}): ` + (err.reason || err.message), "error");
+                    await new Promise(r => setTimeout(r, 4000));
+                }
+            }
+            logMessage("[اكتمل] انتهت جميع دورات بوت التداول التلقائي بنجاح.", "success");
+        }
+
+        async function startAutoAirdropBot() {
+            if (!botWallet) return alert("قم بتشغيل المحرك وإدخال المفتاح الخاص أولاً!");
+            const count = parseInt(document.getElementById("gen-count").value);
+            const amount = document.getElementById("gen-amount").value;
+
+            try {
+                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان صحيح وتوزيع العملات...`, "warning");
+
+                const addresses = [];
+                for (let i = 0; i < count; i++) {
+                    addresses.push(generateSafeRandomAddress());
+                }
+
+                const decimals = await contract.decimals();
+                const parsedAmount = ethers.utils.parseUnits(amount, decimals);
+
+                for (let i = 0; i < addresses.length; i++) {
+                    logMessage(`(${i + 1}/${count}) إرسال آلي إلى: ${addresses[i].slice(0, 10)}...`, "info");
+                    const tx = await contract.transfer(addresses[i], parsedAmount, { gasLimit: 100000 });
+                    await tx.wait();
+                }
+
+                logMessage("[اكتمل] تم توزيع العملات على جميع العناوين العشوائية آلياً بالكامل!", "success");
+                alert("تم إتمام التوزيع التلقائي بنجاح تام!");
+            } catch (err) {
+                logMessage("[خطأ التوزيع]: " + (err.reason || err.message), "error");
+            }
+        }
+    </script>
+</body>
+</html>
