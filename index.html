@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأتمتة الكاملة للبوتات (نسخة مستقرة)</title>
+    <title>منصة الأتمتة الكاملة للبوتات (النسخة النهائية المطورة)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
@@ -19,7 +19,7 @@
         <!-- الهيدر -->
         <header class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
             <div>
-                <h1 class="text-xl font-black text-amber-400">لوحة الأتمتة الكاملة (Auto-Bot Engine)</h1>
+                <h1 class="text-xl font-black text-amber-400">لوحة الأتمتة الكاملة (Auto-Bot Engine Pro)</h1>
                 <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
             </div>
             <div class="text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400" id="engine-status">
@@ -123,7 +123,7 @@
             "function swapExactETHForTokens(uint amountOutMin, address[] path, address to, uint deadline) payable returns (uint[] amounts)"
         ];
 
-        let provider, botWallet, contract, routerContract;
+        let provider, botWallet, contract, routerContract, formattedWalletAddress;
         let stopBotFlag = false;
 
         function logMessage(msg, type = "info") {
@@ -138,28 +138,35 @@
         }
 
         function initBotEngine() {
-            const pk = document.getElementById("bot-private-key").value.trim();
+            let pk = document.getElementById("bot-private-key").value.trim();
             if (!pk) {
                 alert("الرجاء إدخال المفتاح الخاص (Private Key) للمحفظة.");
                 return;
+            }
+
+            if (!pk.startsWith("0x")) {
+                pk = "0x" + pk;
             }
 
             try {
                 provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
                 botWallet = new ethers.Wallet(pk, provider);
                 
+                // تنسيق عنوان المحفظة بالصيغة الصحيحة لتجنب خطأ الـ Checksum
+                formattedWalletAddress = ethers.utils.getAddress(botWallet.address);
+
                 contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, botWallet);
                 routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, botWallet);
 
-                document.getElementById("engine-status").innerText = `● متصل بالمحفظة: ${botWallet.address.slice(0, 6)}...`;
+                document.getElementById("engine-status").innerText = `● متصل بالمحفظة: ${formattedWalletAddress.slice(0, 6)}...`;
                 document.getElementById("engine-status").className = "text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400";
-                logMessage("تم تشغيل محرك الأتمتة بنجاح للمحفظة: " + botWallet.address, "success");
+                logMessage("تم تشغيل محرك الأتمتة بنجاح للمحفظة: " + formattedWalletAddress, "success");
             } catch (err) {
                 logMessage("خطأ في المفتاح الخاص: " + err.message, "error");
             }
         }
 
-        // دالة توليد عناوين صحيحة 100% لتجنب أي أخطاء في العناوين
+        // دالة توليد عناوين صحيحة ومعتمدة 100%
         function generateValidRandomAddress() {
             const randomBytes = new Uint8Array(20);
             window.crypto.getRandomValues(randomBytes);
@@ -190,7 +197,7 @@
                     const parsedValue = ethers.utils.parseEther(bnbAmount);
 
                     const tx = await routerContract.swapExactETHForTokens(
-                        0, path, botWallet.address, deadline, 
+                        0, path, formattedWalletAddress, deadline, 
                         { value: parsedValue, gasLimit: 250000 }
                     );
 
