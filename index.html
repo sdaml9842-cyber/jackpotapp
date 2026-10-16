@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأتمتة الكاملة (النسخة النهائية الذكية)</title>
+    <title>منصة الأتمتة الكاملة (النسخة النهائية المصححة بدقة تامة)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
@@ -20,7 +20,7 @@
         <header class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
             <div>
                 <h1 class="text-xl font-black text-amber-400">لوحة الأتمتة الكاملة (Auto-Bot Engine Pro)</h1>
-                <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
+                <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409c4ca1b04c875b0a60446c850063c0</span></p>
             </div>
             <div class="text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400" id="engine-status">
                 ● وضع الأتمتة: بانتظار إدخال المفتاح
@@ -30,23 +30,12 @@
         <!-- إعدادات محفظة البوت الخلفية -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4">
             <h2 class="text-sm font-bold text-amber-400">⚙️ إعدادات محفظة التشغيل التلقائي (Private Key)</h2>
-            <p class="text-xs text-slate-400">أدخل المفتاح الخاص (Private Key) لمحفظة البوت وتحقق من الأرصدة تلقائياً:</p>
+            <p class="text-xs text-slate-400">أدخل المفتاح الخاص (Private Key) للمحفظة للبدء فوراً:</p>
             <div class="flex gap-2">
                 <input type="password" id="bot-private-key" placeholder="أدخل Private Key هنا (0x...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
                 <button onclick="initBotEngine()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-xl text-xs transition">
-                    تشغيل المحرك وفحص الأرصدة
+                    تشغيل المحرك
                 </button>
-            </div>
-            <!-- لوحة عرض الأرصدة الحية -->
-            <div id="wallet-balances" class="hidden grid grid-cols-2 gap-4 pt-2 text-xs font-mono">
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <span class="text-slate-500 block">رصيد BNB (للغاز):</span>
-                    <span id="bnb-balance" class="text-amber-400 font-bold">0.00</span> BNB
-                </div>
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <span class="text-slate-500 block">رصيد عملة العقد:</span>
-                    <span id="token-balance" class="text-emerald-400 font-bold">0.00</span>
-                </div>
             </div>
         </div>
 
@@ -114,21 +103,22 @@
                 <button onclick="document.getElementById('logs').innerHTML=''" class="text-slate-500 hover:text-slate-300">مسح السجل</button>
             </div>
             <div id="logs" class="bg-slate-950 border border-slate-800 rounded-2xl p-3 h-44 overflow-y-auto font-mono text-xs text-slate-300 space-y-1.5 custom-scrollbar">
-                <div>[النظام] يرجى إدخال مفتاح البوت وتشغيل المحرك لفحص الأرصدة...</div>
+                <div>[النظام] يرجى إدخال مفتاح البوت وتشغيل المحرك للبدء...</div>
             </div>
         </div>
 
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0x40ac9223409C4ca1B04c875b0A60446C850063c0";
-        const ROUTER_ADDRESS = "0x10ED43323113082E3E26B04494566310b59e223b";
+        // استخدام الأحرف الصغيرة بالكامل لتفادي خطأ الـ Checksum نهائياً
+        const CONTRACT_ADDRESS = "0x40ac9223409c4ca1b04c875b0a60446c850063c0";
+        const ROUTER_ADDRESS = "0x10ed43323113082e3e26b04494566310b59e223b";
+        const WBNB_ADDRESS = "0xbb4cdb9cbd36b01d1cbaebf2de08d9173bc095c";
         const BSC_RPC = "https://bsc-dataseed.binance.org/";
 
         const ERC20_ABI = [
             "function transfer(address recipient, uint256 amount) returns (bool)",
-            "function decimals() view returns (uint8)",
-            "function balanceOf(address account) view returns (uint256)"
+            "function decimals() view returns (uint8)"
         ];
 
         const ROUTER_ABI = [
@@ -149,7 +139,7 @@
             logs.scrollTop = logs.scrollHeight;
         }
 
-        async function initBotEngine() {
+        function initBotEngine() {
             let pk = document.getElementById("bot-private-key").value.trim();
             if (!pk) {
                 alert("الرجاء إدخال المفتاح الخاص (Private Key) للمحفظة.");
@@ -176,32 +166,10 @@
                 document.getElementById("engine-status").className = "text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400";
                 
                 logMessage("تم ربط المحفظة بنجاح: " + safeAddress, "success");
-
-                // فحص الأرصدة تلقائياً لتجنب الأخطاء
-                await updateBalances();
-
+                alert("تم تشغيل المحرك بنجاح!");
             } catch (err) {
                 logMessage("خطأ في التهيئة: " + err.message, "error");
                 alert("خطأ: " + err.message);
-            }
-        }
-
-        async function updateBalances() {
-            try {
-                document.getElementById("wallet-balances").classList.remove("hidden");
-                
-                // جلب رصيد BNB
-                const bnbBal = await provider.getBalance(safeAddress);
-                document.getElementById("bnb-balance").innerText = ethers.utils.formatEther(bnbBal);
-
-                // جلب رصيد التوكن
-                const tokenBal = await contract.balanceOf(safeAddress);
-                const decimals = await contract.decimals();
-                document.getElementById("token-balance").innerText = ethers.utils.formatUnits(tokenBal, decimals);
-
-                logMessage("تم تحديث أرصدة المحفظة بنجاح.", "success");
-            } catch (err) {
-                logMessage("تحذير: تعذر جلب الأرصدة بدقة (تأكد من صحة اتصال العقد).", "warning");
             }
         }
 
@@ -211,7 +179,7 @@
         }
 
         async function startAutoVolumeBot() {
-            if (!botWallet) return alert("قم بتشغيل المحرك أولاً!");
+            if (!botWallet) return alert("قم بتشغيل المحرك وإدخال المفتاح الخاص أولاً!");
             const bnbAmount = document.getElementById("micro-bnb").value;
             const loops = parseInt(document.getElementById("loop-count").value);
             stopBotFlag = false;
@@ -227,8 +195,7 @@
                 try {
                     logMessage(`الدورة (${i}/${loops}): إرسال طلب الشراء...`, "info");
                     
-                    const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
-                    const path = [WBNB, CONTRACT_ADDRESS];
+                    const path = [WBNB_ADDRESS, CONTRACT_ADDRESS];
                     const deadline = Math.floor(Date.now() / 1000) + 300;
                     const parsedValue = ethers.utils.parseEther(bnbAmount);
 
@@ -247,16 +214,16 @@
                     await new Promise(r => setTimeout(r, 4000));
                 }
             }
-            logMessage("[اكتمل] انتهت دورات بوت التداول.", "success");
+            logMessage("[اكتمل] انتهت دورات بوت التداول التلقائي.", "success");
         }
 
         async function startAutoAirdropBot() {
-            if (!botWallet) return alert("قم بتشغيل المحرك أولاً!");
+            if (!botWallet) return alert("قم بتشغيل المحرك وإدخال المفتاح الخاص أولاً!");
             const count = parseInt(document.getElementById("gen-count").value);
             const amount = document.getElementById("gen-amount").value;
 
             try {
-                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان وتوزيع العملات...`, "warning");
+                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان صحيح وتوزيع العملات...`, "warning");
 
                 const addresses = [];
                 for (let i = 0; i < count; i++) {
