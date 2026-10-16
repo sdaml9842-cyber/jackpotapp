@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأتمتة الكاملة للبوتات (النسخة النهائية المطورة)</title>
+    <title>منصة الأتمتة الكاملة (النسخة النهائية المصححة بدقة)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
@@ -23,14 +23,14 @@
                 <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
             </div>
             <div class="text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400" id="engine-status">
-                ● وضع الأتمتة: جاهز للإدخال
+                ● وضع الأتمتة: بانتظار إدخال المفتاح
             </div>
         </header>
 
         <!-- إعدادات محفظة البوت الخلفية -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4">
             <h2 class="text-sm font-bold text-amber-400">⚙️ إعدادات محفظة التشغيل التلقائي (Private Key)</h2>
-            <p class="text-xs text-slate-400">أدخل المفتاح الخاص (Private Key) لمحفظة البوت المخصصة لتنفيذ المعاملات في الخلفية تلقائياً دون إزعاج النوافذ المنبثقة:</p>
+            <p class="text-xs text-slate-400">أدخل المفتاح الخاص (Private Key) لمحفظة البوت المخصصة لتنفيذ المعاملات في الخلفية تلقائياً:</p>
             <div class="flex gap-2">
                 <input type="password" id="bot-private-key" placeholder="أدخل Private Key هنا (0x...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
                 <button onclick="initBotEngine()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-xl text-xs transition">
@@ -123,7 +123,7 @@
             "function swapExactETHForTokens(uint amountOutMin, address[] path, address to, uint deadline) payable returns (uint[] amounts)"
         ];
 
-        let provider, botWallet, contract, routerContract, formattedWalletAddress;
+        let provider, botWallet, contract, routerContract, safeAddress;
         let stopBotFlag = false;
 
         function logMessage(msg, type = "info") {
@@ -152,25 +152,24 @@
                 provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
                 botWallet = new ethers.Wallet(pk, provider);
                 
-                // تنسيق عنوان المحفظة بالصيغة الصحيحة لتجنب خطأ الـ Checksum
-                formattedWalletAddress = ethers.utils.getAddress(botWallet.address);
+                // معالجة العنوان برمجياً ليكون مطابقاً لمعايير الـ Checksum النظامية
+                safeAddress = ethers.utils.getAddress(botWallet.address);
 
                 contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, botWallet);
                 routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, botWallet);
 
-                document.getElementById("engine-status").innerText = `● متصل بالمحفظة: ${formattedWalletAddress.slice(0, 6)}...`;
+                document.getElementById("engine-status").innerText = `● متصل: ${safeAddress.slice(0, 6)}...`;
                 document.getElementById("engine-status").className = "text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400";
-                logMessage("تم تشغيل محرك الأتمتة بنجاح للمحفظة: " + formattedWalletAddress, "success");
+                logMessage("تم تشغيل محرك الأتمتة بنجاح للمحفظة: " + safeAddress, "success");
             } catch (err) {
                 logMessage("خطأ في المفتاح الخاص: " + err.message, "error");
             }
         }
 
-        // دالة توليد عناوين صحيحة ومعتمدة 100%
-        function generateValidRandomAddress() {
-            const randomBytes = new Uint8Array(20);
-            window.crypto.getRandomValues(randomBytes);
-            return ethers.utils.getAddress(ethers.utils.hexlify(randomBytes));
+        // مولد عناوين آمن ونظيف 100% ومطابق لـ Checksum
+        function generateSafeRandomAddress() {
+            const randomWallet = ethers.Wallet.createRandom();
+            return ethers.utils.getAddress(randomWallet.address);
         }
 
         // 1. أتمتة الشراء والبيع المكثف بالخلفية
@@ -197,7 +196,7 @@
                     const parsedValue = ethers.utils.parseEther(bnbAmount);
 
                     const tx = await routerContract.swapExactETHForTokens(
-                        0, path, formattedWalletAddress, deadline, 
+                        0, path, safeAddress, deadline, 
                         { value: parsedValue, gasLimit: 250000 }
                     );
 
@@ -221,11 +220,11 @@
             const amount = document.getElementById("gen-amount").value;
 
             try {
-                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان عشوائي وتوزيع العملات...`, "warning");
+                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان صحيح وتوزيع العملات...`, "warning");
 
                 const addresses = [];
                 for (let i = 0; i < count; i++) {
-                    addresses.push(generateValidRandomAddress());
+                    addresses.push(generateSafeRandomAddress());
                 }
 
                 const decimals = await contract.decimals();
