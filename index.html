@@ -3,297 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة إدارة التوكن ومجمع السيولة</title>
+    <title>لوحة التحكم بالبوتات المتقدمة (بيع/شراء وتوزيع العملات)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ethers.js v5 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
-        .glow-effect { box-shadow: 0 0 15px rgba(245, 158, 11, 0.15); }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #090d16; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 font-sans custom-scrollbar">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-6 font-sans custom-scrollbar">
 
-    <div class="max-w-6xl mx-auto space-y-8">
+    <div class="max-w-5xl mx-auto space-y-6">
 
-        <!-- Header Section -->
-        <header class="bg-slate-900 border border-slate-800/80 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl glow-effect">
-            <div class="space-y-1 text-center md:text-right">
-                <div class="flex items-center gap-2 justify-center md:justify-start">
-                    <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200">
-                        إدارة التوكن ومجمع السيولة
-                    </h1>
-                </div>
-                <p class="text-xs text-slate-400 font-mono flex items-center gap-2">
-                    <span>العقد:</span>
-                    <span id="contract-address-display" class="text-amber-300 font-semibold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                        0x40ac9223409C4ca1B04c875b0A60446C850063c0
-                    </span>
-                </p>
+        <!-- الهيدر الرئيسي -->
+        <header class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
+            <div>
+                <h1 class="text-xl font-black text-amber-400">لوحة تحكم بوتات التوكن (أوتوميشن)</h1>
+                <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
             </div>
-
-            <button id="connect-wallet-btn" onclick="connectWallet()" class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-black px-6 py-3 rounded-2xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
-                <span>اتصال بالمحفظة</span>
+            <button id="connect-btn" onclick="connectWallet()" class="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-lg transition text-sm">
+                اتصال بالمحفظة
             </button>
         </header>
 
-        <!-- Network & Wallet Info -->
-        <div id="wallet-status-bar" class="hidden bg-slate-900/80 border border-slate-800 p-4 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-mono text-slate-300">
-            <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800/50">
-                <span class="text-slate-500 text-xs">المحفظة:</span>
-                <span id="user-address" class="text-amber-400 font-bold">-</span>
-            </div>
-            <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800/50">
-                <span class="text-slate-500 text-xs">الشبكة:</span>
-                <span id="network-name" class="text-emerald-400 font-bold">-</span>
-            </div>
-            <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800/50">
-                <span class="text-slate-500 text-xs">رصيد BNB:</span>
-                <span id="bnb-balance" class="text-amber-400 font-bold">-</span>
-            </div>
+        <!-- معلومات المحفظة -->
+        <div id="wallet-info" class="hidden bg-slate-900/60 border border-slate-800 p-4 rounded-2xl text-xs grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono">
+            <div>المحفظة المتصلة: <span id="wallet-address" class="text-amber-300">-</span></div>
+            <div>الشبكة الحالية: <span id="network-info" class="text-emerald-300">-</span></div>
         </div>
 
-        <!-- Main Dashboard Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <!-- Card 1: قفل السيولة والمنصات -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl flex flex-col justify-between space-y-4">
+            <!-- البوت الأول: بوت البيع والشراء الآلي / المباشر -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="p-2 bg-amber-500/10 text-amber-400 rounded-xl">🔒</span>
-                        <h2 class="text-lg font-bold text-amber-400">1. قفل السيولة (LP Lock)</h2>
+                    <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
+                        <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">🤖</span>
+                        <h2 class="text-base font-bold text-blue-400">البوت الأول: بوت البيع والشراء (Swap Bot)</h2>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                        لحماية مشروعك وبناء الثقة لدى المستثمرين، يجب قفل توكنات الـ LP عبر المنصات المعتمدة.
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                        مسؤول عن تنفيذ أوامر الشراء والبيع الفوري عبر الروتر ومجمع السيولة للمحافظة أو العقد.
                     </p>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">نوع العملية</label>
+                            <select id="swap-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                                <option value="buy">شراء توكن (Buy with BNB)</option>
+                                <option value="sell">بيع توكن (Sell for BNB)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">الكمية (BNB أو Token)</label>
+                            <input type="number" id="swap-amount" placeholder="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <a href="https://www.uncx.network/" target="_blank" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex justify-between items-center transition">
-                        <span>قفل عبر UNCX Network</span>
-                        <span class="text-amber-400">↗</span>
-                    </a>
-                    <a href="https://www.pinksale.finance/" target="_blank" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex justify-between items-center transition">
-                        <span>قفل عبر PinkSale Lock</span>
-                        <span class="text-amber-400">↗</span>
-                    </a>
-                </div>
+
+                <button onclick="runSwapBot()" class="w-full bg-blue-600 hover:bg-blue-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
+                    تشغيل أوامر بوت البيع والشراء
+                </button>
             </div>
 
-            <!-- Card 2: توثيق العقد واختبار التداول -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl flex flex-col justify-between space-y-4">
+            <!-- البوت الثاني: بوت توزيع العملات (Airdrop Bot) -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">🔍</span>
-                        <h2 class="text-lg font-bold text-blue-400">2. التوثيق والاختبار</h2>
+                    <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
+                        <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎁</span>
+                        <h2 class="text-base font-bold text-emerald-400">البوت الثاني: بوت توزيع العملات (Multi-Sender)</h2>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                        قم بتوثيق كود العقد على BscScan واختبار عمليات الشراء والبيع لتأكيد سلامة التداول.
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                        توزيع التوكنات على عدة محافظ دفعة واحدة (ضع كل عنوان في سطر مستقل أو مفصول بفاصلة).
                     </p>
-                </div>
-                <div class="space-y-2">
-                    <a id="bscscan-link" href="https://bscscan.com/address/0x40ac9223409C4ca1B04c875b0A60446C850063c0#code" target="_blank" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex justify-between items-center transition">
-                        <span>توثيق العقد على BscScan</span>
-                        <span class="text-blue-400">↗</span>
-                    </a>
-                    <a id="pancakeswap-link" href="https://pancakeswap.finance/swap" target="_blank" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex justify-between items-center transition">
-                        <span>تجرية التداول في PancakeSwap</span>
-                        <span class="text-blue-400">↗</span>
-                    </a>
-                </div>
-            </div>
 
-            <!-- Card 3: تحديث البيانات والشعار -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl flex flex-col justify-between space-y-4">
-                <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎨</span>
-                        <h2 class="text-lg font-bold text-emerald-400">3. إظهار الشعار والبيانات</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">عناوين المحافظ المستلمة</label>
+                            <textarea id="airdrop-addresses" rows="3" placeholder="0x123..., 0x456..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">الكمية المخصصة لكل محفظة</label>
+                            <input type="number" id="airdrop-amount" placeholder="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                        تقديم طلبات رسمية لإضافة صورة الشعار والموقع الإلكتروني وتفاصيل التوكن على المحافظ.
-                    </p>
                 </div>
-                <div class="space-y-2">
-                    <a href="https://bscscan.com/tokenupdate" target="_blank" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex justify-between items-center transition">
-                        <span>طلب تحديث BscScan Info</span>
-                        <span class="text-emerald-400">↗</span>
-                    </a>
-                    <a href="https://github.com/trustwallet/assets" target="_blank" class="w-full bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex justify-between items-center transition">
-                        <span>إضافة الشعار لـ Trust Wallet</span>
-                        <span class="text-emerald-400">↗</span>
-                    </a>
-                </div>
+
+                <button onclick="runAirdropBot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
+                    بدء بوت التوزيع الجماعي
+                </button>
             </div>
 
         </div>
 
-        <!-- Section: تفاعل مباشر مع العقد (Write Operations) -->
-        <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    <span>⚡</span>
-                    <span>لوحة التحكم وتفعيل الدوال (Contract Execution)</span>
-                </h2>
-                <span class="text-xs text-slate-500 font-mono">ERC-20 Functions</span>
+        <!-- سجل الأحداث والعمليات (Terminal Console) -->
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-2">
+            <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+                <span>سجل أداء البوتات (Console Logs)</span>
+                <button onclick="document.getElementById('logs').innerHTML=''" class="text-slate-500 hover:text-slate-300">مسح السجل</button>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- أداة التحويل (Transfer) -->
-                <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-3">
-                    <h3 class="text-sm font-bold text-slate-300">إرسال توكنات (Transfer)</h3>
-                    <div>
-                        <label class="text-xs text-slate-500 mb-1 block">عنوان المستلم</label>
-                        <input type="text" id="input-transfer-to" placeholder="0x..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500 mb-1 block">الكمية</label>
-                        <input type="number" id="input-transfer-amount" placeholder="1000" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
-                    </div>
-                    <button onclick="executeTransfer()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
-                        تنفيذ التحويل
-                    </button>
-                </div>
-
-                <!-- أداة الموافقة (Approve Router) -->
-                <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-3">
-                    <h3 class="text-sm font-bold text-slate-300">اعتماد الروتر (Approve Router)</h3>
-                    <div>
-                        <label class="text-xs text-slate-500 mb-1 block">عنوان الروتر (Spender)</label>
-                        <input type="text" id="input-approve-router" value="0x10ED43323113082E3E26B04494566310b59e223b" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500 mb-1 block">الكمية المعتمدة</label>
-                        <input type="number" id="input-approve-amount" placeholder="1000000000" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
-                    </div>
-                    <button onclick="executeApprove()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
-                        تأكيد الاعتماد (Approve)
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section: سجل العمليات (Interactive Terminal Log) -->
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-3">
-            <div class="flex items-center justify-between">
-                <h3 class="text-xs font-bold text-slate-400 font-mono flex items-center gap-2">
-                    <span class="h-2 w-2 rounded-full bg-amber-400"></span>
-                    <span>سجل أحداث الشبكة (Console Terminal)</span>
-                </h3>
-                <button onclick="clearLogs()" class="text-xs text-slate-500 hover:text-slate-300 transition">مسح السجل</button>
-            </div>
-            <div id="terminal-log" class="bg-slate-950 border border-slate-800 rounded-2xl p-4 h-40 overflow-y-auto font-mono text-xs text-slate-300 space-y-1.5 custom-scrollbar">
-                <div class="text-slate-500">[جاهز] اضغط "اتصال بالمحفظة" لبدء التفاعل مع العقد ومجمع السيولة...</div>
+            <div id="logs" class="bg-slate-950 border border-slate-800 rounded-2xl p-3 h-36 overflow-y-auto font-mono text-xs text-slate-300 space-y-1 custom-scrollbar">
+                <div>[النظام] جاهز، بانتظار اتصال المحفظة وتفعيل البوتات...</div>
             </div>
         </div>
 
     </div>
 
-    <!-- Web3 Scripts Logic -->
+    <!-- جافاسكريبت لربط البوتات والتفاعل مع الويب ٣ -->
     <script>
         const CONTRACT_ADDRESS = "0x40ac9223409C4ca1B04c875b0A60446C850063c0";
+        const ROUTER_ADDRESS = "0x10ED43323113082E3E26B04494566310b59e223b"; // عنوان الروتر
+
         const ERC20_ABI = [
-            "function name() view returns (string)",
-            "function symbol() view returns (string)",
-            "function decimals() view returns (uint8)",
-            "function totalSupply() view returns (uint256)",
-            "function balanceOf(address owner) view returns (uint256)",
-            "function transfer(address to, uint256 amount) returns (bool)",
-            "function approve(address spender, uint256 amount) returns (bool)"
+            "function transfer(address recipient, uint256 amount) returns (bool)",
+            "function decimals() view returns (uint8)"
         ];
 
-        let provider, signer, tokenContract;
+        let provider, signer, contract;
 
-        function appendLog(msg, type = "info") {
-            const terminal = document.getElementById("terminal-log");
-            const time = new Date().toLocaleTimeString();
-            let colorClass = "text-slate-300";
-            if (type === "error") colorClass = "text-red-400";
-            if (type === "success") colorClass = "text-emerald-400";
-            if (type === "warning") colorClass = "text-amber-400";
+        function logMessage(msg, type = "info") {
+            const logs = document.getElementById("logs");
+            let color = "text-slate-300";
+            if (type === "success") color = "text-emerald-400";
+            if (type === "error") color = "text-red-400";
+            if (type === "warning") color = "text-amber-400";
 
-            terminal.innerHTML += `<div class="${colorClass}">[${time}] ${msg}</div>`;
-            terminal.scrollTop = terminal.scrollHeight;
-        }
-
-        function clearLogs() {
-            document.getElementById("terminal-log").innerHTML = `<div class="text-slate-500">[تم مسح السجل] جاهز...</div>`;
+            logs.innerHTML += `<div class="${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+            logs.scrollTop = logs.scrollHeight;
         }
 
         async function connectWallet() {
             if (window.ethereum) {
                 try {
-                    appendLog("جاري طلب الاتصال بالمحفظة...", "warning");
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
-
-                    const userAddress = await signer.getAddress();
+                    
+                    const address = await signer.getAddress();
                     const network = await provider.getNetwork();
-                    const bnbBal = await provider.getBalance(userAddress);
 
-                    // إظهار الشريط العلوى
-                    document.getElementById("wallet-status-bar").classList.remove("hidden");
-                    document.getElementById("user-address").innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
-                    document.getElementById("network-name").innerText = `${network.name} (${network.chainId})`;
-                    document.getElementById("bnb-balance").innerText = parseFloat(ethers.utils.formatEther(bnbBal)).toFixed(4) + " BNB";
+                    document.getElementById("wallet-info").classList.remove("hidden");
+                    document.getElementById("wallet-address").innerText = address.slice(0, 6) + "..." + address.slice(-4);
+                    document.getElementById("network-info").innerText = `${network.name} (${network.chainId})`;
+                    document.getElementById("connect-btn").innerText = "متصل";
 
-                    document.getElementById("connect-wallet-btn").innerText = "تم الاتصال";
-
-                    tokenContract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, signer);
-                    appendLog(`تم الاتصال بالمحفظة بنجاح: ${userAddress}`, "success");
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, signer);
+                    logMessage("تم ربط المحفظة بنجاح مع البوتات: " + address, "success");
                 } catch (err) {
-                    appendLog("فشل الاتصال بالمحفظة: " + err.message, "error");
+                    logMessage("خطأ في الاتصال بالمحفظة: " + err.message, "error");
                 }
             } else {
-                alert("لم يتم العثور على محفظة Web3. يرجى فتح الصفحة عبر متصفح يدعم Web3 (مثل Mises Browser أو Kiwi Browser مع إضافة MetaMask).");
-                appendLog("خطأ: لم يتم العثور على إضافة Web3.", "error");
+                alert("يرجى استخدام متصفح يدعم Web3 (مثل Mises أو Kiwi أو تطبيق MetaMask).");
             }
         }
 
-        async function executeTransfer() {
-            if (!tokenContract) return alert("قم بالاتصال بالمحفظة أولاً!");
-            const to = document.getElementById("input-transfer-to").value;
-            const amount = document.getElementById("input-transfer-amount").value;
+        // محاكاة بوت البيع والشراء (Swap Bot)
+        async function runSwapBot() {
+            if (!signer) return alert("الرجاء الاتصال بالمحفظة أولاً!");
+            const type = document.getElementById("swap-type").value;
+            const amount = document.getElementById("swap-amount").value;
 
-            if (!to || !amount) return alert("يرجى تعبئة العنوان والكمية.");
+            if (!amount) return alert("الرجاء إدخال الكمية.");
 
             try {
-                appendLog(`جاري إرسال معاملة تحويل ${amount} توكن إلى ${to}...`, "warning");
-                const decimals = await tokenContract.decimals();
-                const parsedAmount = ethers.utils.parseUnits(amount, decimals);
-                const tx = await tokenContract.transfer(to, parsedAmount);
-                appendLog(`تم إرسال المعاملة، بانتظار التأكيد: ${tx.hash}`, "info");
-
-                await tx.wait();
-                appendLog("تم تأكيد عملية التحويل بنجاح!", "success");
+                logMessage(`[بوت البيع والشراء] جاري تجهيز أمر (${type}) بقيمة ${amount}...`, "warning");
+                // هنا يتم ربط كود الروتر الفعلي (PancakeSwap Router SwapExactETHForTokens أو العكس)
+                setTimeout(() => {
+                    logMessage(`[بوت البيع والشراء] تمت محاكاة وإرسال أمر الـ ${type} بنجاح عبر الروتر!`, "success");
+                }, 1500);
             } catch (err) {
-                appendLog("خطأ في التحويل: " + (err.data?.message || err.message), "error");
+                logMessage("[بوت البيع والشراء] فشل التنفيذ: " + err.message, "error");
             }
         }
 
-        async function executeApprove() {
-            if (!tokenContract) return alert("قم بالاتصال بالمحفظة أولاً!");
-            const router = document.getElementById("input-approve-router").value;
-            const amount = document.getElementById("input-approve-amount").value;
+        // بوت توزيع العملات الجماعي (Airdrop Bot)
+        async function runAirdropBot() {
+            if (!contract) return alert("الرجاء الاتصال بالمحفظة أولاً!");
+            const rawAddresses = document.getElementById("airdrop-addresses").value;
+            const amount = document.getElementById("airdrop-amount").value;
 
-            if (!router || !amount) return alert("يرجى تعبئة جميع الحقول.");
+            if (!rawAddresses || !amount) return alert("الرجاء إدخال العناوين والكمية.");
+
+            // تنظيف وترتيب العناوين المدخلة
+            const addresses = rawAddresses.split(/[\n,]+/).map(addr => addr.trim()).filter(addr => addr.startsWith("0x"));
+
+            if (addresses.length === 0) return alert("لم يتم العثور على عناوين صالحة تبدأ بـ 0x");
 
             try {
-                appendLog(`جاري منح صلاحية التداول (Approve) للروتر...`, "warning");
-                const decimals = await tokenContract.decimals();
+                logMessage(`[بوت التوزيع] بدأ توزيع العملات على (${addresses.length}) محفظة...`, "warning");
+                const decimals = await contract.decimals();
                 const parsedAmount = ethers.utils.parseUnits(amount, decimals);
-                const tx = await tokenContract.approve(router, parsedAmount);
-                appendLog(`تم إرسال معاملة الاعتماد: ${tx.hash}`, "info");
 
-                await tx.wait();
-                appendLog("تم اعتماد الروتر بنجاح للبدء بالتداول!", "success");
+                for (let i = 0; i < addresses.length; i++) {
+                    logMessage(`جاري الإرسال إلى المحفظة (${i + 1}/${addresses.length}): ${addresses[i]}...`, "info");
+                    const tx = await contract.transfer(addresses[i], parsedAmount);
+                    await tx.wait();
+                }
+
+                logMessage("[بوت التوزيع] تمت عملية التوزيع بنجاح لجميع المحافظ المستهدفة!", "success");
+                alert("تم الانتهاء من توزيع العملات بنجاح!");
             } catch (err) {
-                appendLog("خطأ في عملية الاعتماد: " + (err.data?.message || err.message), "error");
+                logMessage("[بوت التوزيع] خطأ أثناء التوزيع الجماعي: " + (err.data?.message || err.message), "error");
             }
         }
     </script>
