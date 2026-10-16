@@ -3,86 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم عقد تسونامي بوت</title>
-    <!-- استخدام Tailwind CSS للتصميم السريع والأنيق -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- مكتبة Ethers.js للتفاعل مع البلوكشين -->
+    <title>لوحة تحكم عقد King of the Hill</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Ethers.js v6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col items-center justify-center p-4">
-
-    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6">
-        
-        <!-- رأس الصفحة -->
-        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-            <h1 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                ⚡ لوحة تحكم التوكن الذكي
-            </h1>
-            <button id="connectBtn" onclick="connectWallet()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-4 py-2 rounded-xl transition text-sm">
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8 bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
+            <div>
+                <h1 class="text-2xl font-black text-amber-400">King of the Hill 👑</h1>
+                <p class="text-xs text-gray-400 mt-1">لوحة التحكم التفاعلية المباشرة</p>
+            </div>
+            <button id="connectBtn" onclick="connectWallet()" class="bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold px-5 py-2.5 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-amber-500/20 text-sm">
                 ربط المحفظة
             </button>
         </div>
 
-        <!-- حالة المحفظة -->
-        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60 text-sm space-y-1">
-            <p class="text-slate-400">حالة الاتصال: <span id="walletStatus" class="text-red-400 font-medium">غير متصل</span></p>
-            <p class="text-slate-400 truncate">المحفظة: <span id="walletAddress" class="text-slate-200">-</span></p>
+        <!-- Contract Info Card -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 mb-6 shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <span class="text-gray-400 text-sm">حالة الشبكة:</span>
+                <span id="networkStatus" class="text-red-400 font-semibold text-sm">غير متصل</span>
+            </div>
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <span class="text-gray-400 text-sm">عنوان المحفظة:</span>
+                <span id="walletAddress" class="text-amber-300 font-mono text-xs">---</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-gray-400 text-sm">صندوق الجائزة الحالي:</span>
+                <span id="jackpotBalance" class="text-emerald-400 font-bold text-lg">0.0 BNB</span>
+            </div>
         </div>
 
-        <!-- إدخال عنوان العقد -->
-        <div class="space-y-2">
-            <label class="block text-sm font-medium text-slate-300">عنوان العقد المنشور (Contract Address):</label>
-            <input type="text" id="contractAddress" placeholder="0x..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 text-slate-200">
-            <button onclick="loadContractData()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-medium py-2 rounded-xl transition text-sm">
-                تحميل بيانات العقد والتحقق من الروتر
+        <!-- Owner Actions Panel -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 mb-6 shadow-xl space-y-4">
+            <h2 class="text-lg font-bold text-amber-400 mb-2 border-b border-gray-800 pb-2">لوحة المالك (Owner Panel)</h2>
+            
+            <button onclick="enableTrading()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-emerald-600/20 text-sm">
+                🚀 تفعيل التداول (enableTrading)
             </button>
-        </div>
 
-        <!-- بيانات وعتبات العقد -->
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                <p class="text-xs text-slate-400">رصيد صندوق المكافآت (Bounty Pool)</p>
-                <p id="bountyBalance" class="text-lg font-bold text-amber-400 mt-1">0.00 BNB</p>
-            </div>
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
-                <p class="text-xs text-slate-400">عتبة التسونامي الحالية</p>
-                <p id="currentThreshold" class="text-lg font-bold text-emerald-400 mt-1">0.00 BNB</p>
-            </div>
-        </div>
-
-        <!-- خانة عرض والتحقق من عنوان الروتر المسجل في العقد -->
-        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
-            <p class="text-xs text-slate-400">عنوان الروتر المسجل في العقد حالياً:</p>
-            <p id="routerAddressDisplay" class="text-xs font-mono text-cyan-400 break-all">-</p>
-        </div>
-
-        <!-- أزرار التفاعل والإجراءات -->
-        <div class="space-y-3 pt-2">
-            <div class="flex gap-2">
-                <input type="number" id="fundAmount" value="0.003" step="0.001" class="w-1/3 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-center text-slate-200">
-                <button onclick="fundContract()" class="w-2/3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-xl transition text-sm">
-                    تمويل العقد بـ BNB (إرسال مباشر)
+            <div class="flex gap-2 pt-2">
+                <input type="text" id="jackpotAmount" placeholder="قيمة الـ BNB للتمويل" class="flex-1 bg-gray-950 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-amber-500">
+                <button onclick="fundJackpot()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl transition duration-200 cursor-pointer text-sm">
+                    تمويل الجائزة
                 </button>
             </div>
-            <button onclick="triggerUpkeep()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl transition text-sm">
-                تشغيل دالة التسونامي (Perform Upkeep)
-            </button>
         </div>
 
+        <!-- Public Actions Panel -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl space-y-4">
+            <h2 class="text-lg font-bold text-amber-400 mb-2 border-b border-gray-800 pb-2">سحب الجائزة (Public Action)</h2>
+            <button onclick="claimJackpot()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-purple-600/20 text-sm">
+                🏆 المطالبة بالجائزة الكبرى (claimJackpot)
+            </button>
+        </div>
     </div>
 
-    <!-- كود الجافاسكريبت للربط والعمليات -->
+    <!-- Script Logic -->
     <script>
-        let provider, signer, contract;
-
-        // الـ ABI المحدث يضم دالة pancakeRouter للتحقق الفوري
-        const abi = [
-            "function bountyPool() external view returns (uint256)",
-            "function getCurrentThreshold() external view returns (uint256)",
-            "function pancakeRouter() external view returns (address)",
-            "function performUpkeep(bytes calldata performData) external",
-            "receive() external payable"
+        const contractAddress = "0x9a8442D45d8adB7f8868Fe40f24E50bfb46d88a7";
+        const contractABI = [
+            "function enableTrading() external",
+            "function fundJackpot() external payable",
+            "function claimJackpot() external",
+            "function tradingEnabled() view returns (bool)"
         ];
+
+        let provider, signer, contract;
 
         async function connectWallet() {
             if (typeof window.ethereum !== 'undefined') {
@@ -92,81 +83,78 @@
                     signer = await provider.getSigner();
                     const address = await signer.getAddress();
                     
-                    document.getElementById('walletStatus').innerText = "متصل بنجاح";
-                    document.getElementById('walletStatus').className = "text-emerald-400 font-medium";
-                    document.getElementById('walletAddress').innerText = address;
+                    document.getElementById('walletAddress').innerText = address.substring(0, 6) + "..." + address.substring(address.length - 4);
                     document.getElementById('connectBtn').innerText = "متصل";
+                    document.getElementById('connectBtn').classList.remove('bg-amber-500', 'hover:bg-amber-600');
+                    document.getElementById('connectBtn').classList.add('bg-emerald-500', 'text-gray-950');
+
+                    const network = await provider.getNetwork();
+                    document.getElementById('networkStatus').innerText = `ID: ${network.chainId}`;
+                    document.getElementById('networkStatus').classList.remove('text-red-400');
+                    document.getElementById('networkStatus').classList.add('text-emerald-400');
+
+                    contract = new ethers.Contract(contractAddress, contractABI, signer);
+                    updateJackpotBalance();
                 } catch (error) {
-                    alert("فشل الاتصال بالمحفظة: " + error.message);
+                    console.error("خطأ في الربط:", error);
+                    alert("فشل ربط المحفظة!");
                 }
             } else {
-                alert("يرجى تثبيت محفظة متوافقة مثل MetaMask أو Binance Web3 Wallet");
+                alert("الرجاء تثبيت محفظة مثل MetaMask أو استخدام متصفح يدعم Web3!");
             }
         }
 
-        async function loadContractData() {
-            const addr = document.getElementById('contractAddress').value.trim();
-            if (!ethers.isAddress(addr)) {
-                alert("يرجى إدخال عنوان عقد صحيح!");
-                return;
-            }
-            if (!provider) {
-                alert("يرجى ربط المحفظة أولاً!");
-                return;
-            }
-
+        async function updateJackpotBalance() {
+            if (!provider) return;
             try {
-                contract = new ethers.Contract(addr, abi, signer);
-                
-                // جلب البيانات مباشرة من البلوكشين
-                const pool = await contract.bountyPool();
-                const threshold = await contract.getCurrentThreshold();
-                const router = await contract.pancakeRouter();
-
-                document.getElementById('bountyBalance').innerText = ethers.formatEther(pool) + " BNB";
-                document.getElementById('currentThreshold').innerText = ethers.formatEther(threshold) + " BNB";
-                document.getElementById('routerAddressDisplay').innerText = router;
+                const balanceWei = await provider.getBalance(contractAddress);
+                const balanceBnb = ethers.formatEther(balanceWei);
+                document.getElementById('jackpotBalance').innerText = balanceBnb + " BNB";
             } catch (error) {
-                alert("حدث خطأ أثناء قراءة بيانات العقد: " + error.message);
+                console.error("خطأ في جلب الرصيد:", error);
             }
         }
 
-        async function fundContract() {
-            const addr = document.getElementById('contractAddress').value.trim();
-            const amount = document.getElementById('fundAmount').value;
-            if (!contract || !ethers.isAddress(addr)) {
-                alert("يرجى تحميل العقد أولاً!");
-                return;
-            }
-
+        async function enableTrading() {
+            if (!contract) { alert("الرجاء ربط المحفظة أولاً!"); return; }
             try {
-                const tx = await signer.sendTransaction({
-                    to: addr,
-                    value: ethers.parseEther(amount)
-                });
-                alert("جاري ارسال معاملة التمويل...");
+                const tx = await contract.enableTrading();
+                alert("تم إرسال المعاملة بنجاح، بانتظار التأكيد...");
                 await tx.wait();
-                alert("تم تمويل العقد بنجاح وتمت تعبئة صندوق المكافآت!");
-                loadContractData();
+                alert("تم تفعيل التداول بنجاح! 🚀");
             } catch (error) {
-                alert("فشلت عملية التمويل: " + error.message);
+                console.error(error);
+                alert("حدث خطأ أو أنك لست مالك العقد.");
             }
         }
 
-        async function triggerUpkeep() {
-            if (!contract) {
-                alert("يرجى تحميل العقد أولاً!");
-                return;
-            }
-
+        async function fundJackpot() {
+            if (!contract) { alert("الرجاء ربط المحفظة أولاً!"); return; }
+            const amount = document.getElementById('jackpotAmount').value;
+            if (!amount || isNaN(amount)) { alert("الرجاء إدخال قيمة صحيحة للـ BNB"); return; }
             try {
-                const tx = await contract.performUpkeep("0x");
-                alert("جاري تنفيذ التسونامي...");
+                const tx = await contract.fundJackpot({ value: ethers.parseEther(amount) });
+                alert("جاري إرسال تمويل الجائزة...");
                 await tx.wait();
-                alert("تم تنفيذ موجة التسونامي بنجاح!");
-                loadContractData();
+                alert("تم تمويل الجائزة بنجاح! 🏆");
+                updateJackpotBalance();
             } catch (error) {
-                alert("فشل التنفيذ (قد لا تكون الشروط مكتملة بعد): " + error.message);
+                console.error(error);
+                alert("فشل تمويل الجائزة.");
+            }
+        }
+
+        async function claimJackpot() {
+            if (!contract) { alert("الرجاء ربط المحفظة أولاً!"); return; }
+            try {
+                const tx = await contract.claimJackpot();
+                alert("جاري إرسال معاملة المطالبة بالجائزة...");
+                await tx.wait();
+                alert("مبروك! تم سحب الجائزة بنجاح 🎉");
+                updateJackpotBalance();
+            } catch (error) {
+                console.error(error);
+                alert("شروط سحب الجائزة غير متوفرة بعد (الوقت لم ينته أو لست آخر مشتري).");
             }
         }
     </script>
