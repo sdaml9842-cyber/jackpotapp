@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأتمتة المتقدمة (نسخة مصححة ومحدثة)</title>
+    <title>منصة الأتمتة الكاملة للبوتات (نسخة مستقرة)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
@@ -19,22 +19,22 @@
         <!-- الهيدر -->
         <header class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
             <div>
-                <h1 class="text-xl font-black text-amber-400">لوحة التحكم الآلي المصححة (Auto-Bot Engine Pro)</h1>
+                <h1 class="text-xl font-black text-amber-400">لوحة الأتمتة الكاملة (Auto-Bot Engine)</h1>
                 <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
             </div>
-            <div id="engine-status" class="text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-red-400">
-                ● المحرك غير متصل
+            <div class="text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400" id="engine-status">
+                ● وضع الأتمتة: جاهز للإدخال
             </div>
         </header>
 
         <!-- إعدادات محفظة البوت الخلفية -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4">
-            <h2 class="text-sm font-bold text-amber-400">⚙️ إعدادات محفظة التشغيل والتأكد من الرصيد</h2>
-            <p class="text-xs text-slate-400">أدخل المفتاح الخاص (Private Key) لمحفظة البوت، وتأكد أن المحفظة تحتوي على رصيد BNB لتسديد رسوم الغاز:</p>
+            <h2 class="text-sm font-bold text-amber-400">⚙️ إعدادات محفظة التشغيل التلقائي (Private Key)</h2>
+            <p class="text-xs text-slate-400">أدخل المفتاح الخاص (Private Key) لمحفظة البوت المخصصة لتنفيذ المعاملات في الخلفية تلقائياً دون إزعاج النوافذ المنبثقة:</p>
             <div class="flex gap-2">
                 <input type="password" id="bot-private-key" placeholder="أدخل Private Key هنا (0x...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500">
                 <button onclick="initBotEngine()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2 rounded-xl text-xs transition">
-                    فحص وتشغيل المحرك
+                    تشغيل المحرك
                 </button>
             </div>
         </div>
@@ -46,7 +46,7 @@
                 <div>
                     <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
                         <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">⚡</span>
-                        <h2 class="text-base font-bold text-blue-400">1. بوت الشراء والبيع التلقائي (حجم تداول)</h2>
+                        <h2 class="text-base font-bold text-blue-400">1. بوت الشراء والبيع التلقائي (مئات المرات)</h2>
                     </div>
                     <div class="space-y-3">
                         <div>
@@ -54,15 +54,15 @@
                             <input type="number" id="micro-bnb" value="0.0001" step="0.0001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">عدد الدورات التلقائية</label>
-                            <input type="number" id="loop-count" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
+                            <label class="block text-xs text-slate-500 mb-1">عدد الدورات التلقائية (مئات المرات)</label>
+                            <input type="number" id="loop-count" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-2 mt-4">
                     <button onclick="startAutoVolumeBot()" class="w-full bg-blue-600 hover:bg-blue-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
-                        بدء أتمتة الشراء (تلقائي)
+                        بدء الأتمتة المكثفة (بدون تأكيد)
                     </button>
                     <button onclick="stopBotFlag = true" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-bold py-2 rounded-xl text-xs transition">
                         إيقاف طارئ
@@ -70,17 +70,17 @@
                 </div>
             </div>
 
-            <!-- البوت الثاني: توليد عناوين صحيحة 100% والتوزيع -->
+            <!-- البوت الثاني: توليد عناوين عشوائية وتوزيع تلقائي -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
                         <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎲</span>
-                        <h2 class="text-base font-bold text-emerald-400">2. توليد عناوين حقيقية والتوزيع التلقائي</h2>
+                        <h2 class="text-base font-bold text-emerald-400">2. توليد مئات العناوين والتوزيع الذاتي</h2>
                     </div>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">عدد العناوين الصحيحة المراد توليدها</label>
-                            <input type="number" id="gen-count" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
+                            <label class="block text-xs text-slate-500 mb-1">عدد العناوين الوهمية المراد توليدها</label>
+                            <input type="number" id="gen-count" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-xs text-slate-500 mb-1">الكمية المرسلة لكل عنوان</label>
@@ -90,7 +90,7 @@
                 </div>
 
                 <button onclick="startAutoAirdropBot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
-                    توليد عناوين سليمة وبدء التوزيع
+                    بدء التوزيع التلقائي بالكامل
                 </button>
             </div>
 
@@ -103,7 +103,7 @@
                 <button onclick="document.getElementById('logs').innerHTML=''" class="text-slate-500 hover:text-slate-300">مسح السجل</button>
             </div>
             <div id="logs" class="bg-slate-950 border border-slate-800 rounded-2xl p-3 h-44 overflow-y-auto font-mono text-xs text-slate-300 space-y-1.5 custom-scrollbar">
-                <div>[النظام] أدخل المفتاح الخاص لمحفظة البوت واضغط فحص وتشغيل...</div>
+                <div>[النظام] يرجى إدخال مفتاح البوت (Private Key) وتشغيل المحرك للبدء...</div>
             </div>
         </div>
 
@@ -137,10 +137,10 @@
             logs.scrollTop = logs.scrollHeight;
         }
 
-        async function initBotEngine() {
+        function initBotEngine() {
             const pk = document.getElementById("bot-private-key").value.trim();
             if (!pk) {
-                alert("الرجاء إدخال المفتاح الخاص (Private Key).");
+                alert("الرجاء إدخال المفتاح الخاص (Private Key) للمحفظة.");
                 return;
             }
 
@@ -148,50 +148,41 @@
                 provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
                 botWallet = new ethers.Wallet(pk, provider);
                 
-                // فحص الرصيد للتأكد من وجود BNB للغاز
-                const balance = await provider.getBalance(botWallet.address);
-                const bnbFormatted = ethers.utils.formatEther(balance);
-
                 contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, botWallet);
                 routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, botWallet);
 
-                document.getElementById("engine-status").innerText = `● متصل: ${botWallet.address.slice(0, 6)}... (${parseFloat(bnbFormatted).toFixed(4)} BNB)`;
+                document.getElementById("engine-status").innerText = `● متصل بالمحفظة: ${botWallet.address.slice(0, 6)}...`;
                 document.getElementById("engine-status").className = "text-xs font-mono bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-emerald-400";
-                
-                logMessage(`تم ربط المحفظة بنجاح! الرصيد المتاح: ${bnbFormatted} BNB`, "success");
-                
-                if (parseFloat(bnbFormatted) === 0) {
-                    logMessage("تحذير: رصيد محفظة البوت من الـ BNB يساوي صفر! لن تتمكن من إرسال أي معاملات حتى تقوم بتمويلها بمبلغ بسيط رسوم غاز.", "error");
-                }
+                logMessage("تم تشغيل محرك الأتمتة بنجاح للمحفظة: " + botWallet.address, "success");
             } catch (err) {
-                logMessage("خطأ في الاتصال بالمفتاح الخاص: " + err.message, "error");
+                logMessage("خطأ في المفتاح الخاص: " + err.message, "error");
             }
         }
 
-        // دالة توليد عناوين عشوائية صحيحة وآمنة 100%
+        // دالة توليد عناوين صحيحة 100% لتجنب أي أخطاء في العناوين
         function generateValidRandomAddress() {
             const randomBytes = new Uint8Array(20);
             window.crypto.getRandomValues(randomBytes);
             return ethers.utils.getAddress(ethers.utils.hexlify(randomBytes));
         }
 
-        // 1. بوت التداول التلقائي في الخلفية
+        // 1. أتمتة الشراء والبيع المكثف بالخلفية
         async function startAutoVolumeBot() {
-            if (!botWallet) return alert("قم بتشغيل المحرك أولاً!");
+            if (!botWallet) return alert("قم بتشغيل المحرك وإدخال المفتاح الخاص أولاً!");
             const bnbAmount = document.getElementById("micro-bnb").value;
             const loops = parseInt(document.getElementById("loop-count").value);
             stopBotFlag = false;
 
-            logMessage(`[بدء البوت] تنفيذ ${loops} عملية شراء تلقائية...`, "warning");
+            logMessage(`[بدء البوت] تنفيذ ${loops} عملية تلقائية بقيمة ${bnbAmount} BNB لكل معاملة...`, "warning");
 
             for (let i = 1; i <= loops; i++) {
                 if (stopBotFlag) {
-                    logMessage("[إيقاف] تم إيقاف البوت.", "warning");
+                    logMessage("[إيقاف] تم إيقاف البوت بواسطة المستخدم.", "warning");
                     break;
                 }
 
                 try {
-                    logMessage(`الدورة (${i}/${loops}): إرسال معاملة شراء عبر الروتر...`, "info");
+                    logMessage(`الدورة (${i}/${loops}): إرسال معاملة شراء تلقائية في الخلفية...`, "info");
                     
                     const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
                     const path = [WBNB, CONTRACT_ADDRESS];
@@ -205,6 +196,7 @@
 
                     logMessage(`الدورة (${i}): تم الإرسال، Tx: ${tx.hash.slice(0, 12)}...`, "success");
                     await tx.wait();
+
                     await new Promise(r => setTimeout(r, 4000));
 
                 } catch (err) {
@@ -212,34 +204,34 @@
                     await new Promise(r => setTimeout(r, 6000));
                 }
             }
-            logMessage("[اكتمل] انتهت دورات بوت الشراء بنجاح.", "success");
+            logMessage("[اكتمل] انتهت جميع دورات بوت التداول التلقائي بنجاح.", "success");
         }
 
-        // 2. بوت توزيع العملات على عناوين صحيحة
+        // 2. توليد مئات العناوين والتوزيع الذاتي في الخلفية
         async function startAutoAirdropBot() {
-            if (!botWallet) return alert("قم بتشغيل المحرك أولاً!");
+            if (!botWallet) return alert("قم بتشغيل المحرك وإدخال المفتاح الخاص أولاً!");
             const count = parseInt(document.getElementById("gen-count").value);
             const amount = document.getElementById("gen-amount").value;
 
             try {
-                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان صحيح وتوزيع العملات...`, "warning");
+                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان عشوائي وتوزيع العملات...`, "warning");
 
                 const addresses = [];
                 for (let i = 0; i < count; i++) {
-                    addresses.push(generateValidRandomAddress()); // استخدام مولد آمن وصحيح
+                    addresses.push(generateValidRandomAddress());
                 }
 
                 const decimals = await contract.decimals();
                 const parsedAmount = ethers.utils.parseUnits(amount, decimals);
 
                 for (let i = 0; i < addresses.length; i++) {
-                    logMessage(`(${i + 1}/${count}) إرسال إلى: ${addresses[i].slice(0, 10)}...`, "info");
+                    logMessage(`(${i + 1}/${count}) إرسال آلي إلى: ${addresses[i].slice(0, 10)}...`, "info");
                     const tx = await contract.transfer(addresses[i], parsedAmount, { gasLimit: 100000 });
                     await tx.wait();
                 }
 
-                logMessage("[اكتمل] تم توزيع العملات على العناوين الصحيحة آلياً بالكامل!", "success");
-                alert("تم إتمام التوزيع التلقائي بنجاح!");
+                logMessage("[اكتمل] تم توزيع العملات على جميع العناوين العشوائية آلياً بالكامل!", "success");
+                alert("تم إتمام التوزيع التلقائي بنجاح تام!");
             } catch (err) {
                 logMessage("[خطأ التوزيع]: " + (err.reason || err.message), "error");
             }
