@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأتمتة الكاملة (النسخة النهائية المصححة بدقة تامة)</title>
+    <title>منصة الأتمتة الكاملة (النسخة النهائية مع التأكيد الفردي)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
@@ -70,12 +70,12 @@
                 </div>
             </div>
 
-            <!-- البوت الثاني: توليد عناوين عشوائية وتوزيع تلقائي -->
+            <!-- البوت الثاني: توليد عناوين والتوزيع الفردي المؤكد -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
                 <div>
                     <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
                         <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎲</span>
-                        <h2 class="text-base font-bold text-emerald-400">2. توليد عناوين والتوزيع الذاتي</h2>
+                        <h2 class="text-base font-bold text-emerald-400">2. توليد وتوزيع بالتأكيد الفردي</h2>
                     </div>
                     <div class="space-y-3">
                         <div>
@@ -90,7 +90,7 @@
                 </div>
 
                 <button onclick="startAutoAirdropBot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
-                    بدء التوزيع التلقائي بالكامل
+                    بدء التوزيع بالتأكيد الفردي
                 </button>
             </div>
 
@@ -221,26 +221,43 @@
             if (!botWallet) return alert("قم بتشغيل المحرك وإدخال المفتاح الخاص أولاً!");
             const count = parseInt(document.getElementById("gen-count").value);
             const amount = document.getElementById("gen-amount").value;
+            stopBotFlag = false;
 
             try {
-                logMessage(`[التوزيع الآلي] جاري توليد (${count}) عنوان صحيح وتوزيع العملات...`, "warning");
-
-                const addresses = [];
-                for (let i = 0; i < count; i++) {
-                    addresses.push(generateSafeRandomAddress());
-                }
+                logMessage(`[التوزيع الفردي] تجهيز (${count}) عملية مع التأكيد اليدوي...`, "warning");
 
                 const decimals = await contract.decimals();
                 const parsedAmount = ethers.utils.parseUnits(amount, decimals);
 
-                for (let i = 0; i < addresses.length; i++) {
-                    logMessage(`(${i + 1}/${count}) إرسال إلى: ${addresses[i].slice(0, 10)}...`, "info");
-                    const tx = await contract.transfer(addresses[i], parsedAmount, { gasLimit: 100000 });
+                for (let i = 0; i < count; i++) {
+                    if (stopBotFlag) {
+                        logMessage("[إيقاف] تم إيقاف عملية التوزيع.", "warning");
+                        break;
+                    }
+
+                    // توليد عنوان عشوائي واحد في كل دورة
+                    const targetAddress = generateSafeRandomAddress();
+
+                    // نافذة تأكيد فردية لكل عملية إرسال
+                    const userConfirmed = confirm(`تأكيد الإرسال الفردي:\n\n- العملية: (${i + 1} من ${count})\n- إلى العنوان: ${targetAddress}\n- الكمية: ${amount}\n\nاضغط موافق للمتابعة أو إلغاء لتخطي هذا العنوان.`);
+
+                    if (!userConfirmed) {
+                        logMessage(`[تخطي] تم تخطي العنوان رقم (${i + 1}) بواسطة المستخدم.`, "warning");
+                        continue;
+                    }
+
+                    logMessage(`(${i + 1}/${count}) جاري الإرسال إلى: ${targetAddress.slice(0, 10)}...`, "info");
+                    
+                    const tx = await contract.transfer(targetAddress, parsedAmount, { gasLimit: 100000 });
+                    logMessage(`تم إرسال المعاملة، Tx: ${tx.hash.slice(0, 12)}... بانتظار التأكيد`, "warning");
+                    
                     await tx.wait();
+                    logMessage(`[نجاح] تمت تأكيد العملية (${i + 1}) بنجاح!`, "success");
                 }
 
-                logMessage("[اكتمل] تم توزيع العملات بنجاح تام!", "success");
-                alert("تم إتمام التوزيع التلقائي بنجاح!");
+                logMessage("[اكتمل] انتهت عمليات التوزيع الفردي المؤكدة.", "success");
+                alert("اكتملت جميع العمليات بنجاح تام!");
+
             } catch (err) {
                 let errMsg = err.reason || err.message;
                 logMessage(`[خطأ التوزيع]: ${errMsg}`, "error");
