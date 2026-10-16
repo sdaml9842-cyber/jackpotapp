@@ -1,185 +1,131 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم | الناجي الأخير (King of the Hill)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; max-width: 600px; margin: 0 auto; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
-        h2 { color: #38bdf8; margin-top: 0; font-size: 1.2rem; }
-        button { background: #0284c7; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; font-size: 1rem; }
-        button:hover { background: #0369a1; }
-        input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; box-sizing: border-box; margin-top: 5px; }
-        .status { padding: 10px; border-radius: 6px; background: #334155; margin-bottom: 10px; font-size: 0.9rem; word-break: break-all; }
-        .btn-success { background: #16a34a; }
-        .btn-success:hover { background: #15803d; }
-        .btn-warning { background: #d97706; }
-        .btn-warning:hover { background: #b45309; }
-    </style>
-</head>
-<body>
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-    <h1 style="text-align: center; color: #f59e0b; font-size: 1.5rem;">👑 لوحة التحكم باللعبة</h1>
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-    <!-- 1. ربط المحفظة والعقد -->
-    <div class="card">
-        <h2>1. الاتصال بالعقد</h2>
-        <button id="connectBtn" onclick="connectWallet()">ربط المحفظة (Connect Wallet)</button>
-        <div id="walletAddr" class="status" style="margin-top: 10px; display: none;"></div>
+interface IPancakeFactory {
+    function createPair(address tokenA, address tokenB) external returns (address pair);
+}
+
+interface IPancakeRouter02 {
+    function factory() external pure returns (address);
+    function WETH() external pure returns (address);
+}
+
+contract PureKingOfTheHill is ERC20, Ownable, ReentrancyGuard {
+    IPancakeRouter02 public immutable pancakeRouter;
+    address public immutable pancakePair;
+
+    bool public tradingEnabled = false;             
+    uint256 public maxTxAmount;                     
+    mapping(address => uint256) public lastTradeBlock; 
+
+    address public lastBuyer;            
+    uint256 public countdownEndTime;     
+    uint256 public gameDuration = 30 minutes;       
+    uint256 public minBuyTokens;                    
+
+    mapping(address => bool) public automatedMarketMakerPairs;
+
+    event TradingEnabled(uint256 timestamp);
+    event LastBuyerUpdated(address indexed buyer, uint256 newEndTime, uint256 blockTime);
+    event JackpotWon(address indexed winner, uint256 prizeAmount, uint256 timestamp);
+    event JackpotFunded(address indexed funder, uint256 amount);
+
+    constructor(
+        string memory name,
+        string memory symbol,
+        uint256 initialSupply,
+        address _router
+    ) ERC20(name, symbol) Ownable(msg.sender) {
+        require(_router != address(0), "Invalid router");
+
+        pancakeRouter = IPancakeRouter02(_router);
         
-        <label style="margin-top: 15px; display: block;">عنوان العقد المنشور (Contract Address):</label>
-        <input type="text" id="contractAddress" placeholder="0x..." />
-        <button onclick="initContract()" style="background: #475569;">تحميل بيانات العقد</button>
-    </div>
+        address _pancakePair = IPancakeFactory(pancakeRouter.factory()).createPair(address(this), pancakeRouter.WETH());
+        pancakePair = _pancakePair;
+        automatedMarketMakerPairs[pancakePair] = true;
 
-    <!-- 2. حالة اللعبة والجائزة -->
-    <div class="card">
-        <h2>2. حالة اللعبة الحالية</h2>
-        <div class="status">
-            <b>صندوق الجائزة الحالي:</b> <span id="jackpotBalance">0</span> BNB<br>
-            <b>حالة التداول:</b> <span id="tradingStatus">غير معروف</span><br>
-            <b>الناجي الأخير (الملك):</b> <span id="lastBuyerAddr">-</span><br>
-            <b>الوقت المتبقي:</b> <span id="timer">-</span>
-        </div>
-        <button onclick="refreshData()" style="background: #334155;">تحديث البيانات 🔄</button>
-    </div>
-
-    <!-- 3. الإجراءات والتحكم -->
-    <div class="card">
-        <h2>3. إدارة اللعبة</h2>
+        uint256 totalSupplyValue = initialSupply * 10**decimals();
         
-        <!-- تمويل الجائزة عبر التحويل المباشر (الأكثر أماناً وتجنباً لأخطاء الـ ABI) -->
-        <label>تمويل صندوق الجائزة (إرسال مباشر بـ BNB):</label>
-        <input type="number" id="fundAmount" step="0.0001" placeholder="مثلاً: 0.001" />
-        <button onclick="sendDirectFund()" class="btn-warning">إرسال الجائزة مباشرة للعقد 💰</button>
+        maxTxAmount = totalSupplyValue / 100;       
+        minBuyTokens = totalSupplyValue / 10000;    
 
-        <hr style="border-color: #334155; margin: 20px 0;">
+        _mint(msg.sender, totalSupplyValue);
+    }
 
-        <!-- فتح التجارة -->
-        <button id="enableTradeBtn" onclick="enableTrading()" class="btn-success">تفعيل التداول وبدء العداد 🚀</button>
-    </div>
+    receive() external payable {
+        emit JackpotFunded(msg.sender, msg.value);
+    }
 
-    <script>
-        const abi = [
-            "function tradingEnabled() view returns (bool)",
-            "function lastBuyer() view returns (address)",
-            "function countdownEndTime() view returns (uint256)",
-            "function enableTrading() external"
-        ];
+    function fundJackpot() external payable onlyOwner {
+        emit JackpotFunded(msg.sender, msg.value);
+    }
 
-        let provider, signer, contract;
+    function enableTrading() external onlyOwner {
+        require(!tradingEnabled, "Trading already enabled");
+        tradingEnabled = true;
+        countdownEndTime = block.timestamp + gameDuration;
+        emit TradingEnabled(block.timestamp);
+    }
 
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    const address = await signer.getAddress();
-                    document.getElementById("walletAddr").innerText = "المحفظة المتصلة: " + address;
-                    document.getElementById("walletAddr").style.display = "block";
-                    document.getElementById("connectBtn").innerText = "تم الربط بنجاح ✅";
-                } catch (err) {
-                    alert("فشل ربط المحفظة: " + err.message);
-                }
-            } else {
-                alert("يرجى فتح الصفحة من داخل متصفح المحفظة (MetaMask / Binance Wallet)");
-            }
+    function claimJackpot() external nonReentrant {
+        require(tradingEnabled, "Trading not active yet");
+        require(block.timestamp > countdownEndTime, "Game timer is still running!");
+        require(lastBuyer != address(0), "No active buyer recorded");
+
+        address winner = lastBuyer;
+        uint256 prize = address(this).balance; 
+
+        lastBuyer = address(0);
+        countdownEndTime = block.timestamp + gameDuration;
+
+        if (prize > 0) {
+            (bool success, ) = payable(winner).call{value: prize}("");
+            require(success, "Jackpot transfer failed");
+            emit JackpotWon(winner, prize, block.timestamp);
+        }
+    }
+
+    function setGameDuration(uint256 newDuration) external onlyOwner {
+        gameDuration = newDuration;
+    }
+
+    // دالة التحكم في رفع أو خفض الحد الأقصى للصفقة من الهاتف مباشرة
+    function setMaxTxAmount(uint256 newMax) external onlyOwner {
+        maxTxAmount = newMax;
+    }
+
+    function setMinBuyTokens(uint256 newMin) external onlyOwner {
+        minBuyTokens = newMin;
+    }
+
+    function _update(
+        address from,
+        address to,
+        uint256 value
+    ) internal virtual override {
+        if (from == address(0) || to == address(0) || from == owner() || to == owner()) {
+            super._update(from, to, value);
+            return;
         }
 
-        async function initContract() {
-            const addr = document.getElementById("contractAddress").value.trim();
-            if (!addr || !ethers.utils.isAddress(addr)) {
-                alert("يرجى إدخال عنوان عقد صحيح");
-                return;
-            }
-            try {
-                contract = new ethers.Contract(addr, abi, signer || provider);
-                alert("تم تحميل العقد بنجاح!");
-                refreshData();
-            } catch (err) {
-                alert("خطأ في تحميل العقد: " + err.message);
-            }
+        require(tradingEnabled, "Trading is disabled by developer");
+
+        if (automatedMarketMakerPairs[from] || automatedMarketMakerPairs[to]) {
+            require(value <= maxTxAmount, "Exceeds max transaction limit");
+            require(lastTradeBlock[tx.origin] != block.number, "Anti-bot: 1 trade per block");
+            lastTradeBlock[tx.origin] = block.number;
         }
 
-        async function refreshData() {
-            if (!contract) {
-                alert("يرجى تحميل العقد أولاً");
-                return;
-            }
-            try {
-                const addr = contract.address;
-                const balance = await provider.getBalance(addr);
-                document.getElementById("jackpotBalance").innerText = ethers.utils.formatEther(balance);
+        super._update(from, to, value);
 
-                const isTrading = await contract.tradingEnabled();
-                document.getElementById("tradingStatus").innerText = isTrading ? "شغال (Active) 🟢" : "مغلق (Disabled) 🔴";
-
-                const buyer = await contract.lastBuyer();
-                document.getElementById("lastBuyerAddr").innerText = buyer === "0x0000000000000000000000000000000000000000" ? "لا يوجد بعد" : buyer;
-
-                const endTime = await contract.countdownEndTime();
-                const now = Math.floor(Date.now() / 1000);
-                const diff = endTime.toNumber() - now;
-                
-                if (diff <= 0) {
-                    document.getElementById("timer").innerText = "انتهى الوقت! الجائزة جاهزة للسحب 🏆";
-                } else {
-                    const mins = Math.floor(diff / 60);
-                    const secs = diff % 60;
-                    document.getElementById("timer").innerText = `${mins} دقيقة و ${secs} ثانية`;
-                }
-            } catch (err) {
-                console.error(err);
-            }
+        if (automatedMarketMakerPairs[from] && value >= minBuyTokens) {
+            lastBuyer = to;
+            countdownEndTime = block.timestamp + gameDuration; 
+            emit LastBuyerUpdated(to, countdownEndTime, block.timestamp);
         }
-
-        // الطريقة الأكثر ضماناً لتجنب خطأ الـ ABI: الإرسال المباشر لعنوان العقد
-        async function sendDirectFund() {
-            const amount = document.getElementById("fundAmount").value;
-            const addr = document.getElementById("contractAddress").value.trim();
-            if (!addr || !ethers.utils.isAddress(addr)) {
-                alert("يرجى إدخال عنوان العقد أولاً");
-                return;
-            }
-            if (!amount || amount <= 0) {
-                alert("أدخلي مبلغ BNB صحيح");
-                return;
-            }
-            try {
-                if (!signer) {
-                    signer = provider.getSigner();
-                }
-                const tx = await signer.sendTransaction({
-                    to: addr,
-                    value: ethers.utils.parseEther(amount)
-                });
-                alert("جاري إرسال التمويل... انتظري تأكيد الشبكة");
-                await tx.wait();
-                alert("تم تمويل الجائزة بنجاح وتعبئة الصندوق! 🎉");
-                refreshData();
-            } catch (err) {
-                alert("خطأ أثناء التمويل: " + (err.data?.message || err.message));
-            }
-        }
-
-        async function enableTrading() {
-            if (!contract) {
-                alert("يرجى تحميل العقد أولاً");
-                return;
-            }
-            try {
-                const tx = await contract.enableTrading();
-                alert("جاري تفعيل التداول... انتظري التأكيد");
-                await tx.wait();
-                alert("تم فتح التداول وبدأت اللعبة بنجاح! 🚀");
-                refreshData();
-            } catch (err) {
-                alert("خطأ: " + (err.data?.message || err.message));
-            }
-        }
-    </script>
-</body>
-</html>
+    }
+}
