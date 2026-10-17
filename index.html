@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumLaunchpad - Base Network Elite</title>
+    <title>QuantumLaunchpad - Live Predator Monitor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         :root {
@@ -12,6 +12,7 @@
             --accent: #0052ff;
             --success: #10b981;
             --danger: #ef4444;
+            --warning: #f59e0b;
             --text: #f9fafb;
             --text-dim: #9ca3af;
         }
@@ -27,7 +28,7 @@
         }
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
         }
         .header {
             text-align: center;
@@ -68,7 +69,6 @@
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         button:hover { opacity: 0.9; transform: translateY(-1px); }
-        button:disabled { background: #374151; cursor: not-allowed; transform: none; color: #9ca3af; }
         input {
             width: 100%;
             padding: 12px;
@@ -90,30 +90,39 @@
             margin-top: 5px;
         }
         .badge-active { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-        .badge-inactive { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .stat-box {
+            background: #030712;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #1f2937;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #38bdf8;
+            margin-top: 5px;
+        }
         .log-box {
             background: #030712;
             padding: 12px;
             border-radius: 8px;
             font-family: monospace;
             font-size: 13px;
-            color: #38bdf8;
-            min-height: 60px;
-            max-height: 160px;
+            color: #34d399;
+            min-height: 80px;
+            max-height: 200px;
             overflow-y: auto;
             border: 1px solid #1f2937;
             word-break: break-all;
             text-align: left;
             direction: ltr;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--text-dim);
-            text-align: center;
         }
     </style>
 </head>
@@ -121,196 +130,87 @@
 
     <div class="container">
         <div class="header">
-            <h1>QuantumLaunchpad : Base</h1>
-            <p style="color: var(--text-dim); font-size: 13px;">لوحة السيطرة والتحكم الفائق على شبكة Base</p>
+            <h1>QuantumLaunchpad : Monitor</h1>
+            <p style="color: var(--text-dim); font-size: 13px;">لوحة مراقبة البوتات وفخ العمليات اللحظي</p>
         </div>
 
-        <!-- ربط المحفظة والشبكة -->
+        <!-- حالة النظام -->
         <div class="card">
-            <h3>اتصال المحفظة وشبكة Base</h3>
-            <button id="connectBtn" class="btn-primary" onclick="initWeb3()">ربط المحفظة والتحول لـ Base 🛡️</button>
-            <div id="walletInfo" class="info-grid"></div>
-        </div>
-
-        <!-- حالة العقد -->
-        <div class="card">
-            <h3>حالة الفخ والملكية</h3>
+            <h3>حالة العقد والشبكة</h3>
             <div style="text-align: center;">
-                <div>حالة التداول: <span id="tradingStatusBadge" class="status-badge badge-inactive">غير متصل</span></div>
-                <div style="margin-top: 8px; font-size: 13px; color: var(--text-dim);" id="ownerText">المالك المسجل: --</div>
+                <div>حالة التداول: <span id="tradingStatusBadge" class="status-badge badge-active">نشط ومفتوح 🚀</span></div>
+                <div style="margin-top: 8px; font-size: 13px; color: var(--text-dim);" id="walletInfo">المحفظة غير متصلة</div>
             </div>
-            <button class="btn-primary" style="margin-top: 15px; background: #374151;" onclick="refreshContractState()">تحديث حالة العقد 🔄</button>
+            <button class="btn-primary" style="margin-top: 15px;" onclick="initMonitor()">توصيل ورصد الأحداث 🔍</button>
         </div>
 
-        <!-- تفعيل التداول -->
+        <!-- إحصائيات البوتات المحظورة -->
         <div class="card">
-            <h3>تفعيل النظام (Activate Trading)</h3>
-            <p style="font-size: 13px; color: var(--text-dim);">فتح الباب لبدء العمليات وتفعيل فخ الحماية للبوتات.</p>
-            <button id="activateBtn" class="btn-success" onclick="activateTrading()" disabled>تفعيل التداول الآن 🚀</button>
+            <h3>إحصائيات فخ الحماية (Predator Stats)</h3>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div style="font-size: 13px; color: var(--text-dim);">إجمالي البوتات المرصودة</div>
+                    <div id="botCount" class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div style="font-size: 13px; color: var(--text-dim);">إجمالي الأرباح المستنزفة</div>
+                    <div id="seizedTotal" class="stat-value">0 Token</div>
+                </div>
+            </div>
         </div>
 
-        <!-- إدارة الاستثناءات -->
+        <!-- سجل تفاعلات البوتات اللحظي -->
         <div class="card">
-            <h3>إدارة الاستثناءات (Whitelist)</h3>
-            <input type="text" id="targetAddress" placeholder="أدخل عنوان المحفظة 0x..." />
-            <button class="btn-primary" onclick="setExcludedStatus(true)">إضافة إلى المستثنين ✅</button>
-            <button class="btn-danger" onclick="setExcludedStatus(false)">إزالة من المستثنين ❌</button>
-        </div>
-
-        <!-- سجل الأخطاء والعمليات -->
-        <div class="card">
-            <h3>سجل التتبع اللحظي (Console)</h3>
-            <div id="logBox" class="log-box">جاهز للاتصال بشبكة Base...</div>
+            <h3>سجل مراقبة البوتات (Live Interceptions)</h3>
+            <div id="logBox" class="log-box">في انتظار تفاعل البوتات أو عمليات الشراء...</div>
         </div>
     </div>
 
     <script>
         const CONTRACT_ADDRESS = "0x5F29f10faF6C24E5E34cFeB186cF650C5CE36b6D";
-        const BASE_CHAIN_ID = "0x2105"; // 8453 بالعشري
-
+        
         const CONTRACT_ABI = [
-            "function activateTrading() external",
-            "function setExcluded(address account, bool status) external",
             "function tradingActive() external view returns (bool)",
-            "function owner() external view returns (address)"
+            "function owner() external view returns (address)",
+            "event PredatorInterception(address indexed target, uint256 seized)"
         ];
 
-        let provider, signer, contract, userAddress, contractOwner;
+        let provider, contract;
+        let interceptedBotsCount = 0;
+        let totalSeizedTokens = ethers.BigNumber.from(0);
 
-        async function initWeb3() {
+        async function initMonitor() {
             if (!window.ethereum) {
-                alert("يرجى فتح هذه الصفحة من داخل متصفح يدعم Web3 مثل MetaMask أو Mises");
+                alert("يرجى فتح الصفحة من متصفح يدعم Web3");
                 return;
             }
 
             try {
-                log("جاري طلب الاتصال بالمحفظة...");
                 provider = new ethers.providers.Web3Provider(window.ethereum);
-                
-                const network = await provider.getNetwork();
-                if (network.chainId !== 8453) {
-                    log("جاري التحويل التلقائي إلى شبكة Base...");
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: BASE_CHAIN_ID }],
-                        });
-                    } catch (switchError) {
-                        if (switchError.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: BASE_CHAIN_ID,
-                                    chainName: 'Base Mainnet',
-                                    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                                    rpcUrls: ['https://mainnet.base.org'],
-                                    blockExplorerUrls: ['https://basescan.org']
-                                }],
-                            });
-                        } else {
-                            throw switchError;
-                        }
-                    }
-                }
-
                 await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                userAddress = await signer.getAddress();
+                const signer = provider.getSigner();
+                const address = await signer.getAddress();
+
+                document.getElementById("walletInfo").innerHTML = `متصل بالحساب: ${address.substring(0,6)}...`;
                 
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                log("تم الاتصال بنجاح وجاري مراقبة الأحداث على العقد...");
 
-                document.getElementById("walletInfo").innerHTML = `
-                    <div style="color: #34d399;">المحفظة متصلة بنجاح على Base ✅</div>
-                    <div>الحساب: ${userAddress}</div>
-                `;
-                document.getElementById("connectBtn").innerText = "متصل بشبكة Base ✅";
-                document.getElementById("connectBtn").style.background = "#047857";
+                // الاستماع المباشر لحدث اصطياد البوتات (PredatorInterception) في الوقت الفعلي
+                contract.on("PredatorInterception", (target, seized, event) => {
+                    interceptedBotsCount++;
+                    totalSeizedTokens = totalSeizedTokens.add(seized);
+                    
+                    document.getElementById("botCount").innerText = interceptedBotsCount;
+                    document.getElementById("seizedTotal").innerText = ethers.utils.formatUnits(totalSeizedTokens, 18).substring(0, 8) + " Tokens";
 
-                log("تم الاتصال بنجاح. الحساب: " + userAddress);
-                await refreshContractState();
+                    log(`🚨 [تم اصطياد بوت!] الهدف: ${target} | الكمية المستنزفة: ${ethers.utils.formatUnits(seized, 18)} Tokens`);
+                });
+
+                log("🟢 النظام نشط ويستمع لأي تفاعل أو هجوم من البوتات الآن.");
 
             } catch (error) {
-                log("خطأ في الاتصال: " + (error.reason || error.message));
-            }
-        }
-
-        async function refreshContractState() {
-            if (!contract) {
-                alert("يرجى ربط المحفظة أولاً!");
-                return;
-            }
-            try {
-                log("جاري استعلام حالة العقد من شبكة Base...");
-                
-                const isActive = await contract.tradingActive();
-                const badge = document.getElementById("tradingStatusBadge");
-                if (isActive) {
-                    badge.className = "status-badge badge-active";
-                    badge.innerText = "نشط ومفتوح 🚀";
-                } else {
-                    badge.className = "status-badge badge-inactive";
-                    badge.innerText = "مغلق / متوقف ⛔";
-                }
-
-                contractOwner = await contract.owner();
-                document.getElementById("ownerText").innerText = "المالك المسجل: " + contractOwner;
-
-                const activateBtn = document.getElementById("activateBtn");
-                if (userAddress.toLowerCase() === contractOwner.toLowerCase()) {
-                    if (!isActive) {
-                        activateBtn.disabled = false;
-                        activateBtn.innerText = "تفعيل التداول الآن 🚀";
-                    } else {
-                        activateBtn.disabled = true;
-                        activateBtn.innerText = "التداول مفعل مسبقاً ✅";
-                    }
-                    log("تأكيد الصلاحية: أنت مالك العقد الرسمي.");
-                } else {
-                    activateBtn.disabled = true;
-                    activateBtn.innerText = "لست مالك العقد ❌";
-                    log("تحذير: الحساب الحالي ليس مالك العقد.");
-                }
-
-                log("تم تحديث بيانات العقد بنجاح.");
-            } catch (error) {
-                log("خطأ في قراءة بيانات العقد: " + (error.reason || error.message));
-            }
-        }
-
-        async function activateTrading() {
-            if (!contract) return;
-            try {
-                log("جاري إرسال معاملة تفعيل التداول على Base...");
-                const tx = await contract.activateTrading();
-                log("تم إرسال المعاملة، الهاش: " + tx.hash);
-                
-                await tx.wait();
-                log("تم تأكيد التفعيل بنجاح تام على شبكة Base! 🎉");
-                await refreshContractState();
-            } catch (error) {
-                log("فشلت المعاملة: " + (error.reason || error.message));
-                alert("فشلت المعاملة: تأكد من امتلاكك رصيد ETH كافٍ لرسوم الغاز.");
-            }
-        }
-
-        async function setExcludedStatus(status) {
-            if (!contract) return;
-            const target = document.getElementById("targetAddress").value.trim();
-            if (!ethers.utils.isAddress(target)) {
-                alert("يرجى إدخال عنوان محفظة (0x...) صالح!");
-                return;
-            }
-
-            try {
-                log(`جاري تحديث الاستثناء للعنوان ${target}...`);
-                const tx = await contract.setExcluded(target, status);
-                log("تم إرسال المعاملة، الهاش: " + tx.hash);
-                
-                await tx.wait();
-                log("تم تحديث الاستثناء بنجاح تام! ✅");
-                document.getElementById("targetAddress").value = "";
-            } catch (error) {
-                log("خطأ في الاستثناء: " + (error.reason || error.message));
+                log("خطأ في بدء المراقبة: " + (error.reason || error.message));
             }
         }
 
