@@ -3,133 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - Apex Predator Engine</title>
-    <!-- استخدام مكتبة ethers متوافقة ومستقرة -->
+    <title>ApexPredator V2 - لوحة التحكم والاصطياد</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
-        body {
-            font-family: Tahoma, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            padding: 20px;
-            text-align: center;
-        }
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: #1e293b;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        button {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            margin: 10px 0;
-            width: 100%;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover { background-color: #2563eb; }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: white;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        .status {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #38bdf8;
-            word-break: break-all;
-        }
+        body { font-family: Tahoma, sans-serif; background-color: #0f172a; color: #f8fafc; text-align: center; padding: 20px; }
+        .card { background: #1e293b; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        button { background: #3b82f6; color: white; border: none; padding: 12px 20px; margin: 10px 0; width: 100%; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2563eb; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; text-align: center; font-size: 16px; }
+        .status { margin-top: 15px; font-size: 14px; color: #38bdf8; word-break: break-all; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Apex Predator / MevFlash</h2>
-        <p style="font-size: 12px; color: #94a3b8;">العقد: 0xA021080086f19B8D38a1A63d0597d6da90f79Ea8</p>
+    <div class="card">
+        <h2>ApexPredator V2</h2>
+        <p style="font-size: 12px; color: #94a3b8;">العقد: 0xA021...79Ea8</p>
         
-        <button id="connectBtn">ربط المحفظة</button>
+        <button onclick="connectWallet()">ربط المحفظة (MetaMask)</button>
         <p id="walletAddress" class="status">المحفظة غير متصلة</p>
 
-        <hr style="border-color: #475569; margin: 20px 0;">
+        <hr style="border-color: #334155; margin: 20px 0;">
 
         <h3>1. تفعيل التداول</h3>
-        <button id="activateBtn">تفعيل التداول (activateTrading)</button>
+        <button onclick="activateTrading()" style="background: #10b981;">تفعيل التداول (Activate)</button>
 
-        <hr style="border-color: #475569; margin: 20px 0;">
+        <hr style="border-color: #334155; margin: 20px 0;">
 
-        <h3>2. الشراء / إطلاق الشرارة الأولى</h3>
-        <input type="number" id="bnbAmount" value="0.0005" step="0.0001">
-        <button id="buyBtn">شراء / تنفيذ الشرارة (executePredatorBuy)</button>
+        <h3>2. الشراء الفوري (Execute Buy)</h3>
+        <input type="text" id="bnbAmount" value="0.0005" placeholder="كمية BNB للشراء">
+        <button onclick="buyTokens()" style="background: #8b5cf6;">تنفيذ الشراء (Buy)</button>
 
         <p id="txStatus" class="status"></p>
     </div>
 
     <script>
         const contractAddress = "0xA021080086f19B8D38a1A63d0597d6da90f79Ea8";
+        
+        // ABI الخاص بالدالتين الأساسيتين فقط لضمان عدم حدوث أي خطأ
         const contractABI = [
             "function activateTrading() external",
-            "function executePredatorBuy() external payable"
+            "function executePredatorBuy() public payable"
         ];
 
         let provider, signer, contract;
 
-        document.getElementById("connectBtn").addEventListener("click", async () => {
-            if (typeof window.ethereum !== 'undefined') {
+        async::connectWallet = async function() {
+            if (window.ethereum) {
                 try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
                     await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
-                    const address = await signer.getAddress();
-                    document.getElementById("walletAddress").innerText = "متصل: " + address;
+                    let addr = await signer.getAddress();
+                    document.getElementById("walletAddress").innerText = "متصل: " + addr;
                     contract = new ethers.Contract(contractAddress, contractABI, signer);
-                    document.getElementById("txStatus").innerText = "تم ربط المحفظة بنجاح!";
-                } catch (error) {
-                    document.getElementById("txStatus").innerText = "فشل الاتصال: " + (error.message || error);
+                } catch (err) {
+                    alert("فشل الاتصال بالمحفظة!");
                 }
             } else {
-                alert("الرجاء استخدام متصفح يدعم Web3 مثل Mises أو Kiwi أو تطبيق MetaMask");
+                alert("يرجى فتح الصفحة من متصفح يدعم محفظة مثل MetaMask أو Mises/Kiwi!");
             }
-        });
+        }
 
-        document.getElementById("activateBtn").addEventListener("click", async () => {
-            if (!contract) { alert("يرجى ربط المحفظة أولاً"); return; }
+        async function activateTrading() {
+            if (!contract) { alert("اربط المحفظة أولاً!"); return; }
             try {
                 document.getElementById("txStatus").innerText = "جاري إرسال معاملة التفعيل...";
-                const tx = await contract.activateTrading();
+                let tx = await contract.activateTrading();
                 await tx.wait();
                 document.getElementById("txStatus").innerText = "تم تفعيل التداول بنجاح! ✅";
-            } catch (error) {
-                document.getElementById("txStatus").innerText = "خطأ: " + (error.data?.message || error.message);
+            } catch (err) {
+                document.getElementById("txStatus").innerText = "فشل التفعيل (تأكد أنك المالك): " + (err.reason || err.message);
             }
-        });
+        }
 
-        document.getElementById("buyBtn").addEventListener("click", async () => {
-            if (!contract) { alert("يرجى ربط المحفظة أولاً"); return; }
+        async function buyTokens() {
+            if (!contract) { alert("اربط المحفظة أولاً!"); return; }
             try {
-                const bnbVal = document.getElementById("bnbAmount").value;
-                const valueWei = ethers.utils.parseEther(bnbVal);
+                let amountBnb = document.getElementById("bnbAmount").value;
+                let parsedValue = ethers.utils.parseEther(amountBnb);
                 
-                document.getElementById("txStatus").innerText = "جاري تنفيذ معاملة الشراء...";
-                const tx = await contract.executePredatorBuy({ value: valueWei });
+                document.getElementById("txStatus").innerText = "جاري تنفيذ الشراء وإرسال المعاملة...";
+                
+                // استدعاء دالة الشراء مع إرفاق قيمة الـ BNB بشكل صحيح وآمن تماماً
+                let tx = await contract.executePredatorBuy({ value: parsedValue });
                 await tx.wait();
-                document.getElementById("txStatus").innerText = "تمت عملية الشراء وإطلاق الشرارة بنجاح! 🚀";
-            } catch (error) {
-                document.getElementById("txStatus").innerText = "خطأ: " + (error.data?.message || error.message);
+                
+                document.getElementById("txStatus").innerText = "تمت عملية الشراء بنجاح! 🚀";
+            } catch (err) {
+                document.getElementById("txStatus").innerText = "فشلت العملية: " + (err.reason || err.message);
             }
-        });
+        }
     </script>
 </body>
 </html>
