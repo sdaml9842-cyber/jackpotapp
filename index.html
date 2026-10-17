@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم العقد | Quantum Launchpad</title>
+    <title>لوحة تداول العقد | Quantum Launchpad</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 </head>
@@ -15,16 +15,16 @@
         <div class="text-center space-y-2">
             <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-emerald-400 text-xs font-semibold">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                عقد المفترس نشط
+                تم تفعيل التداول بنجاح
             </div>
-            <h1 class="text-2xl font-extrabold tracking-tight text-white">لوحة الإدارة والتفعيل</h1>
-            <p class="text-xs text-slate-400 font-mono break-all bg-slate-950 p-2 rounded-xl border border-slate-800">
+            <h1 class="text-xl font-extrabold tracking-tight text-white">إدارة عقد المفترس</h1>
+            <p class="text-[11px] text-slate-400 font-mono break-all bg-slate-950 p-2 rounded-xl border border-slate-800">
                 0x93eb91E922784eE08bFf436b5be1F0A86990eDD1
             </p>
         </div>
 
         <!-- Connect Button -->
-        <button id="connectBtn" onclick="connectWallet()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-blue-950 flex items-center justify-center gap-2">
+        <button id="connectBtn" onclick="connectWallet()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-blue-950 flex items-center justify-center gap-2 text-sm">
             <span>ربط المحفظة</span>
         </button>
 
@@ -32,18 +32,12 @@
 
         <!-- Actions -->
         <div class="space-y-4">
-            <!-- Activate Trading -->
-            <button onclick="activateTrading()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-4 rounded-2xl transition shadow-xl shadow-emerald-950/50 flex flex-col items-center justify-center">
-                <span class="text-base">🚀 تفعيل التداول (Activate Trading)</span>
-                <span class="text-[10px] text-emerald-200 font-normal">استدعاء الدالة لفتح حظر التداول مباشرة</span>
-            </button>
-
-            <!-- Test Buy -->
+            <!-- Test Buy Section -->
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                <label class="block text-xs font-medium text-slate-400">إجراء شراء تجريبي لتنشيط الـ Mempool (اختياري)</label>
+                <label class="block text-xs font-medium text-slate-400">حدد كمية BNB للشراء (تأكد من إرسال قيمة أكبر من الصفر)</label>
                 <div class="flex gap-2">
-                    <input type="number" id="buyAmount" value="0.0005" step="0.0001" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm text-center focus:outline-none focus:border-emerald-500">
-                    <button onclick="executeBuy()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap transition border border-emerald-500/30">
+                    <input type="number" id="buyAmount" value="0.001" step="0.0001" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white text-sm text-center focus:outline-none focus:border-emerald-500">
+                    <button onclick="executeBuy()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl text-xs whitespace-nowrap transition shadow-lg shadow-emerald-950">
                         شراء الآن
                     </button>
                 </div>
@@ -51,8 +45,8 @@
         </div>
 
         <!-- Status Log -->
-        <div id="status" class="text-center text-xs text-slate-400 bg-slate-950/50 p-3 rounded-xl min-h-[40px] flex items-center justify-center border border-slate-900">
-            بانتظار ربط المحفظة...
+        <div id="status" class="text-center text-xs text-slate-400 bg-slate-950/50 p-3 rounded-xl min-h-[50px] flex items-center justify-center border border-slate-900">
+            جاهز للاستخدام، يرجى ربط المحفظة...
         </div>
 
     </div>
@@ -60,7 +54,6 @@
     <script>
         const contractAddress = "0x93eb91E922784eE08bFf436b5be1F0A86990eDD1";
         const contractABI = [
-            "function activateTrading() external",
             "function executePredatorBuy() external payable"
         ];
 
@@ -70,37 +63,20 @@
             if (window.ethereum) {
                 try {
                     provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
+                    await provider.send("eth_requestAccounts", [], );
                     signer = provider.getSigner();
                     contract = new ethers.Contract(contractAddress, contractABI, signer);
                     
                     const address = await signer.getAddress();
-                    document.getElementById("connectBtn").innerText = "تم الربط: " + address.substring(0, 6) + "..." + address.substring(38);
-                    document.getElementById("connectBtn").classList.replace("bg-blue-600", "bg-slate-800");
-                    document.getElementById("status").innerText = "المحفظة متصلة جاهز للتفعيل.";
+                    document.getElementById("connectBtninnerText" || "connectBtn").innerText = "تم الربط: " + address.substring(0, 6) + "..." + address.substring(38);
+                    document.getElementById("connectBtn").className = "w-full bg-slate-800 text-white font-bold py-3.5 rounded-2xl transition border border-slate-700 text-sm";
+                    document.getElementById("status").innerText = "المحفظة متصلة بنجاح، يمكنك تنفيذ الشراء.";
                 } catch (err) {
                     console.error(err);
                     document.getElementById("status").innerText = "فشل الاتصال بالمحفظة.";
                 }
             } else {
-                alert("يرجى فتح الصفحة داخل متصفح المحفظة (مثل MetaMask Mobile)!");
-            }
-        }
-
-        async function activateTrading() {
-            if (!contract) {
-                alert("يرجى ربط المحفظة أولاً!");
-                return;
-            }
-            try {
-                document.getElementById("status").innerText = "جاري إرسال طلب تفعيل التداول...";
-                const tx = await contract.activateTrading();
-                document.getElementById("status").innerText = "تم إرسال المعاملة، بانتظار التأكيد: " + tx.hash.substring(0, 10) + "...";
-                await tx.wait();
-                document.getElementById("status").innerHTML = "<span class='text-emerald-400 font-bold'>✅ تم تفعيل التداول بنجاح! العقد جاهز الآن.</span>";
-            } catch (err) {
-                console.error(err);
-                document.getElementById("status").innerText = "خطأ: " + (err.data?.message || err.message);
+                alert("يرجى فتح الصفحة من داخل متصفح يدعم Web3 (مثل MetaMask Mobile)!");
             }
         }
 
@@ -111,16 +87,29 @@
             }
             try {
                 const amount = document.getElementById("buyAmount").value;
-                const txValue = ethers.utils.parseEther(amount);
+                if(!amount || parseFloat(amount) <= 0) {
+                    alert("الرجاء إدخال قيمة صحيحة للـ BNB أكبر من الصفر");
+                    return;
+                }
                 
-                document.getElementById("status").innerText = "جاري إرسال معاملة الشراء التجريبية...";
-                const tx = await contract.executePredatorBuy({ value: txValue });
-                document.getElementById("status").innerText = "تم الإرسال، بانتظار التأكيد: " + tx.hash.substring(0, 10) + "...";
+                const txValue = ethers.utils.parseEther(amount.toString());
+                
+                document.getElementById("status").innerText = "جاري إرسال معاملة الشراء وتحويل الـ BNB...";
+                
+                // إرسال المعاملة مع تحديد قيمة الـ value بـ Wei بشكل صحيح
+                const tx = await contract.executePredatorBuy({ 
+                    value: txValue,
+                    gasLimit: 300000 // تخصيص حد أمان للغاز لضمان النجاح
+                });
+                
+                document.getElementById("status").innerText = "تم إرسال المعاملة، بانتظار التأكيد...";
                 await tx.wait();
-                document.getElementById("status").innerHTML = "<span class='text-emerald-400 font-bold'>✅ تم الشراء بنجاح وتنشيط الـ Mempool!</span>";
+                
+                document.getElementById("status").innerHTML = "<span class='text-emerald-400 font-bold'>✅ تمت عملية الشراء بنجاح وتم تنشيط Mempool العقد!</span>";
             } catch (err) {
                 console.error(err);
-                document.getElementById("status").innerText = "خطأ: " + (err.data?.message || err.message);
+                let errMsg = err.data?.message || err.message || "خطأ غير معروف";
+                document.getElementById("status").innerText = "فشلت المعاملة: " + errMsg;
             }
         }
     </script>
