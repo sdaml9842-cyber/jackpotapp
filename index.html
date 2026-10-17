@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumLaunchpad Elite Dashboard</title>
+    <title>QuantumLaunchpad - Base Network Elite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #1e293b;
-            --accent: #3b82f6;
+            --bg-color: #07090e;
+            --card-bg: #111827;
+            --accent: #0052ff; /* لون شبكة Base الرسمي */
             --success: #10b981;
             --danger: #ef4444;
-            --text: #f8fafc;
-            --text-dim: #94a3b8;
+            --text: #f9fafb;
+            --text-dim: #9ca3af;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -43,15 +43,15 @@
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-            border: 1px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1f2937;
         }
         .card h3 {
             margin-top: 0;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid #1f2937;
             padding-bottom: 10px;
             font-size: 18px;
-            color: #38bdf8;
+            color: #60a5fa;
         }
         button {
             width: 100%;
@@ -68,14 +68,14 @@
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         button:hover { opacity: 0.9; transform: translateY(-1px); }
-        button:disabled { background: #475569; cursor: not-allowed; transform: none; }
+        button:disabled { background: #374151; cursor: not-allowed; transform: none; color: #9ca3af; }
         input {
             width: 100%;
             padding: 12px;
             margin: 8px 0;
             border-radius: 8px;
-            border: 1px solid #475569;
-            background: #0f172a;
+            border: 1px solid #374151;
+            background: #030712;
             color: white;
             box-sizing: border-box;
             text-align: center;
@@ -83,7 +83,7 @@
         }
         .status-badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: bold;
@@ -92,27 +92,28 @@
         .badge-active { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
         .badge-inactive { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
         .log-box {
-            background: #0f172a;
+            background: #030712;
             padding: 12px;
             border-radius: 8px;
             font-family: monospace;
             font-size: 13px;
             color: #38bdf8;
-            min-height: 50px;
-            max-height: 150px;
+            min-height: 60px;
+            max-height: 160px;
             overflow-y: auto;
-            border: 1px solid #334155;
+            border: 1px solid #1f2937;
             word-break: break-all;
             text-align: left;
             direction: ltr;
         }
         .info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr;
+            gap: 8px;
             margin-top: 10px;
             font-size: 14px;
             color: var(--text-dim);
+            text-align: center;
         }
     </style>
 </head>
@@ -120,71 +121,100 @@
 
     <div class="container">
         <div class="header">
-            <h1>QuantumLaunchpad</h1>
-            <p style="color: var(--text-dim); font-size: 13px;">لوحة الإدارة المركزية والذكية للفخ المالي</p>
+            <h1>QuantumLaunchpad : Base</h1>
+            <p style="color: var(--text-dim); font-size: 13px;">لوحة السيطرة والتحكم الفائق على شبكة Base</p>
         </div>
 
-        <!-- قسم ربط المحفظة -->
+        <!-- ربط المحفظة والشبكة -->
         <div class="card">
-            <h3>اتصال المحفظة</h3>
-            <button id="connectBtn" class="btn-primary" onclick="connectWallet()">ربط المحفظة الذكية</button>
+            <h3>اتصال المحفظة وشبكة Base</h3>
+            <button id="connectBtn" class="btn-primary" onclick="initWeb3()">ربط المحفظة والتحول لـ Base 🛡️</button>
             <div id="walletInfo" class="info-grid"></div>
         </div>
 
         <!-- حالة العقد -->
         <div class="card">
-            <h3>حالة العقد والملكية</h3>
+            <h3>حالة الفخ والملكية</h3>
             <div style="text-align: center;">
-                <div>حالة التداول: <span id="tradingStatusBadge" class="status-badge badge-inactive">جاري الفحص...</span></div>
+                <div>حالة التداول: <span id="tradingStatusBadge" class="status-badge badge-inactive">غير متصل</span></div>
                 <div style="margin-top: 8px; font-size: 13px; color: var(--text-dim);" id="ownerText">المالك المسجل: --</div>
             </div>
-            <button class="btn-primary" style="margin-top: 15px; background: #475569;" onclick="refreshContractState()">تحديث الحالة الآن 🔄</button>
+            <button class="btn-primary" style="margin-top: 15px; background: #374151;" onclick="refreshContractState()">تحديث حالة العقد 🔄</button>
         </div>
 
-        <!-- لوحة التحكم وتفعيل التداول -->
+        <!-- تفعيل التداول -->
         <div class="card">
-            <h3>تفعيل النظام الفخ</h3>
-            <p style="font-size: 13px; color: var(--text-dim);">تفعيل دالة activateTrading للسماح ببدء العمليات وصد البوتات.</p>
-            <button id="activateBtn" class="btn-success" onclick="activateTrading()" disabled>تفعيل التداول (مغلق حالياً)</button>
+            <h3>تفعيل النظام (Activate Trading)</h3>
+            <p style="font-size: 13px; color: var(--text-dim);">فتح الباب لبدء العمليات وتفعيل فخ الحماية للبوتات.</p>
+            <button id="activateBtn" class="btn-success" onclick="activateTrading()" disabled>تفعيل التداول الآن 🚀</button>
         </div>
 
         <!-- إدارة الاستثناءات -->
         <div class="card">
             <h3>إدارة الاستثناءات (Whitelist)</h3>
             <input type="text" id="targetAddress" placeholder="أدخل عنوان المحفظة 0x..." />
-            <button class="btn-primary" onclick="setExcludedStatus(true)">إضافة إلى المستثنين</button>
-            <button class="btn-danger" onclick="setExcludedStatus(false)">إزالة من المستثنين</button>
+            <button class="btn-primary" onclick="setExcludedStatus(true)">إضافة إلى المستثنين ✅</button>
+            <button class="btn-danger" onclick="setExcludedStatus(false)">إزالة من المستثنين ❌</button>
         </div>
 
-        <!-- سجل العمليات -->
+        <!-- سجل الأخطاء والعمليات -->
         <div class="card">
-            <h3>سجل التتبع والعمليات (Console)</h3>
-            <div id="logBox" class="log-box">جاهز للاتصال بشبكة البلوكشين...</div>
+            <h3>سجل التتبع اللحظي (Console)</h3>
+            <div id="logBox" class="log-box">جاهز للاتصال بشبكة Base...</div>
         </div>
     </div>
 
     <script>
         const CONTRACT_ADDRESS = "0xe97836C00f04D3E51aa2Fb17f74B1a29b6bC5334";
-        
+        const BASE_CHAIN_ID = "0x2105"; // 8453 بالعشري
+
         const CONTRACT_ABI = [
             "function activateTrading() external",
             "function setExcluded(address account, bool status) external",
             "function tradingActive() external view returns (bool)",
-            "function owner() external view returns (address)",
-            "function getReserves() external view returns (uint256 tokenRes, uint256 ethRes)"
+            "function owner() external view returns (address)"
         ];
 
         let provider, signer, contract, userAddress, contractOwner;
 
-        async function connectWallet() {
+        async function initWeb3() {
             if (!window.ethereum) {
-                alert("يرجى فتح هذه الصفحة من داخل متصفح يدعم Web3 مثل MetaMask أو Mises Browser");
+                alert("يرجى فتح هذه الصفحة من داخل متصفح يدعم Web3 مثل MetaMask أو Mises");
                 return;
             }
 
             try {
                 log("جاري طلب الاتصال بالمحفظة...");
                 provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                // التأكد من التواجد على شبكة Base
+                const network = await provider.getNetwork();
+                if (network.chainId !== 8453) {
+                    log("تم اكتشاف شبكة أخرى، جاري التحويل التلقائي إلى شبكة Base...");
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: BASE_CHAIN_ID }],
+                        });
+                    } catch (switchError) {
+                        // إذا لم تكن الشبكة مضافة، قم بإضافتها
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: BASE_CHAIN_ID,
+                                    chainName: 'Base Mainnet',
+                                    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                                    rpcUrls: ['https://mainnet.base.org'],
+                                    blockExplorerUrls: ['https://basescan.org']
+                                }],
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                }
+
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
@@ -192,17 +222,17 @@
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
                 document.getElementById("walletInfo").innerHTML = `
-                    <div>الحساب: ${userAddress.substring(0,6)}...${userAddress.substring(38)}</div>
-                    <div style="color: #34d399; text-align: left;">متصل بنجاح ✅</div>
+                    <div style="color: #34d399;">المحفظة متصلة بنجاح بنجاح على Base ✅</div>
+                    <div>الحساب: ${userAddress}</div>
                 `;
-                document.getElementById("connectBtn").innerText = "تم الاتصال بنجاح";
-                document.getElementById("connectBtn").style.background = "#059669";
+                document.getElementById("connectBtn").innerText = "متصل بشبكة Base ✅";
+                document.getElementById("connectBtn").style.background = "#047857";
 
-                log("تم ربط المحفظة بنجاح: " + userAddress);
+                log("تم الاتصال بنجاح. عنوان المحفظة: " + userAddress);
                 await refreshContractState();
 
             } catch (error) {
-                log("خطأ في الاتصال: " + (error.reason || error.message));
+                log("خطأ في الاتصال أو تبديل الشبكة: " + (error.reason || error.message));
             }
         }
 
@@ -212,9 +242,8 @@
                 return;
             }
             try {
-                log("جاري جلب بيانات العقد من الشبكة...");
+                log("جاري استعلام حالة العقد من شبكة Base...");
                 
-                // جلب حالة التداول
                 const isActive = await contract.tradingActive();
                 const badge = document.getElementById("tradingStatusBadge");
                 if (isActive) {
@@ -222,14 +251,12 @@
                     badge.innerText = "نشط ومفتوح 🚀";
                 } else {
                     badge.className = "status-badge badge-inactive";
-                    badge.innerText = "متوقف / مغلق ⛔";
+                    badge.innerText = "مغلق / متوقف ⛔";
                 }
 
-                // جلب المالك
                 contractOwner = await contract.owner();
                 document.getElementById("ownerText").innerText = "المالك المسجل: " + contractOwner;
 
-                // التحقق الذكي من الصلاحية
                 const activateBtn = document.getElementById("activateBtn");
                 if (userAddress.toLowerCase() === contractOwner.toLowerCase()) {
                     if (!isActive) {
@@ -239,33 +266,32 @@
                         activateBtn.disabled = true;
                         activateBtn.innerText = "التداول مفعل مسبقاً ✅";
                     }
-                    log("تحقق الصلاحية: أنت مالك العقد وصلاحياتك كاملة.");
+                    log("تأكيد الصلاحية: أنت مالك العقد الرسمي.");
                 } else {
                     activateBtn.disabled = true;
-                    activateBtn.innerText = "غير مسموح (لست مالك العقد) ❌";
-                    log("تنبيه: الحساب الحالي ليس مالك العقد، ستفشل معاملة التفعيل إن تم إرسالها.");
+                    activateBtn.innerText = "لست مالك العقد ❌";
+                    log("تحذير: الحساب الحالي ليس مالك العقد.");
                 }
 
                 log("تم تحديث بيانات العقد بنجاح.");
             } catch (error) {
-                log("خطأ أثناء جلب الحالة: " + (error.reason || error.message));
+                log("خطأ في قراءة بيانات العقد: تأكد من أن العنوان صحيح على شبكة Base. التفاصيل: " + (error.reason || error.message));
             }
         }
 
         async function activateTrading() {
             if (!contract) return;
             try {
-                log("جاري إرسال معاملة تفعيل التداول إلى الشبكة...");
+                log("جاري إرسال معاملة تفعيل التداول على Base...");
                 const tx = await contract.activateTrading();
-                log("تم إرسال المعاملة بنجاح، الهاش: " + tx.hash);
-                log("بانتظار تأكيد الكتلة...");
+                log("تم إرسال المعاملة، الهاش: " + tx.hash);
                 
                 await tx.wait();
-                log("تم تأكيد معاملة تفعيل التداول بنجاح تام! 🎉");
+                log("تم تأكيد التفعيل بنجاح تام على شبكة Base! 🎉");
                 await refreshContractState();
             } catch (error) {
-                log("خطأ في تنفيذ المعاملة (Reverted): " + (error.reason || error.message));
-                alert("فشلت المعاملة: تأكد من أنك تستخدم محفظة المالك وأن التداول لم يُفعل مسبقاً.");
+                log("فشلت المعاملة: " + (error.reason || error.message));
+                alert("فشلت المعاملة: تأكد من امتلاكك رصيد كافٍ من ETH لدفع رسوم الغاز على شبكة Base.");
             }
         }
 
@@ -278,9 +304,9 @@
             }
 
             try {
-                log(`جاري تحديث حالة الاستثناء للعنوان ${target} إلى ${status}...`);
+                log(`جاري تحديث الاستثناء للعنوان ${target}...`);
                 const tx = await contract.setExcluded(target, status);
-                log("معاملة الاستثناء قيد المعالجة، الهاش: " + tx.hash);
+                log("تم إرسال المعاملة، الهاش: " + tx.hash);
                 
                 await tx.wait();
                 log("تم تحديث الاستثناء بنجاح تام! ✅");
