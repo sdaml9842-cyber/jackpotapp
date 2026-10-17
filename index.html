@@ -2,101 +2,150 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>أداة سحب المجمع المتطورة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumLaunchpad Controller</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
-        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; padding: 20px; text-align: center; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; box-sizing: border-box; }
-        button { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        button:hover { background: #059669; }
-        #status { margin-top: 15px; font-size: 13px; word-break: break-all; text-align: right; line-height: 1.5; color: #fbbf24; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+        }
+        .card {
+            max-width: 500px;
+            margin: 20px auto;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        button:hover { opacity: 0.85; }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            text-align: center;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            background: #334155;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
 
+    <h2>لوحة تحكم العقد: QuantumLaunchpad</h2>
+
     <div class="card">
-        <h2>سحب المجمع الذكي</h2>
-        <button onclick="connectWallet()">1. ربط المحفظة</button>
-        <p id="walletAddress" style="font-size: 12px; color: #94a3b8;"></p>
+        <button id="connectBtn" class="btn-primary" onclick="connectWallet()">ربط المحفظة</button>
+        <div id="walletAddress" style="margin-top: 10px; font-size: 14px; color: #94a3b8;"></div>
+    </div>
 
-        <hr style="border-color: #475569; margin: 15px 0;">
+    <div class="card">
+        <h3>تفعيل التداول</h3>
+        <p style="font-size: 13px; color: #94a3b8;">اضغط لتشغيل دالة activateTrading() والسماح بالشراء</p>
+        <button class="btn-success" onclick="activateTrading()">تفعيل التداول الآن 🚀</button>
+    </div>
 
-        <label style="font-size: 12px; display: block; text-align: right;">عنوان العقد:</label>
-        <input type="text" id="contractAddress" value="0x76488cd4317470569201e004f5870affc0267c3c">
+    <div class="card">
+        <h3>إدارة الاستثناء (Set Excluded)</h3>
+        <input type="text" id="excludeAddress" placeholder="عنوان المحفظة 0x..." />
+        <button class="btn-primary" onclick="setExcluded(true)">استثناء العنوان</button>
+        <button class="btn-danger" onclick="setExcluded(false)">إلغاء الاستثناء</button>
+    </div>
 
-        <label style="font-size: 12px; display: block; text-align: right;">نوع دالة السحب في العقد:</label>
-        <select id="functionType">
-            <option value="withdraw">withdraw(amount)</option>
-            <option value="withdrawAll">withdrawAll()</option>
-            <option value="removeLiquidity">removeLiquidityETH / Max</option>
-            <option value="emergencyWithdraw">emergencyWithdraw(pid)</option>
-            <option value="claim">claim()</option>
-        </select>
-
-        <label style="font-size: 12px; display: block; text-align: right;">القيمة / الكمية / Token ID:</label>
-        <input type="text" id="withdrawAmount" placeholder="1 أو 0 أو All">
-
-        <button onclick="executeWithdraw()">2. تنفيذ السحب</button>
-
-        <div id="status"></div>
+    <div class="card">
+        <h3>الحالة والإشعارات</h3>
+        <div id="statusLog" class="status">جاهز للربط...</div>
     </div>
 
     <script>
-        let provider, signer, userAddress;
+        const CONTRACT_ADDRESS = "0xe97836C00f04D3E51aa2Fb17f74B1a29b6bC5334";
+        
+        const CONTRACT_ABI = [
+            "function activateTrading() external",
+            "function setExcluded(address account, bool status) external",
+            "function tradingActive() external view returns (bool)",
+            "function owner() external view returns (address)"
+        ];
+
+        let provider, signer, contract;
 
         async function connectWallet() {
-            if (!window.ethereum) { alert("يرجى فتح الصفحة من متصفح يدعم Web3"); return; }
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                userAddress = await signer.getAddress();
-                document.getElementById("walletAddress").innerText = "المحفظة: " + userAddress;
-                document.getElementById("status").innerText = "تم الاتصال بنجاح.";
-            } catch (err) {
-                document.getElementById("status").innerText = "خطأ الاتصال: " + err.message;
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    
+                    document.getElementById("walletAddress").innerText = "المحفظة المرتبطة: " + address;
+                    document.getElementById("connectBtn").innerText = "تم الربط بنجاح ✅";
+                    
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                    logStatus("تم ربط المحفظة والعقد بنجاح.");
+                } catch (error) {
+                    logStatus("خطأ أثناء ربط المحفظة: " + error.message);
+                }
+            } else {
+                alert("يرجى فتح الصفحة من داخل متصفح يقتني محفظة Web3 مثل MetaMask أو Mises");
             }
         }
 
-        async function executeWithdraw() {
-            const address = document.getElementById("contractAddress").value.trim();
-            const fnType = document.getElementById("functionType").value;
-            const amountVal = document.getElementById("withdrawAmount").value.trim();
+        async function activateTrading() {
+            if (!contract) return alert("قم بربط المحفظة أولاً!");
+            try {
+                logStatus("جاري إرسال معاملة تفعيل التداول...");
+                const tx = await contract.activateTrading();
+                logStatus("تم إرسال المعاملة، بانتظار التأكيد: " + tx.hash);
+                await tx.wait();
+                logStatus("تم تفعيل التداول بنجاح! 🚀");
+            } catch (error) {
+                logStatus("خطأ في التفعيل: " + (error.reason || error.message));
+            }
+        }
 
-            if (!address) { alert("أدخل عنوان العقد"); return; }
+        async function setExcluded(status) {
+            if (!contract) return alert("قم بربط المحفظة أولاً!");
+            const targetAddress = document.getElementById("excludeAddress").value.trim();
+            if (!targetAddress) return alert("يرجى إدخال عنوان صحيح!");
 
             try {
-                document.getElementById("status").innerText = "جاري إرسال الطلب...";
-
-                const abi = [
-                    "function withdraw(uint256 amount) external",
-                    "function withdrawAll() external",
-                    "function emergencyWithdraw(uint256 pid) external",
-                    "function claim() external"
-                ];
-
-                const contract = new ethers.Contract(address, abi, signer);
-                let tx;
-
-                if (fnType === "withdrawAll") {
-                    tx = await contract.withdrawAll();
-                } else if (fnType === "claim") {
-                    tx = await contract.claim();
-                } else if (fnType === "emergencyWithdraw") {
-                    tx = await contract.emergencyWithdraw(amountVal || 0);
-                } else {
-                    let parsedAmount = (amountVal === "1" || amountVal === "0") ? ethers.BigNumber.from(amountVal) : ethers.utils.parseUnits(amountVal || "1", 18);
-                    tx = await contract.withdraw(parsedAmount);
-                }
-
-                document.getElementById("status").innerText = "تم الإرسال، بانتظار التأكيد...\nHash: " + tx.hash;
+                logStatus("جاري تحديث الاستثناء للعنوان...");
+                const tx = await contract.setExcluded(targetAddress, status);
+                logStatus("تم إرسال المعاملة: " + tx.hash);
                 await tx.wait();
-                document.getElementById("status").innerText = "تم السحب بنجاح!";
+                logStatus("تم تحديث حالة الاستثناء بنجاح!");
             } catch (error) {
-                console.error(error);
-                document.getElementById("status").innerText = "فشل السحب: " + (error.reason || error.data?.message || error.message);
+                logStatus("خطأ: " + (error.reason || error.message));
             }
+        }
+
+        function logStatus(msg) {
+            document.getElementById("statusLog").innerText = msg;
         }
     </script>
 </body>
