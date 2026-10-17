@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم - Apex Predator Engine</title>
+    <!-- استخدام مكتبة ethers متوافقة ومستقرة -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         body {
@@ -59,19 +60,19 @@
         <h2>Apex Predator / MevFlash</h2>
         <p style="font-size: 12px; color: #94a3b8;">العقد: 0xA021080086f19B8D38a1A63d0597d6da90f79Ea8</p>
         
-        <button onclick="connectWallet()">ربط المحفظة</button>
+        <button id="connectBtn">ربط المحفظة</button>
         <p id="walletAddress" class="status">المحفظة غير متصلة</p>
 
         <hr style="border-color: #475569; margin: 20px 0;">
 
-        <h3>1. تفعيل التداول (للصاحب فقط)</h3>
-        <button onclick="activateTrading()">تفعيل التداول (activateTrading)</button>
+        <h3>1. تفعيل التداول</h3>
+        <button id="activateBtn">تفعيل التداول (activateTrading)</button>
 
         <hr style="border-color: #475569; margin: 20px 0;">
 
         <h3>2. الشراء / إطلاق الشرارة الأولى</h3>
-        <input type="number" id="bnbAmount" placeholder="كمية BNB للشراء (مثال: 0.0005)" value="0.0005" step="0.0001">
-        <button onclick="buyTokens()">شراء / تنفيذ الشرارة (executePredatorBuy)</button>
+        <input type="number" id="bnbAmount" value="0.0005" step="0.0001">
+        <button id="buyBtn">شراء / تنفيذ الشرارة (executePredatorBuy)</button>
 
         <p id="txStatus" class="status"></p>
     </div>
@@ -85,24 +86,25 @@
 
         let provider, signer, contract;
 
-        async::connectWallet = async function() {
-            if (window.ethereum) {
+        document.getElementById("connectBtn").addEventListener("click", async () => {
+            if (typeof window.ethereum !== 'undefined') {
                 try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
                     await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
                     const address = await signer.getAddress();
                     document.getElementById("walletAddress").innerText = "متصل: " + address;
                     contract = new ethers.Contract(contractAddress, contractABI, signer);
+                    document.getElementById("txStatus").innerText = "تم ربط المحفظة بنجاح!";
                 } catch (error) {
-                    alert("فشل الاتصال بالمحفظة: " + error.message);
+                    document.getElementById("txStatus").innerText = "فشل الاتصال: " + (error.message || error);
                 }
             } else {
-                alert("الرجاء فتح هذه الصفحة من متصفح داعم للمحفظة مثل MetaMask أو Mises Browser");
+                alert("الرجاء استخدام متصفح يدعم Web3 مثل Mises أو Kiwi أو تطبيق MetaMask");
             }
-        }
+        });
 
-        async function activateTrading() {
+        document.getElementById("activateBtn").addEventListener("click", async () => {
             if (!contract) { alert("يرجى ربط المحفظة أولاً"); return; }
             try {
                 document.getElementById("txStatus").innerText = "جاري إرسال معاملة التفعيل...";
@@ -112,9 +114,9 @@
             } catch (error) {
                 document.getElementById("txStatus").innerText = "خطأ: " + (error.data?.message || error.message);
             }
-        }
+        });
 
-        async function buyTokens() {
+        document.getElementById("buyBtn").addEventListener("click", async () => {
             if (!contract) { alert("يرجى ربط المحفظة أولاً"); return; }
             try {
                 const bnbVal = document.getElementById("bnbAmount").value;
@@ -127,7 +129,7 @@
             } catch (error) {
                 document.getElementById("txStatus").innerText = "خطأ: " + (error.data?.message || error.message);
             }
-        }
+        });
     </script>
 </body>
 </html>
