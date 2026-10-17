@@ -3,133 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الشراء - شبكة Base</title>
-    <!-- استدعاء مكتبة Ethers.js للتعامل مع العقود والمحافظ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <title>لوحة تفعيل عقد Quantum Paradox</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; text-align: center; padding-top: 50px; }
-        .card { background: #1e293b; padding: 30px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        button { background: #3b82f6; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin: 10px; transition: 0.3s; }
-        button:hover { background: #2563eb; }
-        #status { margin-top: 15px; font-size: 14px; color: #94a3b8; }
+        body {
+            font-family: Tahoma, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>شراء الرمز على شبكة Base</h2>
-        <p id="walletAddress">المحفظة غير متصلة</p>
+    <div class="container">
+        <h2>إدارة عقد QPRX</h2>
+        <p style="font-size: 12px; color: #94a3b8;">العنوان: 0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE</p>
         
-        <br>
-        <button onclick="connectWallet()">ربط المحفظة</button>
-        <button onclick="buyToken()">شراء الآن</button>
+        <button id="connectBtn" onclick="connectWallet()">ربط المحفظة</button>
+        <button id="activateBtn" onclick="activateEngine()" style="background-color: #10b981; display:none;">تفعيل التداول (Activate)</button>
         
-        <div id="status"></div>
+        <div class="status" id="status">الرجاء ربط المحفظة للبدء</div>
     </div>
 
+    <!-- استدعاء مكتبة Ethers.js للتعامل مع العقود الذكية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script>
-        // --- 1. إعدادات العقد وشبكة Base ---
-        const BASE_CHAIN_ID = "0x2105"; // 8453 بالـ Hexadecimal
-        const CONTRACT_ADDRESS = "0xb641f9B099963443951180Eea91ad59390Bd1A7a"; // عنوان عقدك
-        
-        // ضع هنا دالة الشراء (ABI الخاص بعقدك والدالة المسؤولة عن الشراء مثل buy أو mint)
-        const CONTRACT_ABI = [
-            "function buy() payable public" // مثال: استبدلها بدالة الشراء الفعلي في عقدك إذا كانت مختلفة
+        const contractAddress = "0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE";
+        // واجهة مبسطة تحتوي فقط على دالة التفعيل والتحقق من المالك
+        const contractABI = [
+            "function activateEngine() external",
+            "function owner() view returns (address)"
         ];
 
-        let provider;
-        let signer;
+        let provider, signer, contract;
 
-        // --- 2. دالة ربط المحفظة ---
+        async::connectWallet = async function() {} // Dummy to avoid syntax issues in thought
+
         async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
+            if (window.ethereum) {
                 try {
+                    document.getElementById("status").innerText = "جاري الاتصال بالمحفظة...";
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
                     provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
-                    let address = await signer.getAddress();
+                    const address = await signer.getAddress();
                     
-                    document.getElementById("walletAddress").innerText = "تم الاتصال: " + address.substring(0, 6) + "..." + address.substring(38);
-                    document.getElementById("status").innerText = "تم ربط المحفظة بنجاح!";
+                    document.getElementById("status").innerText = "تم الاتصال: " + address.substring(0, 6) + "...";
+                    document.getElementById("connectBtn").style.display = "none";
+                    document.getElementById("activateBtn").style.display = "block";
                     
-                    // التحقق التلقائي والتحويل لشبكة Base فور ربط المحفظة
-                    await ensureBaseNetwork();
+                    contract = new ethers.Contract(contractAddress, contractABI, signer);
                 } catch (error) {
-                    console.error(error);
-                    document.getElementById("status").innerText = "فشل الاتصال بالمحفظة.";
+                    document.getElementById("status").innerText = "فشل الاتصال: " + error.message;
                 }
             } else {
-                alert("يرجى فتح الموقع من متصفح محفظة Web3 (مثل متصفح Binance Web3 أو MetaMask)");
+                alert("يرجى فتح الصفحة من متصفح يدعم المحافظ (مثل MetaMask أو Mises)");
             }
         }
 
-        // --- 3. دالة التحقق وإجبار المحفظة على التحول لشبكة Base ---
-        async function ensureBaseNetwork() {
+        async function activateEngine() {
             try {
-                const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+                document.getElementById("status").innerText = "جاري إرسال معاملة التفعيل... يرجى التأكيد من المحفظة";
                 
-                if (currentChainId !== BASE_CHAIN_ID) {
-                    document.getElementById("status").innerText = "جاري تحويل المحفظة إلى شبكة Base...";
-                    try {
-                        // محاولة التحويل المباشر لشبكة Base
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: BASE_CHAIN_ID }],
-                        });
-                    } catch (switchError) {
-                        // إذا لم تكن الشبكة مضافة مسبقاً في المحفظة، قم بإضافتها تلقائياً
-                        if (switchError.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: BASE_CHAIN_ID,
-                                    chainName: 'Base Mainnet',
-                                    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-                                    rpcUrls: ['https://mainnet.base.org'],
-                                    blockExplorerUrls: ['https://basescan.org'],
-                                }],
-                            });
-                        } else {
-                            throw switchError;
-                        }
-                    }
-                }
-                document.getElementById("status").innerText = "المحفظة متصلة بشبكة Base وجاهزة للشراء!";
-            } catch (error) {
-                console.error("خطأ في تغيير الشبكة:", error);
-                document.getElementById("status").innerText = "يرجى تغيير الشبكة يدوياً إلى Base من المحفظة.";
-            }
-        }
-
-        // --- 4. دالة الشراء التنفيذية ---
-        async function buyToken() {
-            try {
-                if (!signer) {
-                    alert("يرجى ربط المحفظة أولاً!");
-                    return;
-                }
-
-                // التأكد مرة أخرى أننا على شبكة Base قبل إرسال المعاملة لمنع أي خطأ
-                await ensureBaseNetwork();
-
-                document.getElementById("status").innerText = "جاري تنفيذ معاملة الشراء...";
-
-                // ربط العقد
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-                // تنفيذ دالة الشراء (إذا كان العقد يتطلب إرسال ETH معها، حدد القيمة في value، مثلاً 0.001 ETH)
-                // استبدل buy() بالدالة الموجودة في عقدك وإذا كانت تتطلب قيمة أضف { value: ethers.utils.parseEther("0.001") }
-                const tx = await contract.buy({
-                    value: ethers.utils.parseEther("0.0001") // اضبط القيمة حسب رغبتك أو اجعلها 0 إذا كانت مجانية/تعتمد على التوكن
-                });
-
-                document.getElementById("status").innerText = "تم إرسال المعاملة، بانتظار التأكيد...";
+                // استدعاء دالة التفعيل
+                const tx = await contract.activateEngine();
+                document.getElementById("status").innerText = "تم إرسال المعاملة، بانتظار التأكيد: " + tx.hash;
+                
                 await tx.wait();
-                
-                document.getElementById("status").innerText = "🎉 تم الشراء بنجاح!";
+                document.getElementById("status").innerText = "تم تفعيل التداول بنجاح تام! 🚀";
+                document.getElementById("activateBtn").style.backgroundColor = "#059669";
             } catch (error) {
-                console.error(error);
-                document.getElementById("status").innerText = "فشلت المعاملة: " + (error.data?.message || error.message);
+                document.getElementById("status").innerText = "خطأ أثناء التفعيل: " + (error.data?.message || error.message);
             }
         }
     </script>
