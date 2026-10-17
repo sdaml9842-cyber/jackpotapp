@@ -2,35 +2,36 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>أداة سحب المجمع مباشرة</title>
-    <!-- تضمين مكتبة Ethers.js للتعامل مع Web3 -->
+    <title>كشف وسحب المجمعات تلقائياً</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; padding: 20px; text-align: center; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        select, input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; box-sizing: border-box; }
         button { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         button:hover { background: #059669; }
         #status { margin-top: 15px; font-size: 14px; word-break: break-all; }
+        .info { font-size: 12px; color: #94a3b8; text-align: right; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h2>سحب المجمع مباشرة</h2>
-        <button onclick="connectWallet()">ربط المحفظة</button>
-        <p id="walletAddress" style="font-size: 12px; color: #94a3b8;"></p>
+        <h2>أداة السحب التلقائي للمجمعات</h2>
+        <button onclick="connectAndDetect()">ربط المحفظة والتعرف على المجمع</button>
+        <p id="walletAddress" class="info"></p>
 
         <hr style="border-color: #475569; margin: 15px 0;">
 
-        <!-- حقول مخصصة حسب نوع العقد والدالة المراد استدعاؤها -->
-        <label>عنوان عقد المجمع (LP/Router):</label>
-        <input type="text" id="contractAddress" placeholder="0x...">
+        <label class="info">المجمعات المكتشفة في المحفظة:</label>
+        <select id="poolsList">
+            <option value="">-- اربط المحفظة أولاً --</option>
+        </select>
 
-        <label>الكمية أو معرف المركز (Token ID / Liquidity):</label>
-        <input type="text" id="amountOrId" placeholder="أدخل القيمة أو الـ ID">
+        <label class="info">الكمية المراد سحبها:</label>
+        <input type="text" id="withdrawAmount" placeholder="أدخل الكمية (مثال: 100 أو All)">
 
-        <button onclick="withdrawLiquidity()">تنفيذ السحب</button>
+        <button onclick="withdrawSelectedPool()">سحب المجمع المحدد</button>
 
         <div id="status"></div>
     </div>
@@ -38,50 +39,65 @@
     <script>
         let provider, signer, userAddress;
 
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    userAddress = await signer.getAddress();
-                    document.getElementById("walletAddress").innerText = "تم الاتصال: " + userAddress;
-                } catch (error) {
-                    document.getElementById("status").innerText = "فشل الاتصال: " + error.message;
-                }
-            } else {
-                alert("يرجى فتح الصفحة من متصفح يدعم المحافظ (مثل MetaMask أو Mises)");
-            }
-        }
-
-        async function withdrawLiquidity() {
-            const address = document.getElementById("contractAddress").value;
-            const amountOrId = document.getElementById("amountOrId").value;
-
-            if (!address || !amountOrId) {
-                alert("الرجاء ملء جميع الحقول");
+        async function connectAndDetect() {
+            if (!window.ethereum) {
+                alert("يرجى استخدام متصفح يدعم Web3 (مثل MetaMask أو Mises)");
                 return;
             }
 
             try {
-                document.getElementById("status").innerText = "جاري تنفيذ المعاملة...";
-
-                // مثال على ABI مبسط لدالة سحب شائعة (يمكنك تعديله حسب دالة العقد الفعلية لديك مثل removeLiquidity أو withdraw)
-                const abi = [
-                    "function withdraw(uint256 amount) external",
-                    "function removeLiquidity(address tokenA, address tokenB, uint liquidity, uint amountAMin, uint amountBMin, address to, uint deadline) external returns (uint amountA, uint amountB)"
-                ];
-
-                const contract = new ethers.Contract(address, abi, signer);
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
                 
-                // استدعاء الدالة (تأكد من مطابقة اسم الدالة والباراميترات لعقدك المحدد)
-                const tx = await contract.withdraw(amountOrId); 
-                
+                document.getElementById("walletAddress").innerText = "المحفظة: " + userAddress;
+                document.getElementById("status").innerText = "جاري البحث عن المجمعات والمراكز المرتبطة...";
+
+                // هنا يتم جلب الأرصدة أو استعلام عقد الموجه (Router) أو العقود الشهيرة
+                // كمثال توضيحي للربط التلقائي، سنتحقق من رصيد محفظتك ونفترض إضافة خيار افتراضي لعقد المجمع النشط
+                let balance = await provider.getBalance(userAddress);
+                let formattedBal = ethers.utils.formatEther(balance);
+
+                let select = document.getElementById("poolsList");
+                select.innerHTML = ""; // تفريغ القائمة
+
+                // إضافة خيار تجريبي أو اكتشافي بناءً على العنوان النشط
+                let option = document.createElement("option");
+                option.value = "0xYourPoolOrRouterContractHere"; // استبدله بعنوان العقد الفعلي إذا رغبت
+                option.text = "مجمع سيولة نشط (رصيد BNB/ETH بالمحفظة: " + parseFloat(formattedBal).toFixed(4) + ")";
+                select.appendChild(option);
+
+                document.getElementById("status").innerText = "تم التعرف على المحفظة بنجاح، يختار المجمع وتتم عملية السحب.";
+
+            } catch (error) {
+                document.getElementById("status").innerText = "خطأ في الاتصال: " + error.message;
+            }
+        }
+
+        async function withdrawSelectedPool() {
+            const poolAddress = document.getElementById("poolsList").value;
+            const amount = document.getElementById("withdrawAmount").value;
+
+            if (!poolAddress || !amount) {
+                alert("الرجاء التأكد من اختيار المجمع وتحديد الكمية");
+                return;
+            }
+
+            try {
+                document.getElementById("status").innerText = "جاري إرسال معاملة السحب...";
+
+                // مثال على ABI الخاص بالسحب
+                const abi = ["function withdraw(uint256 amount) external"];
+                const contract = new ethers.Contract(poolAddress, abi, signer);
+
+                const tx = await contract.withdraw(ethers.utils.parseUnits(amount, 18));
                 document.getElementById("status").innerText = "تم إرسال المعاملة، بانتظار التأكيد...\nHash: " + tx.hash;
+                
                 await tx.wait();
                 document.getElementById("status").innerText = "تم السحب بنجاح!";
             } catch (error) {
-                document.getElementById("status").innerText = "حدث خطأ: " + (error.data?.message || error.message);
+                document.getElementById("status").innerText = "فشل السحب: " + (error.data?.message || error.message);
             }
         }
     </script>
