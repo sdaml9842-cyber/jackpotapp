@@ -2,197 +2,88 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سحب سيولة المجمع بالكامل</title>
+    <title>أداة سحب المجمع مباشرة</title>
+    <!-- تضمين مكتبة Ethers.js للتعامل مع Web3 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #080b11;
-            --card: #121824;
-            --inner: #1b2234;
-            --accent: #1fc7d4;
-            --danger: #ed4b9e;
-            --text: #f4f6f8;
-            --muted: #8a99ad;
-            --border: #273147;
-        }
-        * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
-        .box { width: 100%; max-width: 480px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-connect { background: var(--accent); color: #000; border: none; padding: 8px 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
-        .card-inner { background: var(--inner); border-radius: 14px; padding: 15px; margin-bottom: 15px; }
-        .input-group { margin-bottom: 12px; }
-        .input-group label { display: block; color: var(--muted); font-size: 0.85rem; margin-bottom: 6px; }
-        .input-group input { width: 100%; background: #0c1017; border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 0.9rem; direction: ltr; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
-        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 14px; background: var(--accent); color: #000; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 8px; }
-        .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-danger { background: var(--danger); color: #fff; }
-        .status { margin-top: 12px; font-size: 0.85rem; text-align: center; color: var(--muted); word-break: break-all; }
+        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #fff; padding: 20px; text-align: center; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; }
+        button { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        button:hover { background: #059669; }
+        #status { margin-top: 15px; font-size: 14px; word-break: break-all; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <div class="header">
-        <h3>سحب سيولة المجمع بالكامل</h3>
-        <button class="btn-connect" id="connectBtn" onclick="connectWallet()">ربط المحفظة</button>
+    <div class="card">
+        <h2>سحب المجمع مباشرة</h2>
+        <button onclick="connectWallet()">ربط المحفظة</button>
+        <p id="walletAddress" style="font-size: 12px; color: #94a3b8;"></p>
+
+        <hr style="border-color: #475569; margin: 15px 0;">
+
+        <!-- حقول مخصصة حسب نوع العقد والدالة المراد استدعاؤها -->
+        <label>عنوان عقد المجمع (LP/Router):</label>
+        <input type="text" id="contractAddress" placeholder="0x...">
+
+        <label>الكمية أو معرف المركز (Token ID / Liquidity):</label>
+        <input type="text" id="amountOrId" placeholder="أدخل القيمة أو الـ ID">
+
+        <button onclick="withdrawLiquidity()">تنفيذ السحب</button>
+
+        <div id="status"></div>
     </div>
 
-    <div class="card-inner">
-        <div class="input-group">
-            <label>عنوان توكن YAY (Token Address):</label>
-            <input type="text" id="tokenAddress" placeholder="0x..." value="0x40ac920000000000000000000000000000000000" onchange="loadLPInfo()">
-        </div>
-        <div class="input-group">
-            <label>عنوان عقد المجمع (LP Pair Address):</label>
-            <input type="text" id="pairAddress" placeholder="سيتم جلبه تلقائياً أو أدخله يدوياً" onchange="loadLPInfo()">
-        </div>
-    </div>
+    <script>
+        let provider, signer, userAddress;
 
-    <div class="card-inner">
-        <div class="info-row">
-            <span>رصيدك من توكنات LP:</span>
-            <span id="lpBalance">0.00</span>
-        </div>
-        <div class="info-row">
-            <span>نسبة السحب:</span>
-            <span style="color: var(--accent);">100% (سحب كامل المجمع)</span>
-        </div>
-    </div>
-
-    <button class="btn-action" id="approveBtn" onclick="approveLP()" disabled>1. موافقة على الـ LP (Approve)</button>
-    <button class="btn-action btn-danger" id="removeBtn" onclick="removeAllLiquidity()" disabled>2. تفريغ وسحب المجمع بالكامل</button>
-
-    <div class="status" id="statusBox">قم بربط المحفظة واختيار التوكن للمتابعة</div>
-</div>
-
-<script>
-    const ROUTER_ADDRESS = "0x10ED433C71B354367343be24170a6742a4638b0B"; // PancakeSwap V2 Router
-    const FACTORY_ADDRESS = "0xcA143Ce32Fe78f1f7019d7d551a6402fc5350c73"; // PancakeSwap V2 Factory
-    const WBNB_ADDRESS = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
-
-    const ABI_FACTORY = ["function getPair(address tokenA, address tokenB) external view returns (address pair)"];
-    const ABI_PAIR = [
-        "function balanceOf(address owner) view returns (uint256)",
-        "function approve(address spender, uint256 value) returns (bool)",
-        "function allowance(address owner, address spender) view returns (uint256)"
-    ];
-    const ABI_ROUTER = [
-        "function removeLiquidityETH(address token, uint liquidity, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external returns (uint amountToken, uint amountETH)",
-        "function removeLiquidityETHSupportingFeeOnTransferTokens(address token, uint liquidity, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external returns (uint amountETH)"
-    ];
-
-    let provider, signer, userAddress;
-    let pairContract, routerContract;
-    let rawBalance = ethers.BigNumber.from(0);
-
-    async function connectWallet() {
-        if (window.ethereum) {
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                userAddress = await signer.getAddress();
-                
-                document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
-                document.getElementById('statusBox').innerText = "تم ربط المحفظة بنجاح";
-
-                routerContract = new ethers.Contract(ROUTER_ADDRESS, ABI_ROUTER, signer);
-                await loadLPInfo();
-            } catch (err) {
-                document.getElementById('statusBox').innerText = "خطأ في الربط: " + err.message;
-            }
-        } else {
-            alert("يرجى فتح الصفحة من داخل متصفح يحتوي على محفظة Web3 مثل MetaMask أو Mises Browser");
-        }
-    }
-
-    async function loadLPInfo() {
-        if (!signer) return;
-        const tokenAddr = document.getElementById('tokenAddress').value.trim();
-        let pairAddr = document.getElementById('pairAddress').value.trim();
-
-        try {
-            if (!pairAddr && tokenAddr) {
-                const factoryContract = new ethers.Contract(FACTORY_ADDRESS, ABI_FACTORY, provider);
-                pairAddr = await factoryContract.getPair(tokenAddr, WBNB_ADDRESS);
-                if (pairAddr !== "0x0000000000000000000000000000000000000000") {
-                    document.getElementById('pairAddress').value = pairAddr;
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    document.getElementById("walletAddress").innerText = "تم الاتصال: " + userAddress;
+                } catch (error) {
+                    document.getElementById("status").innerText = "فشل الاتصال: " + error.message;
                 }
+            } else {
+                alert("يرجى فتح الصفحة من متصفح يدعم المحافظ (مثل MetaMask أو Mises)");
+            }
+        }
+
+        async function withdrawLiquidity() {
+            const address = document.getElementById("contractAddress").value;
+            const amountOrId = document.getElementById("amountOrId").value;
+
+            if (!address || !amountOrId) {
+                alert("الرجاء ملء جميع الحقول");
+                return;
             }
 
-            if (pairAddr && pairAddr !== "0x0000000000000000000000000000000000000000") {
-                pairContract = new ethers.Contract(pairAddr, ABI_PAIR, signer);
-                rawBalance = await pairContract.balanceOf(userAddress);
-                
-                const formatted = ethers.utils.formatEther(rawBalance);
-                document.getElementById('lpBalance').innerText = parseFloat(formatted).toFixed(6);
-
-                if (rawBalance.gt(0)) {
-                    document.getElementById('statusBox').innerText = "تم العثور على رصيد المجمع! اضغط موافقة أولاً.";
-                    document.getElementById('approveBtn').disabled = false;
-                } else {
-                    document.getElementById('statusBox').innerText = "تنبيه: رصيد توكنات الـ LP في هذه المحفظة يساوي 0";
-                }
-            }
-        } catch (err) {
-            document.getElementById('statusBox').innerText = "خطأ أثناء قراءة بيانات المجمع: " + err.message;
-        }
-    }
-
-    async function approveLP() {
-        try {
-            document.getElementById('statusBox').innerText = "جاري طلب الموافقة من المحفظة...";
-            const tx = await pairContract.approve(ROUTER_ADDRESS, rawBalance);
-            await tx.wait();
-            document.getElementById('statusBox').innerText = "تمت الموافقة بنجاح! اضغط الآن على زر التفريغ والسحب.";
-            document.getElementById('removeBtn').disabled = false;
-        } catch (err) {
-            document.getElementById('statusBox').innerText = "خطأ في عملية الموافقة: " + err.message;
-        }
-    }
-
-    async function removeAllLiquidity() {
-        try {
-            const tokenAddr = document.getElementById('tokenAddress').value.trim();
-            const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 دقائق
-
-            document.getElementById('statusBox').innerText = "جاري تنفيذ معاملة تفريغ المجمع...";
-            
-            let tx;
             try {
-                // المحاولة الأولى: السحب المباشر المباشر القياسي
-                tx = await routerContract.removeLiquidityETH(
-                    tokenAddr,
-                    rawBalance,
-                    0,
-                    0,
-                    userAddress,
-                    deadline
-                );
-            } catch (e) {
-                // المحاولة الثانية: السحب المخصص للتوكنات التي تحتوي على رسوم نقل (Fee on Transfer)
-                tx = await routerContract.removeLiquidityETHSupportingFeeOnTransferTokens(
-                    tokenAddr,
-                    rawBalance,
-                    0,
-                    0,
-                    userAddress,
-                    deadline
-                );
+                document.getElementById("status").innerText = "جاري تنفيذ المعاملة...";
+
+                // مثال على ABI مبسط لدالة سحب شائعة (يمكنك تعديله حسب دالة العقد الفعلية لديك مثل removeLiquidity أو withdraw)
+                const abi = [
+                    "function withdraw(uint256 amount) external",
+                    "function removeLiquidity(address tokenA, address tokenB, uint liquidity, uint amountAMin, uint amountBMin, address to, uint deadline) external returns (uint amountA, uint amountB)"
+                ];
+
+                const contract = new ethers.Contract(address, abi, signer);
+                
+                // استدعاء الدالة (تأكد من مطابقة اسم الدالة والباراميترات لعقدك المحدد)
+                const tx = await contract.withdraw(amountOrId); 
+                
+                document.getElementById("status").innerText = "تم إرسال المعاملة، بانتظار التأكيد...\nHash: " + tx.hash;
+                await tx.wait();
+                document.getElementById("status").innerText = "تم السحب بنجاح!";
+            } catch (error) {
+                document.getElementById("status").innerText = "حدث خطأ: " + (error.data?.message || error.message);
             }
-
-            await tx.wait();
-            document.getElementById('statusBox').innerText = "تم سحب المجمع بالكامل بنجاح وإعادة الـ BNB والتوكنات إلى محفظتك!";
-            await loadLPInfo();
-        } catch (err) {
-            document.getElementById('statusBox').innerText = "فشلت المعاملة: " + (err.reason || err.message);
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>
