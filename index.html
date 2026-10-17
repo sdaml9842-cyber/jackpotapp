@@ -3,83 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumLaunchpad Controller</title>
+    <title>QuantumLaunchpad Elite Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+        .header {
             text-align: center;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            color: #60a5fa;
+            font-size: 24px;
+            margin-bottom: 5px;
         }
         .card {
-            max-width: 500px;
-            margin: 20px auto;
-            background: #1e293b;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            border: 1px solid #334155;
+        }
+        .card h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            font-size: 18px;
+            color: #38bdf8;
         }
         button {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 14px;
+            margin: 8px 0;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.2s ease;
         }
-        .btn-primary { background: #3b82f6; color: white; }
-        .btn-success { background: #22c55e; color: white; }
-        .btn-danger { background: #ef4444; color: white; }
-        button:hover { opacity: 0.85; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:disabled { background: #475569; cursor: not-allowed; transform: none; }
         input {
-            width: calc(100% - 20px);
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
             margin: 8px 0;
-            border-radius: 6px;
-            border: 1px solid #334155;
+            border-radius: 8px;
+            border: 1px solid #475569;
             background: #0f172a;
-            color: #fff;
+            color: white;
+            box-sizing: border-box;
             text-align: center;
+            font-size: 15px;
         }
-        .status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
-            background: #334155;
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .badge-active { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .badge-inactive { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .log-box {
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #38bdf8;
+            min-height: 50px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #334155;
             word-break: break-all;
+            text-align: left;
+            direction: ltr;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-dim);
         }
     </style>
 </head>
 <body>
 
-    <h2>لوحة تحكم العقد: QuantumLaunchpad</h2>
+    <div class="container">
+        <div class="header">
+            <h1>QuantumLaunchpad</h1>
+            <p style="color: var(--text-dim); font-size: 13px;">لوحة الإدارة المركزية والذكية للفخ المالي</p>
+        </div>
 
-    <div class="card">
-        <button id="connectBtn" class="btn-primary" onclick="connectWallet()">ربط المحفظة</button>
-        <div id="walletAddress" style="margin-top: 10px; font-size: 14px; color: #94a3b8;"></div>
-    </div>
+        <!-- قسم ربط المحفظة -->
+        <div class="card">
+            <h3>اتصال المحفظة</h3>
+            <button id="connectBtn" class="btn-primary" onclick="connectWallet()">ربط المحفظة الذكية</button>
+            <div id="walletInfo" class="info-grid"></div>
+        </div>
 
-    <div class="card">
-        <h3>تفعيل التداول</h3>
-        <p style="font-size: 13px; color: #94a3b8;">اضغط لتشغيل دالة activateTrading() والسماح بالشراء</p>
-        <button class="btn-success" onclick="activateTrading()">تفعيل التداول الآن 🚀</button>
-    </div>
+        <!-- حالة العقد -->
+        <div class="card">
+            <h3>حالة العقد والملكية</h3>
+            <div style="text-align: center;">
+                <div>حالة التداول: <span id="tradingStatusBadge" class="status-badge badge-inactive">جاري الفحص...</span></div>
+                <div style="margin-top: 8px; font-size: 13px; color: var(--text-dim);" id="ownerText">المالك المسجل: --</div>
+            </div>
+            <button class="btn-primary" style="margin-top: 15px; background: #475569;" onclick="refreshContractState()">تحديث الحالة الآن 🔄</button>
+        </div>
 
-    <div class="card">
-        <h3>إدارة الاستثناء (Set Excluded)</h3>
-        <input type="text" id="excludeAddress" placeholder="عنوان المحفظة 0x..." />
-        <button class="btn-primary" onclick="setExcluded(true)">استثناء العنوان</button>
-        <button class="btn-danger" onclick="setExcluded(false)">إلغاء الاستثناء</button>
-    </div>
+        <!-- لوحة التحكم وتفعيل التداول -->
+        <div class="card">
+            <h3>تفعيل النظام الفخ</h3>
+            <p style="font-size: 13px; color: var(--text-dim);">تفعيل دالة activateTrading للسماح ببدء العمليات وصد البوتات.</p>
+            <button id="activateBtn" class="btn-success" onclick="activateTrading()" disabled>تفعيل التداول (مغلق حالياً)</button>
+        </div>
 
-    <div class="card">
-        <h3>الحالة والإشعارات</h3>
-        <div id="statusLog" class="status">جاهز للربط...</div>
+        <!-- إدارة الاستثناءات -->
+        <div class="card">
+            <h3>إدارة الاستثناءات (Whitelist)</h3>
+            <input type="text" id="targetAddress" placeholder="أدخل عنوان المحفظة 0x..." />
+            <button class="btn-primary" onclick="setExcludedStatus(true)">إضافة إلى المستثنين</button>
+            <button class="btn-danger" onclick="setExcludedStatus(false)">إزالة من المستثنين</button>
+        </div>
+
+        <!-- سجل العمليات -->
+        <div class="card">
+            <h3>سجل التتبع والعمليات (Console)</h3>
+            <div id="logBox" class="log-box">جاهز للاتصال بشبكة البلوكشين...</div>
+        </div>
     </div>
 
     <script>
@@ -89,63 +170,131 @@
             "function activateTrading() external",
             "function setExcluded(address account, bool status) external",
             "function tradingActive() external view returns (bool)",
-            "function owner() external view returns (address)"
+            "function owner() external view returns (address)",
+            "function getReserves() external view returns (uint256 tokenRes, uint256 ethRes)"
         ];
 
-        let provider, signer, contract;
+        let provider, signer, contract, userAddress, contractOwner;
 
         async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    const address = await signer.getAddress();
-                    
-                    document.getElementById("walletAddress").innerText = "المحفظة المرتبطة: " + address;
-                    document.getElementById("connectBtn").innerText = "تم الربط بنجاح ✅";
-                    
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                    logStatus("تم ربط المحفظة والعقد بنجاح.");
-                } catch (error) {
-                    logStatus("خطأ أثناء ربط المحفظة: " + error.message);
+            if (!window.ethereum) {
+                alert("يرجى فتح هذه الصفحة من داخل متصفح يدعم Web3 مثل MetaMask أو Mises Browser");
+                return;
+            }
+
+            try {
+                log("جاري طلب الاتصال بالمحفظة...");
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                document.getElementById("walletInfo").innerHTML = `
+                    <div>الحساب: ${userAddress.substring(0,6)}...${userAddress.substring(38)}</div>
+                    <div style="color: #34d399; text-align: left;">متصل بنجاح ✅</div>
+                `;
+                document.getElementById("connectBtn").innerText = "تم الاتصال بنجاح";
+                document.getElementById("connectBtn").style.background = "#059669";
+
+                log("تم ربط المحفظة بنجاح: " + userAddress);
+                await refreshContractState();
+
+            } catch (error) {
+                log("خطأ في الاتصال: " + (error.reason || error.message));
+            }
+        }
+
+        async function refreshContractState() {
+            if (!contract) {
+                alert("يرجى ربط المحفظة أولاً!");
+                return;
+            }
+            try {
+                log("جاري جلب بيانات العقد من الشبكة...");
+                
+                // جلب حالة التداول
+                const isActive = await contract.tradingActive();
+                const badge = document.getElementById("tradingStatusBadge");
+                if (isActive) {
+                    badge.className = "status-badge badge-active";
+                    badge.innerText = "نشط ومفتوح 🚀";
+                } else {
+                    badge.className = "status-badge badge-inactive";
+                    badge.innerText = "متوقف / مغلق ⛔";
                 }
-            } else {
-                alert("يرجى فتح الصفحة من داخل متصفح يقتني محفظة Web3 مثل MetaMask أو Mises");
+
+                // جلب المالك
+                contractOwner = await contract.owner();
+                document.getElementById("ownerText").innerText = "المالك المسجل: " + contractOwner;
+
+                // التحقق الذكي من الصلاحية
+                const activateBtn = document.getElementById("activateBtn");
+                if (userAddress.toLowerCase() === contractOwner.toLowerCase()) {
+                    if (!isActive) {
+                        activateBtn.disabled = false;
+                        activateBtn.innerText = "تفعيل التداول الآن 🚀";
+                    } else {
+                        activateBtn.disabled = true;
+                        activateBtn.innerText = "التداول مفعل مسبقاً ✅";
+                    }
+                    log("تحقق الصلاحية: أنت مالك العقد وصلاحياتك كاملة.");
+                } else {
+                    activateBtn.disabled = true;
+                    activateBtn.innerText = "غير مسموح (لست مالك العقد) ❌";
+                    log("تنبيه: الحساب الحالي ليس مالك العقد، ستفشل معاملة التفعيل إن تم إرسالها.");
+                }
+
+                log("تم تحديث بيانات العقد بنجاح.");
+            } catch (error) {
+                log("خطأ أثناء جلب الحالة: " + (error.reason || error.message));
             }
         }
 
         async function activateTrading() {
-            if (!contract) return alert("قم بربط المحفظة أولاً!");
+            if (!contract) return;
             try {
-                logStatus("جاري إرسال معاملة تفعيل التداول...");
+                log("جاري إرسال معاملة تفعيل التداول إلى الشبكة...");
                 const tx = await contract.activateTrading();
-                logStatus("تم إرسال المعاملة، بانتظار التأكيد: " + tx.hash);
+                log("تم إرسال المعاملة بنجاح، الهاش: " + tx.hash);
+                log("بانتظار تأكيد الكتلة...");
+                
                 await tx.wait();
-                logStatus("تم تفعيل التداول بنجاح! 🚀");
+                log("تم تأكيد معاملة تفعيل التداول بنجاح تام! 🎉");
+                await refreshContractState();
             } catch (error) {
-                logStatus("خطأ في التفعيل: " + (error.reason || error.message));
+                log("خطأ في تنفيذ المعاملة (Reverted): " + (error.reason || error.message));
+                alert("فشلت المعاملة: تأكد من أنك تستخدم محفظة المالك وأن التداول لم يُفعل مسبقاً.");
             }
         }
 
-        async function setExcluded(status) {
-            if (!contract) return alert("قم بربط المحفظة أولاً!");
-            const targetAddress = document.getElementById("excludeAddress").value.trim();
-            if (!targetAddress) return alert("يرجى إدخال عنوان صحيح!");
+        async function setExcludedStatus(status) {
+            if (!contract) return;
+            const target = document.getElementById("targetAddress").value.trim();
+            if (!ethers.utils.isAddress(target)) {
+                alert("يرجى إدخال عنوان محفظة (0x...) صالح!");
+                return;
+            }
 
             try {
-                logStatus("جاري تحديث الاستثناء للعنوان...");
-                const tx = await contract.setExcluded(targetAddress, status);
-                logStatus("تم إرسال المعاملة: " + tx.hash);
+                log(`جاري تحديث حالة الاستثناء للعنوان ${target} إلى ${status}...`);
+                const tx = await contract.setExcluded(target, status);
+                log("معاملة الاستثناء قيد المعالجة، الهاش: " + tx.hash);
+                
                 await tx.wait();
-                logStatus("تم تحديث حالة الاستثناء بنجاح!");
+                log("تم تحديث الاستثناء بنجاح تام! ✅");
+                document.getElementById("targetAddress").value = "";
             } catch (error) {
-                logStatus("خطأ: " + (error.reason || error.message));
+                log("خطأ في الاستثناء: " + (error.reason || error.message));
             }
         }
 
-        function logStatus(msg) {
-            document.getElementById("statusLog").innerText = msg;
+        function log(message) {
+            const box = document.getElementById("logBox");
+            const timestamp = new Date().toLocaleTimeString();
+            box.innerHTML += `[${timestamp}] ${message}<br>`;
+            box.scrollTop = box.scrollHeight;
         }
     </script>
 </body>
