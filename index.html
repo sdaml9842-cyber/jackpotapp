@@ -9,7 +9,7 @@
         :root {
             --bg-color: #07090e;
             --card-bg: #111827;
-            --accent: #0052ff; /* لون شبكة Base الرسمي */
+            --accent: #0052ff;
             --success: #10b981;
             --danger: #ef4444;
             --text: #f9fafb;
@@ -165,7 +165,7 @@
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0xe97836C00f04D3E51aa2Fb17f74B1a29b6bC5334";
+        const CONTRACT_ADDRESS = "0x5F29f10faF6C24E5E34cFeB186cF650C5CE36b6D";
         const BASE_CHAIN_ID = "0x2105"; // 8453 بالعشري
 
         const CONTRACT_ABI = [
@@ -187,17 +187,15 @@
                 log("جاري طلب الاتصال بالمحفظة...");
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 
-                // التأكد من التواجد على شبكة Base
                 const network = await provider.getNetwork();
                 if (network.chainId !== 8453) {
-                    log("تم اكتشاف شبكة أخرى، جاري التحويل التلقائي إلى شبكة Base...");
+                    log("جاري التحويل التلقائي إلى شبكة Base...");
                     try {
                         await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: BASE_CHAIN_ID }],
                         });
                     } catch (switchError) {
-                        // إذا لم تكن الشبكة مضافة، قم بإضافتها
                         if (switchError.code === 4902) {
                             await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
@@ -222,17 +220,17 @@
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
                 document.getElementById("walletInfo").innerHTML = `
-                    <div style="color: #34d399;">المحفظة متصلة بنجاح بنجاح على Base ✅</div>
+                    <div style="color: #34d399;">المحفظة متصلة بنجاح على Base ✅</div>
                     <div>الحساب: ${userAddress}</div>
                 `;
                 document.getElementById("connectBtn").innerText = "متصل بشبكة Base ✅";
                 document.getElementById("connectBtn").style.background = "#047857";
 
-                log("تم الاتصال بنجاح. عنوان المحفظة: " + userAddress);
+                log("تم الاتصال بنجاح. الحساب: " + userAddress);
                 await refreshContractState();
 
             } catch (error) {
-                log("خطأ في الاتصال أو تبديل الشبكة: " + (error.reason || error.message));
+                log("خطأ في الاتصال: " + (error.reason || error.message));
             }
         }
 
@@ -275,7 +273,7 @@
 
                 log("تم تحديث بيانات العقد بنجاح.");
             } catch (error) {
-                log("خطأ في قراءة بيانات العقد: تأكد من أن العنوان صحيح على شبكة Base. التفاصيل: " + (error.reason || error.message));
+                log("خطأ في قراءة بيانات العقد: " + (error.reason || error.message));
             }
         }
 
@@ -291,7 +289,7 @@
                 await refreshContractState();
             } catch (error) {
                 log("فشلت المعاملة: " + (error.reason || error.message));
-                alert("فشلت المعاملة: تأكد من امتلاكك رصيد كافٍ من ETH لدفع رسوم الغاز على شبكة Base.");
+                alert("فشلت المعاملة: تأكد من امتلاكك رصيد ETH كافٍ لرسوم الغاز.");
             }
         }
 
