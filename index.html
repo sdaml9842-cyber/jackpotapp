@@ -3,66 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إنشاء مجمع السيولة</title>
+    <title>إنشاء مجمع سيولة BNB</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
-            text-align: center;
-            padding: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0e11;
+            color: #eaecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-        .card {
-            background: #161b22;
-            padding: 30px;
-            border-radius: 12px;
-            display: inline-block;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        .container {
+            background-color: #1e2329;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border: 1px solid #2b313a;
         }
-        .btn {
-            background-color: #f3ba2f; /* لون BNB الشهير */
-            color: #000;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
+        h2 { text-align: center; color: #f0b90b; margin-top: 0; }
+        .input-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-size: 14px; color: #848e9c; }
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #2b313a;
+            border: 1px solid #474d57;
+            border-radius: 8px;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
             border: none;
             border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-        }
-        .btn:hover {
-            background-color: #e2ab22;
-        }
-        input {
-            padding: 10px;
-            width: 80%;
             margin-top: 10px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            color: #fff;
-            border-radius: 5px;
+            transition: 0.2s;
+        }
+        .btn-connect { background-color: #f0b90b; color: #000; }
+        .btn-approve { background-color: #0ecb81; color: #fff; display: none; }
+        .btn-add { background-color: #f0b90b; color: #000; display: none; }
+        button:disabled { background-color: #474d57; cursor: not-allowed; }
+        #status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            word-break: break-all;
             text-align: center;
         }
+        .success { background: rgba(14, 203, 129, 0.2); color: #0ecb81; }
+        .error { background: rgba(246, 70, 93, 0.2); color: #f6465d; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>إضافة سيولة لعملتك على BNB Chain</h2>
-        <p>انقر على الزر أدناه للتوجه المباشر لإنشاء المجمع:</p>
-        
-        <!-- حقل يعرض عقدك للنسخ السريع -->
-        <br>
-        <input type="text" readonly value="0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE" onclick="this.select();">
-        <br>
+<div class="container">
+    <h2>إضافة السيولة الفورية 🚀</h2>
 
-        <!-- زر التوجيه المباشر لبانكيك سواب -->
-        <a href="https://pancakeswap.finance/add/BNB/0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE" target="_blank" class="btn">
-            فتح مجمع السيولة على PancakeSwap 🚀
-        </a>
+    <div class="input-group">
+        <label>عنوان العقد (Token)</label>
+        <input type="text" id="tokenAddress" value="0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE" readonly>
     </div>
+
+    <div class="input-group">
+        <label>كمية التوكن (Token Amount)</label>
+        <input type="text" id="tokenAmount" value="10000">
+    </div>
+
+    <div class="input-group">
+        <label>كمية BNB (BNB Amount)</label>
+        <input type="text" id="bnbAmount" value="0.0002">
+    </div>
+
+    <button id="connectBtn" class="btn-connect" onclick="connectWallet()">1. ربط المحفظة</button>
+    <button id="approveBtn" class="btn-approve" onclick="approveToken()">2. موافقة على العقد (Approve)</button>
+    <button id="addLiquidityBtn" class="btn-add" onclick="addLiquidity()">3. إضافة السيولة الآن</button>
+
+    <div id="status"></div>
+</div>
+
+<script>
+    // PancakeSwap V2 Router Address on BSC Mainnet
+    const PANCAKE_ROUTER = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+
+    // Standard ERC20 ABI (Minimal)
+    const erc20Abi = [
+        "function approve(address spender, uint256 amount) public returns (bool)",
+        "function decimals() public view returns (uint8)",
+        "function allowance(address owner, address spender) public view returns (uint256)"
+    ];
+
+    // Pancake Router ABI (Minimal)
+    const routerAbi = [
+        "function addLiquidityETH(address token, uint amountTokenDesired, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external payable returns (uint amountToken, uint amountETH, uint liquidity)"
+    ];
+
+    let provider, signer, userAddress;
+
+    async function connectWallet() {
+        if (window.ethereum) {
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                
+                // Check Network (BSC Mainnet ChainID is 56 / 0x38)
+                const network = await provider.getNetwork();
+                if (network.chainId !== 56) {
+                    showStatus("الرجاء التحويل إلى شبكة BNB Smart Chain في المحفظة!", false);
+                    return;
+                }
+
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                document.getElementById("connectBtn").innerText = "المحفظة متصلة: " + userAddress.substring(0, 6) + "..." + userAddress.substring(38);
+                document.getElementById("connectBtn").disabled = true;
+                document.getElementById("approveBtn").style.display = "block";
+                
+                showStatus("تم ربط المحفظة بنجاح!", true);
+            } catch (err) {
+                showStatus("فشل ربط المحفظة: " + err.message, false);
+            }
+        } else {
+            showStatus("لم يتم العثور على محفظة Web3! يرجى فتح الصفحة من متصفح المحفظة.", false);
+        }
+    }
+
+    async function approveToken() {
+        try {
+            showStatus("جاري طلب الموافقة من المحفظة...", true);
+            const tokenAddress = document.getElementById("tokenAddress").value;
+            const tokenAmount = document.getElementById("tokenAmount").value;
+
+            const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+            const decimals = await tokenContract.decimals();
+            const amountParsed = ethers.utils.parseUnits(tokenAmount, decimals);
+
+            const tx = await tokenContract.approve(PANCAKE_ROUTER, amountParsed);
+            showStatus("جاري تأكيد معاملة الموافقة...", true);
+            await tx.wait();
+
+            showStatus("تمت الموافقة بنجاح! يمكنك الآن إضافة السيولة.", true);
+            document.getElementById("approveBtn").style.display = "none";
+            document.getElementById("addLiquidityBtn").style.display = "block";
+        } catch (err) {
+            showStatus("خطأ في الموافقة: " + err.message, false);
+        }
+    }
+
+    async function addLiquidity() {
+        try {
+            showStatus("جاري إرسال معاملة إضافة السيولة...", true);
+            const tokenAddress = document.getElementById("tokenAddress").value;
+            const tokenAmount = document.getElementById("tokenAmount").value;
+            const bnbAmount = document.getElementById("bnbAmount").value;
+
+            const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+            const decimals = await tokenContract.decimals();
+
+            const tokenAmountParsed = ethers.utils.parseUnits(tokenAmount, decimals);
+            const bnbAmountParsed = ethers.utils.parseEther(bnbAmount);
+
+            // Set deadline 20 minutes from now
+            const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+
+            const routerContract = new ethers.Contract(PANCAKE_ROUTER, routerAbi, signer);
+
+            // Call addLiquidityETH
+            const tx = await routerContract.addLiquidityETH(
+                tokenAddress,
+                tokenAmountParsed,
+                0, // amountTokenMin (Slippage tolerant)
+                0, // amountETHMin
+                userAddress,
+                deadline,
+                { value: bnbAmountParsed }
+            );
+
+            showStatus("جاري تنفيذ إضافة السيولة على البلوكشين...", true);
+            await tx.wait();
+
+            showStatus("🎉 تم إنشاء مجمع السيولة وإضافة 10,000 توكن و 0.0002 BNB بنجاح!", true);
+        } catch (err) {
+            showStatus("خطأ أثناء إضافة السيولة: " + err.message, false);
+        }
+    }
+
+    function showStatus(msg, isSuccess) {
+        const el = document.getElementById("status");
+        el.innerText = msg;
+        el.className = isSuccess ? "success" : "error";
+    }
+</script>
 
 </body>
 </html>
