@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexPredator V2 - لوحة التحكم والاصطياد</title>
+    <title>ApexPredator V2 - لوحة التحكم</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         body { font-family: Tahoma, sans-serif; background-color: #0f172a; color: #f8fafc; text-align: center; padding: 20px; }
@@ -40,7 +40,6 @@
     <script>
         const contractAddress = "0xA021080086f19B8D38a1A63d0597d6da90f79Ea8";
         
-        // ABI الخاص بالدالتين الأساسيتين فقط لضمان عدم حدوث أي خطأ
         const contractABI = [
             "function activateTrading() external",
             "function executePredatorBuy() public payable"
@@ -48,7 +47,7 @@
 
         let provider, signer, contract;
 
-        async::connectWallet = async function() {
+        async function connectWallet() {
             if (window.ethereum) {
                 try {
                     provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -73,7 +72,7 @@
                 await tx.wait();
                 document.getElementById("txStatus").innerText = "تم تفعيل التداول بنجاح! ✅";
             } catch (err) {
-                document.getElementById("txStatus").innerText = "فشل التفعيل (تأكد أنك المالك): " + (err.reason || err.message);
+                document.getElementById("txStatus").innerText = "فشل التفعيل: " + (err.reason || err.message);
             }
         }
 
@@ -85,7 +84,6 @@
                 
                 document.getElementById("txStatus").innerText = "جاري تنفيذ الشراء وإرسال المعاملة...";
                 
-                // استدعاء دالة الشراء مع إرفاق قيمة الـ BNB بشكل صحيح وآمن تماماً
                 let tx = await contract.executePredatorBuy({ value: parsedValue });
                 await tx.wait();
                 
