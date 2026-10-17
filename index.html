@@ -3,250 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة البوتات المتقدمة (تداول مكثف + توليد عشوائي)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <title>سحب السيولة من المجمع (Remove Liquidity)</title>
+    <!-- خط Tajawal من Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #090d16; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        :root {
+            --bg-color: #080b11;
+            --card-bg: #121824;
+            --inner-card: #1b2234;
+            --primary-accent: #1fc7d4;
+            --primary-hover: #179ea8;
+            --text-main: #f4f6f8;
+            --text-muted: #8a99ad;
+            --border-color: #273147;
+            --danger-color: #ed4b9e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+
+        .settings-btn:hover {
+            color: var(--text-main);
+        }
+
+        /* Pair Info */
+        .pair-card {
+            background-color: var(--inner-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pair-icons {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .token-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            border: 2px solid var(--inner-card);
+        }
+
+        .icon-yay {
+            background: linear-gradient(135deg, #ed4b9e, #31d0aa);
+            color: white;
+            z-index: 2;
+        }
+
+        .icon-bnb {
+            background: #f3ba2f;
+            color: #000;
+            margin-right: -12px;
+            z-index: 1;
+        }
+
+        .pair-names {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 12px;
+        }
+
+        .badge {
+            background-color: rgba(31, 199, 212, 0.15);
+            color: var(--primary-accent);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Amount Selection Area */
+        .withdraw-section {
+            background-color: var(--inner-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .percent-display {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: #273147;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary-accent);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .btn-preset {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--primary-accent);
+            padding: 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preset:hover, .btn-preset.active {
+            background-color: var(--primary-accent);
+            color: #080b11;
+            border-color: var(--primary-accent);
+        }
+
+        /* Outputs Section */
+        .receive-details {
+            margin-bottom: 20px;
+        }
+
+        .receive-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background-color: var(--inner-card);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .token-amount {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .price-rate {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Action Button */
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background-color: var(--primary-accent);
+            color: #080b11;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-action:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-6 font-sans custom-scrollbar">
+<body>
 
-    <div class="max-w-5xl mx-auto space-y-6">
-
-        <!-- الهيدر -->
-        <header class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl">
-            <div>
-                <h1 class="text-xl font-black text-amber-400">لوحة التحكم الآلي (البوتات المتقدمة)</h1>
-                <p class="text-xs text-slate-400 font-mono mt-1">العقد: <span class="text-slate-300">0x40ac9223409C4ca1B04c875b0A60446C850063c0</span></p>
-            </div>
-            <button id="connect-btn" onclick="connectWallet()" class="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-lg transition text-sm">
-                اتصال بالمحفظة
-            </button>
-        </header>
-
-        <!-- معلومات المحفظة -->
-        <div id="wallet-info" class="hidden bg-slate-900/60 border border-slate-800 p-4 rounded-2xl text-xs grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono">
-            <div>المحفظة المتصلة: <span id="wallet-address" class="text-amber-300">-</span></div>
-            <div>الشبكة الحالية: <span id="network-info" class="text-emerald-300">-</span></div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h2>سحب السيولة</h2>
+            <button class="settings-btn" title="الإعدادات">⚙️</button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            <!-- البوت الأول: تداول تلقائي بالسنتات لمئات المرات -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
-                        <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">⚡</span>
-                        <h2 class="text-base font-bold text-blue-400">بوت التداول المكثف (حجم تداول بالسنتات)</h2>
-                    </div>
-                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                        يشتري ويبيع بـمبالغ ضئيلة جداً (سنتات من BNB) لعدد محدد من التكرارات لرفع التفاعل.
-                    </p>
-
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1">قيمة الصفقة الواحدة (بالـ BNB - مثلاً 0.0005)</label>
-                            <input type="number" id="micro-bnb" value="0.0005" step="0.0001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1">عدد مرات التكرار (مثلاً 100 مرة)</label>
-                            <input type="number" id="loop-count" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500">
-                        </div>
-                    </div>
+        <!-- Pool Pair Card -->
+        <div class="pair-card">
+            <div style="display: flex; align-items: center;">
+                <div class="pair-icons">
+                    <div class="token-icon icon-yay">YAY</div>
+                    <div class="token-icon icon-bnb">BNB</div>
                 </div>
-
-                <div class="space-y-2 mt-4">
-                    <button onclick="startMicroTradingBot()" class="w-full bg-blue-600 hover:bg-blue-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
-                        تشغيل بوت التداول التلقائي
-                    </button>
-                    <button onclick="stopBot = true" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-bold py-2 rounded-xl text-xs transition">
-                        إيقاف البوت الطارئ
-                    </button>
-                </div>
+                <div class="pair-names">yay / WBNB</div>
             </div>
-
-            <!-- البوت الثاني: توليد مئات العناوين العشوائية والتوزيع -->
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center gap-2 mb-3 border-b border-slate-800 pb-3">
-                        <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">🎲</span>
-                        <h2 class="text-base font-bold text-emerald-400">بوت توليد عناوين عشوائية والتوزيع (Airdrop)</h2>
-                    </div>
-                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-                        يولد مئات العناوين العشوائية الوهمية تلقائياً ويوزع عليها الكمية المحددة من التوكنات دفعة واحدة.
-                    </p>
-
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1">عدد العناوين العشوائية المراد توليدها</label>
-                            <input type="number" id="gen-count" value="50" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1">الكمية المرسلة لكل عنوان عشوائي</label>
-                            <input type="number" id="gen-amount" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500">
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="runRandomAirdropBot()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition mt-4">
-                    توليد عناوين وبدء التوزيع التلقائي
-                </button>
-            </div>
-
+            <span class="badge">v2 (0.25%)</span>
         </div>
 
-        <!-- سجل الأحداث والعمليات (Terminal Console) -->
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl space-y-2">
-            <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-                <span>سجل أداء البوتات اللحظي (Terminal)</span>
-                <button onclick="document.getElementById('logs').innerHTML=''" class="text-slate-500 hover:text-slate-300">مسح السجل</button>
+        <!-- Withdraw Percentage Selection -->
+        <div class="withdraw-section">
+            <div class="section-label">
+                <span>نسبة السحب</span>
             </div>
-            <div id="logs" class="bg-slate-950 border border-slate-800 rounded-2xl p-3 h-40 overflow-y-auto font-mono text-xs text-slate-300 space-y-1.5 custom-scrollbar">
-                <div>[النظام] جاهز، بانتظار اتصال المحفظة وتفعيل الأوامر...</div>
+            
+            <div class="percent-display" id="percentDisplay">50%</div>
+
+            <div class="slider-container">
+                <input type="range" min="0" max="100" value="50" class="slider" id="percentSlider">
+            </div>
+
+            <div class="preset-buttons">
+                <button class="btn-preset" onclick="setPercent(25)">25%</button>
+                <button class="btn-preset active" id="btn50" onclick="setPercent(50)">50%</button>
+                <button class="btn-preset" onclick="setPercent(75)">75%</button>
+                <button class="btn-preset" onclick="setPercent(100)">100%</button>
             </div>
         </div>
 
+        <!-- Receive Estimation Details -->
+        <div class="receive-details">
+            <div class="section-label">
+                <span>الكمية التقديرية للانسحاب:</span>
+            </div>
+
+            <div class="receive-row">
+                <div class="token-info">
+                    <div class="token-icon icon-bnb" style="width: 24px; height: 24px; font-size: 0.6rem;">BNB</div>
+                    <span>BNB</span>
+                </div>
+                <div class="token-amount" id="bnbAmount">0.0000</div>
+            </div>
+
+            <div class="receive-row">
+                <div class="token-info">
+                    <div class="token-icon icon-yay" style="width: 24px; height: 24px; font-size: 0.6rem;">YAY</div>
+                    <span>yay</span>
+                </div>
+                <div class="token-amount" id="yayAmount">0</div>
+            </div>
+        </div>
+
+        <!-- Price Details -->
+        <div class="price-rate">
+            سعر الصرف: 1 WBNB = 26,014,854 yay
+        </div>
+
+        <!-- Action Button -->
+        <button class="btn-action" onclick="handleWithdraw()">تأكيد سحب السيولة</button>
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0x40ac9223409C4ca1B04c875b0A60446C850063c0";
-        const ROUTER_ADDRESS = "0x10ED43323113082E3E26B04494566310b59e223b"; // PancakeSwap V2 Router
+        // الأرصدة الإجمالية المتاحة في المجمع
+        const TOTAL_BNB = 0.0035; 
+        const TOTAL_YAY = 93072;
 
-        const ERC20_ABI = [
-            "function transfer(address recipient, uint256 amount) returns (bool)",
-            "function decimals() view returns (uint8)"
-        ];
+        const slider = document.getElementById('percentSlider');
+        const percentDisplay = document.getElementById('percentDisplay');
+        const bnbAmountText = document.getElementById('bnbAmount');
+        const yayAmountText = document.getElementById('yayAmount');
+        const presetBtns = document.querySelectorAll('.btn-preset');
 
-        // واجهة الروتر لعمليات الشراء (swapExactETHForTokens) والبيع
-        const ROUTER_ABI = [
-            "function swapExactETHForTokens(uint amountOutMin, address[] path, address to, uint deadline) payable returns (uint[] amounts)",
-            "function swapExactTokensForETHSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] path, address to, uint deadline)"
-        ];
+        function updateValues(percent) {
+            // تحديث العرض الرقمي والشريط
+            percentDisplay.textContent = percent + '%';
+            slider.value = percent;
 
-        let provider, signer, contract, routerContract;
-        let stopBot = false;
+            // حساب المبالغ بناء على النسبة
+            const calculatedBNB = (TOTAL_BNB * (percent / 100)).toFixed(5);
+            const calculatedYAY = Math.round(TOTAL_YAY * (percent / 100));
 
-        function logMessage(msg, type = "info") {
-            const logs = document.getElementById("logs");
-            let color = "text-slate-300";
-            if (type === "success") color = "text-emerald-400";
-            if (type === "error") color = "text-red-400";
-            if (type === "warning") color = "text-amber-400";
+            bnbAmountText.textContent = calculatedBNB;
+            yayAmountText.textContent = calculatedYAY.toLocaleString();
 
-            logs.innerHTML += `<div class="${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
-            logs.scrollTop = logs.scrollHeight;
+            // تحديث حالة الأزرار
+            presetBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.textContent) === percent) {
+                    btn.classList.add('active');
+                }
+            });
         }
 
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    
-                    const address = await signer.getAddress();
-                    const network = await provider.getNetwork();
+        // الاستماع لتغيير الشريط الانزلاقي
+        slider.addEventListener('input', (e) => {
+            updateValues(parseInt(e.target.value));
+        });
 
-                    document.getElementById("wallet-info").classList.remove("hidden");
-                    document.getElementById("wallet-address").innerText = address.slice(0, 6) + "..." + address.slice(-4);
-                    document.getElementById("network-info").innerText = `${network.name} (${network.chainId})`;
-                    document.getElementById("connect-btn").innerText = "متصل";
-
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, ERC20_ABI, signer);
-                    routerContract = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, signer);
-                    
-                    logMessage("تم ربط المحفظة بنجاح: " + address, "success");
-                } catch (err) {
-                    logMessage("خطأ في الاتصال بالمحفظة: " + err.message, "error");
-                }
-            } else {
-                alert("يرجى استخدام متصفح يدعم Web3 (مثل Mises أو Kiwi).");
-            }
+        // تحديد النسبة من الأزرار الجاهزة
+        function setPercent(percent) {
+            updateValues(percent);
         }
 
-        // 1. بوت التداول المصغر بالسنتات (شراء وبيع متكرر)
-        async function startMicroTradingBot() {
-            if (!signer) return alert("الرجاء الاتصال بالمحفظة أولاً!");
-            const bnbAmount = document.getElementById("micro-bnb").value;
-            const loops = parseInt(document.getElementById("loop-count").value);
-            stopBot = false;
-
-            logMessage(`[بوت التداول] بدأ التشغيل: ${loops} دورة بقيمة ${bnbAmount} BNB للصفقة الواحدة...`, "warning");
-
-            for (let i = 1; i <= loops; i++) {
-                if (stopBot) {
-                    logMessage("[بوت التداول] تم إيقاف البوت بناءً على طلبك.", "warning");
-                    break;
-                }
-
-                try {
-                    logMessage(`الدورة (${i}/${loops}): جاري إرسال صفقة شراء مصغرة...`, "info");
-                    
-                    // مسار الشراء: WBNB -> Token
-                    const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
-                    const path = [WBNB, CONTRACT_ADDRESS];
-                    const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 دقائق
-
-                    const parsedBNBValue = ethers.utils.parseEther(bnbAmount);
-
-                    // تنفيذ أمر الشراء عبر الروتر
-                    const tx = await routerContract.swapExactETHForTokens(
-                        0, 
-                        path, 
-                        await signer.getAddress(), 
-                        deadline, 
-                        { value: parsedBNBValue }
-                    );
-                    
-                    await tx.wait();
-                    logMessage(`الدورة (${i}): نجحت صفقة الشراء! Tx: ${tx.hash.slice(0, 10)}...`, "success");
-
-                    // مهلة قصيرة بين العمليات لتجنب الازدحام
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-
-                } catch (err) {
-                    logMessage(`خطأ في الدورة (${i}): ` + (err.data?.message || err.message), "error");
-                    await new Promise(resolve => setTimeout(resolve, 5000));
-                }
-            }
-            logMessage("[بوت التداول] انتهت دورات التداول المكثف بنجاح.", "success");
+        // تنفيذ زر التأكيد
+        function handleWithdraw() {
+            alert(`تم إرسال طلب سحب ${slider.value}% من السيولة بنجاح!`);
         }
 
-        // 2. توليد مئات العناوين العشوائية والتوزيع التلقائي
-        async function runRandomAirdropBot() {
-            if (!contract) return alert("الرجاء الاتصال بالمحفظة أولاً!");
-            const count = parseInt(document.getElementById("gen-count").value);
-            const amount = document.getElementById("gen-amount").value;
-
-            try {
-                logMessage(`[بوت التوزيع] جاري توليد (${count}) عنوان عشوائي جديد...`, "warning");
-                
-                // توليد عناوين إيثريوم/BSC عشوائية صالحة برمجياً
-                const generatedAddresses = [];
-                for (let i = 0; i < count; i++) {
-                    const randomWallet = ethers.Wallet.createRandom();
-                    generatedAddresses.push(randomWallet.address);
-                }
-
-                logMessage(`تم توليد العناوين بنجاح. جاري البدء بإرسال التوكنات (${amount} لكل عنوان)...`, "info");
-                const decimals = await contract.decimals();
-                const parsedAmount = ethers.utils.parseUnits(amount, decimals);
-
-                for (let i = 0; i < generatedAddresses.length; i++) {
-                    logMessage(`إرسال إلى العنوان العشوائي (${i + 1}/${count}): ${generatedAddresses[i].slice(0, 10)}...`, "info");
-                    const tx = await contract.transfer(generatedAddresses[i], parsedAmount);
-                    await tx.wait();
-                }
-
-                logMessage("[بوت التوزيع] تم إرسال وتوزيع التوكنات لجميع العناوين العشوائية بنجاح تام!", "success");
-                alert("تم الانتهاء من التوزيع العشوائي بنجاح!");
-            } catch (err) {
-                logMessage("[بوت التوزيع] خطأ أثناء عملية التوزيع: " + (err.data?.message || err.message), "error");
-            }
-        }
+        // التشغيل الأولي عند التحميل
+        updateValues(50);
     </script>
 </body>
 </html>
