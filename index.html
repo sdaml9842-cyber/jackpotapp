@@ -3,386 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سحب السيولة من المجمع (Remove Liquidity)</title>
-    <!-- خط Tajawal من Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <title>سحب السيولة - PancakeSwap V2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #080b11;
-            --card-bg: #121824;
-            --inner-card: #1b2234;
-            --primary-accent: #1fc7d4;
-            --primary-hover: #179ea8;
-            --text-main: #f4f6f8;
-            --text-muted: #8a99ad;
-            --border-color: #273147;
-            --danger-color: #ed4b9e;
+            --bg: #080b11;
+            --card: #121824;
+            --inner: #1b2234;
+            --accent: #1fc7d4;
+            --text: #f4f6f8;
+            --muted: #8a99ad;
+            --border: #273147;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .settings-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: color 0.2s;
-        }
-
-        .settings-btn:hover {
-            color: var(--text-main);
-        }
-
-        /* Pair Info */
-        .pair-card {
-            background-color: var(--inner-card);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .pair-icons {
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-
-        .token-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.8rem;
-            border: 2px solid var(--inner-card);
-        }
-
-        .icon-yay {
-            background: linear-gradient(135deg, #ed4b9e, #31d0aa);
-            color: white;
-            z-index: 2;
-        }
-
-        .icon-bnb {
-            background: #f3ba2f;
-            color: #000;
-            margin-right: -12px;
-            z-index: 1;
-        }
-
-        .pair-names {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-right: 12px;
-        }
-
-        .badge {
-            background-color: rgba(31, 199, 212, 0.15);
-            color: var(--primary-accent);
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* Amount Selection Area */
-        .withdraw-section {
-            background-color: var(--inner-card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .section-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .percent-display {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary-accent);
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .slider-container {
-            margin-bottom: 20px;
-        }
-
-        .slider {
-            width: 100%;
-            -webkit-appearance: none;
-            height: 8px;
-            border-radius: 4px;
-            background: #273147;
-            outline: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--primary-accent);
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
-        }
-
-        .preset-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .btn-preset {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--primary-accent);
-            padding: 8px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-preset:hover, .btn-preset.active {
-            background-color: var(--primary-accent);
-            color: #080b11;
-            border-color: var(--primary-accent);
-        }
-
-        /* Outputs Section */
-        .receive-details {
-            margin-bottom: 20px;
-        }
-
-        .receive-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background-color: var(--inner-card);
-            border-radius: 12px;
-            margin-bottom: 8px;
-        }
-
-        .token-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        .token-amount {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .price-rate {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        /* Action Button */
-        .btn-action {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 16px;
-            background-color: var(--primary-accent);
-            color: #080b11;
-            font-size: 1.1rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .btn-action:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-action:active {
-            transform: scale(0.98);
-        }
+        * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        .box { width: 100%; max-width: 460px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .btn-connect { background: var(--accent); color: #000; border: none; padding: 8px 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .card-inner { background: var(--inner); border-radius: 14px; padding: 15px; margin-bottom: 15px; }
+        .pct-title { color: var(--muted); font-size: 0.9rem; margin-bottom: 5px; }
+        .pct-val { font-size: 2.2rem; font-weight: 800; color: var(--accent); text-align: center; }
+        .slider { width: 100%; margin: 15px 0; accent-color: var(--accent); cursor: pointer; }
+        .presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .btn-p { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--accent); padding: 6px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-p.active { background: var(--accent); color: #000; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; }
+        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 14px; background: var(--accent); color: #000; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 5px; }
+        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status { margin-top: 10px; font-size: 0.85rem; text-align: center; color: var(--muted); word-break: break-all; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h2>سحب السيولة</h2>
-            <button class="settings-btn" title="الإعدادات">⚙️</button>
-        </div>
-
-        <!-- Pool Pair Card -->
-        <div class="pair-card">
-            <div style="display: flex; align-items: center;">
-                <div class="pair-icons">
-                    <div class="token-icon icon-yay">YAY</div>
-                    <div class="token-icon icon-bnb">BNB</div>
-                </div>
-                <div class="pair-names">yay / WBNB</div>
-            </div>
-            <span class="badge">v2 (0.25%)</span>
-        </div>
-
-        <!-- Withdraw Percentage Selection -->
-        <div class="withdraw-section">
-            <div class="section-label">
-                <span>نسبة السحب</span>
-            </div>
-            
-            <div class="percent-display" id="percentDisplay">50%</div>
-
-            <div class="slider-container">
-                <input type="range" min="0" max="100" value="50" class="slider" id="percentSlider">
-            </div>
-
-            <div class="preset-buttons">
-                <button class="btn-preset" onclick="setPercent(25)">25%</button>
-                <button class="btn-preset active" id="btn50" onclick="setPercent(50)">50%</button>
-                <button class="btn-preset" onclick="setPercent(75)">75%</button>
-                <button class="btn-preset" onclick="setPercent(100)">100%</button>
-            </div>
-        </div>
-
-        <!-- Receive Estimation Details -->
-        <div class="receive-details">
-            <div class="section-label">
-                <span>الكمية التقديرية للانسحاب:</span>
-            </div>
-
-            <div class="receive-row">
-                <div class="token-info">
-                    <div class="token-icon icon-bnb" style="width: 24px; height: 24px; font-size: 0.6rem;">BNB</div>
-                    <span>BNB</span>
-                </div>
-                <div class="token-amount" id="bnbAmount">0.0000</div>
-            </div>
-
-            <div class="receive-row">
-                <div class="token-info">
-                    <div class="token-icon icon-yay" style="width: 24px; height: 24px; font-size: 0.6rem;">YAY</div>
-                    <span>yay</span>
-                </div>
-                <div class="token-amount" id="yayAmount">0</div>
-            </div>
-        </div>
-
-        <!-- Price Details -->
-        <div class="price-rate">
-            سعر الصرف: 1 WBNB = 26,014,854 yay
-        </div>
-
-        <!-- Action Button -->
-        <button class="btn-action" onclick="handleWithdraw()">تأكيد سحب السيولة</button>
+<div class="box">
+    <div class="header">
+        <h3>سحب السيولة (yay / BNB)</h3>
+        <button class="btn-connect" id="connectBtn" onclick="connectWallet()">ربط المحفظة</button>
     </div>
 
-    <script>
-        // الأرصدة الإجمالية المتاحة في المجمع
-        const TOTAL_BNB = 0.0035; 
-        const TOTAL_YAY = 93072;
+    <div class="card-inner">
+        <div class="pct-title">نسبة السحب</div>
+        <div class="pct-val" id="pctVal">100%</div>
+        <input type="range" min="1" max="100" value="100" class="slider" id="slider" oninput="updatePct(this.value)">
+        <div class="presets">
+            <button class="btn-p" onclick="updatePct(25)">25%</button>
+            <button class="btn-p" onclick="updatePct(50)">50%</button>
+            <button class="btn-p" onclick="updatePct(75)">75%</button>
+            <button class="btn-p active" id="p100" onclick="updatePct(100)">100%</button>
+        </div>
+    </div>
 
-        const slider = document.getElementById('percentSlider');
-        const percentDisplay = document.getElementById('percentDisplay');
-        const bnbAmountText = document.getElementById('bnbAmount');
-        const yayAmountText = document.getElementById('yayAmount');
-        const presetBtns = document.querySelectorAll('.btn-preset');
+    <div class="card-inner">
+        <div class="info-row">
+            <span>رصيد توكنات LP:</span>
+            <span id="lpBalance">0.00</span>
+        </div>
+        <div class="info-row">
+            <span>المبلغ السلس المراد سحبه:</span>
+            <span id="removeAmount">0.00</span>
+        </div>
+    </div>
 
-        function updateValues(percent) {
-            // تحديث العرض الرقمي والشريط
-            percentDisplay.textContent = percent + '%';
-            slider.value = percent;
+    <button class="btn-action" id="approveBtn" onclick="approveLP()" disabled>1. الموافقة (Approve)</button>
+    <button class="btn-action" id="removeBtn" onclick="removeLiquidity()" disabled style="margin-top: 8px; background: #31d0aa;">2. تأكيد السحب</button>
 
-            // حساب المبالغ بناء على النسبة
-            const calculatedBNB = (TOTAL_BNB * (percent / 100)).toFixed(5);
-            const calculatedYAY = Math.round(TOTAL_YAY * (percent / 100));
+    <div class="status" id="statusBox">قم بربط المحفظة للمتابعة</div>
+</div>
 
-            bnbAmountText.textContent = calculatedBNB;
-            yayAmountText.textContent = calculatedYAY.toLocaleString();
+<script>
+    // العناوين الخاصة بالشبكة (BSC Mainnet)
+    const ROUTER_ADDRESS = "0x10ED433C71B354367343be24170a6742a4638b0B"; // PancakeSwap V2 Router
+    const PAIR_ADDRESS = "0x0000000000000000000000000000000000000000"; // ضعي عنوان زوج السيولة (LP Token Address) هنا
+    const YAY_ADDRESS = "0x40ac920000000000000000000000000000000000";  // ضعي عنوان توكن yay الصحيح هنا
 
-            // تحديث حالة الأزرار
-            presetBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (parseInt(btn.textContent) === percent) {
-                    btn.classList.add('active');
-                }
-            });
+    const ABI_PAIR = [
+        "function balanceOf(address owner) view returns (uint256)",
+        "function allowance(address owner, address spender) view returns (uint256)",
+        "function approve(address spender, uint256 value) returns (bool)",
+        "function decimals() view returns (uint8)"
+    ];
+
+    const ABI_ROUTER = [
+        "function removeLiquidityETH(address token, uint liquidity, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external returns (uint amountToken, uint amountETH)"
+    ];
+
+    let provider, signer, userAddress;
+    let pairContract, routerContract;
+    let rawBalance = ethers.BigNumber.from(0);
+    let currentPct = 100;
+
+    async function connectWallet() {
+        if (window.ethereum) {
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
+                document.getElementById('statusBox').innerText = "تم ربط المحفظة بنجاح";
+
+                pairContract = new ethers.Contract(PAIR_ADDRESS, ABI_PAIR, signer);
+                routerContract = new ethers.Contract(ROUTER_ADDRESS, ABI_ROUTER, signer);
+
+                fetchBalance();
+            } catch (err) {
+                document.getElementById('statusBox').innerText = "فشل الربط: " + err.message;
+            }
+        } else {
+            alert("يرجى فتح الصفحة من داخل متصفح Web3 مثل MetaMask أو Mises/Kiwi Browser");
         }
+    }
 
-        // الاستماع لتغيير الشريط الانزلاقي
-        slider.addEventListener('input', (e) => {
-            updateValues(parseInt(e.target.value));
-        });
+    async function fetchBalance() {
+        if (!pairContract) return;
+        rawBalance = await pairContract.balanceOf(userAddress);
+        const formatted = ethers.utils.formatEther(rawBalance);
+        document.getElementById('lpBalance').innerText = parseFloat(formatted).toFixed(6);
+        updateCalculations();
+        
+        document.getElementById('approveBtn').disabled = false;
+    }
 
-        // تحديد النسبة من الأزرار الجاهزة
-        function setPercent(percent) {
-            updateValues(percent);
+    function updatePct(val) {
+        currentPct = val;
+        document.getElementById('pctVal').innerText = val + '%';
+        document.getElementById('slider').value = val;
+        updateCalculations();
+    }
+
+    function updateCalculations() {
+        if (rawBalance.isZero()) return;
+        const withdrawAmount = rawBalance.mul(currentPct).div(100);
+        document.getElementById('removeAmount').innerText = parseFloat(ethers.utils.formatEther(withdrawAmount)).toFixed(6);
+    }
+
+    async function approveLP() {
+        try {
+            const withdrawAmount = rawBalance.mul(currentPct).div(100);
+            document.getElementById('statusBox').innerText = "جاري إرسال طلب الموافقة...";
+            const tx = await pairContract.approve(ROUTER_ADDRESS, withdrawAmount);
+            await tx.wait();
+            document.getElementById('statusBox').innerText = "تمت الموافقة بنجاح! يمكنك الآن السحب.";
+            document.getElementById('removeBtn').disabled = false;
+        } catch (err) {
+            document.getElementById('statusBox').innerText = "خطأ في الموافقة: " + err.message;
         }
+    }
 
-        // تنفيذ زر التأكيد
-        function handleWithdraw() {
-            alert(`تم إرسال طلب سحب ${slider.value}% من السيولة بنجاح!`);
+    async function removeLiquidity() {
+        try {
+            const withdrawAmount = rawBalance.mul(currentPct).div(100);
+            const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 دقائق
+
+            document.getElementById('statusBox').innerText = "جاري تنفيذ معاملة السحب...";
+            
+            // تعيين الحد الأدنى للمقبول لضمان عدم الفشل (سليباج)
+            const tx = await routerContract.removeLiquidityETH(
+                YAY_ADDRESS,
+                withdrawAmount,
+                0, // amountTokenMin (يمكن تعديلها بحسب نسبة السليباج)
+                0, // amountETHMin
+                userAddress,
+                deadline
+            );
+
+            await tx.wait();
+            document.getElementById('statusBox').innerText = "تم سحب السيولة بنجاح إلى محفظتك!";
+            fetchBalance();
+        } catch (err) {
+            document.getElementById('statusBox').innerText = "خطأ أثناء السحب: " + err.message;
         }
+    }
+</script>
 
-        // التشغيل الأولي عند التحميل
-        updateValues(50);
-    </script>
 </body>
 </html>
