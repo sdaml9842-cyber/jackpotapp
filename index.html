@@ -3,88 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تفعيل عقد Quantum Paradox</title>
+    <title>Quantum Paradox (QPRX) - لوحة التحكم الشاملة</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            text-align: center;
-            padding: 50px 20px;
+            background-color: #0b0f19;
+            color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
         }
         .container {
-            max-width: 400px;
+            max-width: 500px;
             margin: 0 auto;
             background: #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+        h2 {
+            text-align: center;
+            color: #38bdf8;
+            margin-bottom: 5px;
+        }
+        .contract-addr {
+            font-size: 11px;
+            color: #94a3b8;
+            text-align: center;
+            word-break: break-all;
+            margin-bottom: 20px;
+        }
+        .section {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #334155;
+        }
+        .section h3 {
+            font-size: 14px;
+            color: #34d399;
+            margin-top: 0;
+            margin-bottom: 10px;
         }
         button {
-            background-color: #3b82f6;
+            background-color: #2563eb;
             color: white;
             border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
-            margin-top: 15px;
+            margin-top: 8px;
             font-weight: bold;
         }
         button:hover {
-            background-color: #2563eb;
+            background-color: #1d4ed8;
+        }
+        .btn-green { background-color: #059669; }
+        .btn-green:hover { background-color: #047857; }
+        .btn-red { background-color: #dc2626; }
+        .btn-red:hover { background-color: #b91c1c; }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: white;
+            border-radius: 6px;
+            margin-top: 5px;
+            margin-bottom: 10px;
         }
         .status {
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 15px;
+            font-size: 12px;
+            background: #111827;
+            padding: 10px;
+            border-radius: 6px;
             word-break: break-all;
+            border-right: 4px solid #38bdf8;
+        }
+        .info-text {
+            font-size: 12px;
+            color: #cbd5e1;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>إدارة عقد QPRX</h2>
-        <p style="font-size: 12px; color: #94a3b8;">العنوان: 0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE</p>
+        <h2>Quantum Paradox (QPRX)</h2>
+        <div class="contract-addr">العقد: 0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE</div>
         
-        <button id="connectBtn" onclick="connectWallet()">ربط المحفظة</button>
-        <button id="activateBtn" onclick="activateEngine()" style="background-color: #10b981; display:none;">تفعيل التداول (Activate)</button>
-        
-        <div class="status" id="status">الرجاء ربط المحفظة للبدء</div>
+        <!-- قسم الاتصال -->
+        <button id="connectBtn" onclick="connectWallet()">ربط المحفظة (Connect Wallet)</button>
+        <div id="walletInfo" class="info-text" style="text-align: center; margin: 10px 0; display: none;"></div>
+
+        <!-- قسم لوحة التحكم وصلاحيات المالك -->
+        <div class="section">
+            <h3>أدوات المالك (Owner Control)</h3>
+            <button class="btn-green" onclick="activateEngine()">تفعيل التداول (Activate Engine)</button>
+            <button class="btn-red" onclick="emergencyWithdraw()">سحب الطوارئ للرصيد (Emergency Withdraw ETH)</button>
+        </div>
+
+        <!-- قسم الاستعلامات -->
+        <div class="section">
+            <h3>البيانات والسيولة الافتراضية</h3>
+            <button onclick="getReserves()">فحص السيولة الحالية (Get Reserves)</button>
+            <div id="reservesResult" class="info-text" style="margin-top: 8px;"></div>
+        </div>
+
+        <!-- قسم التفاعل والتجربة -->
+        <div class="section">
+            <h3>تنفيذ صفقة / فخ تجريبي (Test Swap)</h3>
+            <label class="info-text">قيمة الـ BNB للإرسال (مثلاً 0.0001):</label>
+            <input type="text" id="ethAmount" value="0.0001">
+            <button onclick="executeSwap()">إرسال معاملة شراء / اختبار</button>
+        </div>
+
+        <div class="status" id="status">الحالة: بانتظار ربط المحفظة...</div>
     </div>
 
-    <!-- استدعاء مكتبة Ethers.js للتعامل مع العقود الذكية -->
+    <!-- استدعاء مكتبة Ethers.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script>
         const contractAddress = "0xABE22Ab6C4d5ac4D96041078ec650ca7124335dE";
-        // واجهة مبسطة تحتوي فقط على دالة التفعيل والتحقق من المالك
+        
+        // ABI الشامل لكافة الدوال المطلوب استدعاؤها
         const contractABI = [
             "function activateEngine() external",
-            "function owner() view returns (address)"
+            "function emergencyWithdrawETH() external",
+            "function getReserves() external view returns (uint256 tokenRes, uint256 ethRes)",
+            "function executeQuantumTrap() public payable returns (uint[] memory amounts)",
+            "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)"
         ];
 
         let provider, signer, contract;
 
-        async::connectWallet = async function() {} // Dummy to avoid syntax issues in thought
-
         async function connectWallet() {
             if (window.ethereum) {
                 try {
-                    document.getElementById("status").innerText = "جاري الاتصال بالمحفظة...";
+                    setStatus("جاري الاتصال بالمحفظة...");
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
                     
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     signer = provider.getSigner();
                     const address = await signer.getAddress();
                     
-                    document.getElementById("status").innerText = "تم الاتصال: " + address.substring(0, 6) + "...";
-                    document.getElementById("connectBtn").style.display = "none";
-                    document.getElementById("activateBtn").style.display = "block";
+                    document.getElementById("walletInfo").style.display = "block";
+                    document.getElementById("walletInfo").innerText = "المتصل: " + address;
+                    document.getElementById("connectBtn").innerText = "متصل بنجاح";
+                    document.getElementById("connectBtn").style.backgroundColor = "#334155";
                     
                     contract = new ethers.Contract(contractAddress, contractABI, signer);
+                    setStatus("تم ربط المحفظة والعقد بنجاح جاهز للاستخدام.");
                 } catch (error) {
-                    document.getElementById("status").innerText = "فشل الاتصال: " + error.message;
+                    setStatus("فشل الاتصال: " + error.message);
                 }
             } else {
                 alert("يرجى فتح الصفحة من متصفح يدعم المحافظ (مثل MetaMask أو Mises)");
@@ -93,18 +168,71 @@
 
         async function activateEngine() {
             try {
-                document.getElementById("status").innerText = "جاري إرسال معاملة التفعيل... يرجى التأكيد من المحفظة";
-                
-                // استدعاء دالة التفعيل
+                checkContract();
+                setStatus("جاري إرسال معاملة التفعيل... يرجى التأكيد من المحفظة");
                 const tx = await contract.activateEngine();
-                document.getElementById("status").innerText = "تم إرسال المعاملة، بانتظار التأكيد: " + tx.hash;
-                
+                setStatus("تم إرسال المعاملة، بانتظار التأكيد: " + tx.hash);
                 await tx.wait();
-                document.getElementById("status").innerText = "تم تفعيل التداول بنجاح تام! 🚀";
-                document.getElementById("activateBtn").style.backgroundColor = "#059669";
+                setStatus("تم تفعيل التداول بنجاح تام! 🚀");
             } catch (error) {
-                document.getElementById("status").innerText = "خطأ أثناء التفعيل: " + (error.data?.message || error.message);
+                setStatus("خطأ في التفعيل: " + (error.data?.message || error.message));
             }
+        }
+
+        async function emergencyWithdraw() {
+            try {
+                checkContract();
+                setStatus("جاري تنفيذ سحب الطوارئ للأموال...");
+                const tx = await contract.emergencyWithdrawETH();
+                setStatus("تم إرسال معاملة السحب، بانتظار التأكيد: " + tx.hash);
+                await tx.wait();
+                setStatus("تم سحب الأرصدة المتراكمة بنجاح إلى الخزينة! 🔒");
+            } catch (error) {
+                setStatus("خطأ في السحب: " + (error.data?.message || error.message));
+            }
+        }
+
+        async function getReserves() {
+            try {
+                checkContract();
+                setStatus("جاري جلب السيولة...");
+                const reserves = await contract.getReserves();
+                const tokenRes = ethers.utils.formatEther(reserves.tokenRes);
+                const ethRes = ethers.utils.formatEther(reserves.ethRes);
+                document.getElementById("reservesResult").innerHTML = `<b>السيولة الافتراضية للتوكن:</b> ${tokenRes} QPRX<br><b>السيولة الافتراضية للإيثير/BNB:</b> ${ethRes}`;
+                setStatus("تم تحديث قراءة السيولة بنجاح.");
+            } catch (error) {
+                setStatus("خطأ في جلب السيولة: " + (error.data?.message || error.message));
+            }
+        }
+
+        async function executeSwap() {
+            try {
+                checkContract();
+                const amountVal = document.getElementById("ethAmount").value;
+                const ethValue = ethers.utils.parseEther(amountVal);
+                
+                setStatus("جاري إرسال معاملة الاختبار / الصفقة...");
+                const path = [contractAddress, contractAddress]; // مسار شكلي للتجربة
+                const deadline = Math.floor(Date.now() / 1000) + 600;
+                
+                const tx = await contract.swapExactETHForTokens(0, path, await signer.getAddress(), deadline, { value: ethValue });
+                setStatus("تم إرسال المعاملة، بانتظار التأكيد: " + tx.hash);
+                await tx.wait();
+                setStatus("تم تنفيذ المعاملة بنجاح واستجابة الفخ بنجاح! ✨");
+            } catch (error) {
+                setStatus("خطأ في المعاملة: " + (error.data?.message || error.message));
+            }
+        }
+
+        function checkContract() {
+            if (!contract) {
+                throw new Error("يرجى ربط المحفظة أولاً!");
+            }
+        }
+
+        function setStatus(msg) {
+            document.getElementById("status").innerText = "الحالة: " + msg;
         }
     </script>
 </body>
