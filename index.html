@@ -29,9 +29,9 @@
         .btn-p { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--accent); padding: 6px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-p.active { background: var(--accent); color: #000; }
         .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; }
-        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 14px; background: var(--accent); color: #000; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 5px; }
-        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-        .status { margin-top: 10px; font-size: 0.85rem; text-align: center; color: var(--muted); word-break: break-all; }
+        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 14px; background: var(--accent); color: #000; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 8px; }
+        .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+        .status { margin-top: 12px; font-size: 0.85rem; text-align: center; color: var(--muted); word-break: break-all; }
     </style>
 </head>
 <body>
@@ -60,22 +60,29 @@
             <span id="lpBalance">0.00</span>
         </div>
         <div class="info-row">
-            <span>المبلغ السلس المراد سحبه:</span>
+            <span>الكمية المحددة للسحب:</span>
             <span id="removeAmount">0.00</span>
         </div>
     </div>
 
-    <button class="btn-action" id="approveBtn" onclick="approveLP()" disabled>1. الموافقة (Approve)</button>
-    <button class="btn-action" id="removeBtn" onclick="removeLiquidity()" disabled style="margin-top: 8px; background: #31d0aa;">2. تأكيد السحب</button>
+    <button class="btn-action" id="approveBtn" onclick="approveLP()" disabled>1. موافقة (Approve)</button>
+    <button class="btn-action" id="removeBtn" onclick="removeLiquidity()" disabled style="background: #31d0aa;">2. تأكيد سحب السيولة</button>
 
     <div class="status" id="statusBox">قم بربط المحفظة للمتابعة</div>
 </div>
 
 <script>
-    // العناوين الخاصة بالشبكة (BSC Mainnet)
+    // عناوين العقود الأساسية على BNB Smart Chain
     const ROUTER_ADDRESS = "0x10ED433C71B354367343be24170a6742a4638b0B"; // PancakeSwap V2 Router
-    const PAIR_ADDRESS = "0x0000000000000000000000000000000000000000"; // ضعي عنوان زوج السيولة (LP Token Address) هنا
-    const YAY_ADDRESS = "0x40ac920000000000000000000000000000000000";  // ضعي عنوان توكن yay الصحيح هنا
+    const FACTORY_ADDRESS = "0xcA143Ce32Fe78f1f7019d7d551a6402fc5350c73"; // PancakeSwap V2 Factory
+    const WBNB_ADDRESS = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";  // WBNB Address
+
+    // 👈 فقط ضع هنا العنوان الكامل لتوكن yay الخاص بك
+    const YAY_ADDRESS = "0x40ac92..."; 
+
+    const ABI_FACTORY = [
+        "function getPair(address tokenA, address tokenB) external view returns (address pair)"
+    ];
 
     const ABI_PAIR = [
         "function balanceOf(address owner) view returns (uint256)",
@@ -89,7 +96,7 @@
     ];
 
     let provider, signer, userAddress;
-    let pairContract, routerContract;
+    let pairAddress, pairContract, routerContract;
     let rawBalance = ethers.BigNumber.from(0);
     let currentPct = 100;
 
@@ -102,17 +109,26 @@
                 userAddress = await signer.getAddress();
                 
                 document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
-                document.getElementById('statusBox').innerText = "تم ربط المحفظة بنجاح";
+                document.getElementById('statusBox').innerText = "جاري العثور على مجمع السيولة...";
 
-                pairContract = new ethers.Contract(PAIR_ADDRESS, ABI_PAIR, signer);
                 routerContract = new ethers.Contract(ROUTER_ADDRESS, ABI_ROUTER, signer);
+                
+                // جلب عنوان Pair تلقائياً من الفاكتوري
+                const factoryContract = new ethers.Contract(FACTORY_ADDRESS, ABI_FACTORY, provider);
+                pairAddress = await factoryContract.getPair(YAY_ADDRESS, WBNB_ADDRESS);
 
+                if (pairAddress === "0x0000000000000000000000000000000000000000") {
+                    document.getElementById('statusBox').innerText = "لم يتم العثور على مجمع سيولة لهذا التوكن مع WBNB!";
+                    return;
+                }
+
+                pairContract = new ethers.Contract(pairAddress, ABI_PAIR, signer);
                 fetchBalance();
             } catch (err) {
-                document.getElementById('statusBox').innerText = "فشل الربط: " + err.message;
+                document.getElementById('statusBox').innerText = "خطأ: " + err.message;
             }
         } else {
-            alert("يرجى فتح الصفحة من داخل متصفح Web3 مثل MetaMask أو Mises/Kiwi Browser");
+            alert("يرجى فتح الصفحة داخل متصفح Web3 مثل Mises أو Kiwi أو MetaMask");
         }
     }
 
@@ -121,15 +137,26 @@
         rawBalance = await pairContract.balanceOf(userAddress);
         const formatted = ethers.utils.formatEther(rawBalance);
         document.getElementById('lpBalance').innerText = parseFloat(formatted).toFixed(6);
-        updateCalculations();
         
-        document.getElementById('approveBtn').disabled = false;
+        if (rawBalance.gt(0)) {
+            document.getElementById('statusBox').innerText = "تم العثور على رصيد الـ LP الخاص بك!";
+            document.getElementById('approveBtn').disabled = false;
+        } else {
+            document.getElementById('statusBox').innerText = "رصيد الـ LP في هذه المحفظة هو 0.";
+        }
+        updateCalculations();
     }
 
     function updatePct(val) {
         currentPct = val;
         document.getElementById('pctVal').innerText = val + '%';
         document.getElementById('slider').value = val;
+        
+        document.querySelectorAll('.btn-p').forEach(btn => btn.classList.remove('active'));
+        if (event && event.target && event.target.tagName === 'BUTTON') {
+            event.target.classList.add('active');
+        }
+
         updateCalculations();
     }
 
@@ -142,13 +169,13 @@
     async function approveLP() {
         try {
             const withdrawAmount = rawBalance.mul(currentPct).div(100);
-            document.getElementById('statusBox').innerText = "جاري إرسال طلب الموافقة...";
+            document.getElementById('statusBox').innerText = "جاري طلب الموافقة من المحفظة...";
             const tx = await pairContract.approve(ROUTER_ADDRESS, withdrawAmount);
             await tx.wait();
-            document.getElementById('statusBox').innerText = "تمت الموافقة بنجاح! يمكنك الآن السحب.";
+            document.getElementById('statusBox').innerText = "تمت الموافقة بنجاح! يمكنك الآن الضغط على سحب السيولة.";
             document.getElementById('removeBtn').disabled = false;
         } catch (err) {
-            document.getElementById('statusBox').innerText = "خطأ في الموافقة: " + err.message;
+            document.getElementById('statusBox').innerText = "فشلت الموافقة: " + err.message;
         }
     }
 
@@ -157,20 +184,19 @@
             const withdrawAmount = rawBalance.mul(currentPct).div(100);
             const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 دقائق
 
-            document.getElementById('statusBox').innerText = "جاري تنفيذ معاملة السحب...";
+            document.getElementById('statusBox').innerText = "جاري تأكيد معاملة السحب...";
             
-            // تعيين الحد الأدنى للمقبول لضمان عدم الفشل (سليباج)
             const tx = await routerContract.removeLiquidityETH(
                 YAY_ADDRESS,
                 withdrawAmount,
-                0, // amountTokenMin (يمكن تعديلها بحسب نسبة السليباج)
+                0, // amountTokenMin
                 0, // amountETHMin
                 userAddress,
                 deadline
             );
 
             await tx.wait();
-            document.getElementById('statusBox').innerText = "تم سحب السيولة بنجاح إلى محفظتك!";
+            document.getElementById('statusBox').innerText = "تمت عملية سحب السيولة بنجاح وعادت العملات إلى محفظتك!";
             fetchBalance();
         } catch (err) {
             document.getElementById('statusBox').innerText = "خطأ أثناء السحب: " + err.message;
