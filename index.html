@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEV Arbitrage Router - لوحة التحكم المتقدمة</title>
+    <title>MEV Arbitrage Router - لوحة التحكم السريعة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         body { font-family: Tahoma, sans-serif; background-color: #0f172a; color: #f8fafc; text-align: center; padding: 40px; }
@@ -25,7 +25,7 @@
         <p>عنوان العقد الذكي:</p>
         <p style="color: #38bdf8;">0xf07719ecBb1304C0B910489e3b2607a2db830701</p>
         
-        <div class="status-box" id="engineStatus">حالة المحرك: جاري التحقق...</div>
+        <div class="status-box" id="engineStatus">حالة المحرك: يرجى ربط المحفظة أولاً</div>
 
         <hr style="border: 0.5px solid #334155; margin: 20px 0;">
 
@@ -48,30 +48,32 @@
         let provider, signer, contract;
 
         async function connectWallet() {
-            if (window.ethereum) {
+            if (typeof window.ethereum !== 'undefined') {
                 try {
+                    // طلب الحسابات مباشرة بالطريقة القياسية الحديثة
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+
                     provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
                     signer = provider.getSigner();
-                    const address = await signer.getAddress();
                     
-                    document.getElementById("walletAddressinnerText" in document.getElementById("walletAddress") ? "walletAddress" : "innerText").innerText = "المحفظة المتصلة: " + address;
+                    document.getElementById("walletAddress").innerText = "المحفظة المتصلة: " + account;
                     document.getElementById("connectBtn").innerText = "متصل بنجاح";
                     document.getElementById("connectBtn").style.background = "#10b981";
                     
                     contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-                    // فحص حالة المحرك والمالك
+                    // فحص حالة المحرك
                     await checkEngineStatus();
 
                     // إظهار الأزرار
                     document.getElementById("activateBtn").style.display = "block";
                     document.getElementById("withdrawBtn").style.display = "block";
                 } catch (error) {
-                    alert("فشل الاتصال بالمحفظة: " + error.message);
+                    alert("تم رفض الاتصال أو حدث خطأ في المحفظة:\n" + (error.message || error));
                 }
             } else {
-                alert("يرجى استخدام متصفح يدعم Web3 مثل MetaMask أو Mises!");
+                alert("لم يتم العثور على محفظة Web3! يرجى فتح هذا الرابط من متصفح محفظتك (MetaMask أو Trust Wallet أو Mises).");
             }
         }
 
@@ -91,14 +93,13 @@
 
         async function activateEngine() {
             try {
-                alert("جاري إرسال معاملة التفعيل، يرجى تأكيدها في محفظتك...");
-                // تحديد غاز يدوي لتجنب خطأ التقدير غير المتوقع
+                alert("جاري إرسال معاملة التفعيل، يرجى التأكيد في محفظتك...");
                 const tx = await contract.activateEngine({ gasLimit: 100000 });
                 await tx.wait();
                 alert("تم تفعيل محرك الاصطياد بنجاح تام!");
                 await checkEngineStatus();
             } catch (error) {
-                alert("فشل التفعيل (تأكد أنك مالك العقد أو أنه لم يُفعل مسبقاً):\n" + (error.data?.message || error.message));
+                alert("فشل التفعيل (تأكد أنك مالك العقد حصرياً):\n" + (error.data?.message || error.message));
             }
         }
 
